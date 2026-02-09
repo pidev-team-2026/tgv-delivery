@@ -1,0 +1,106 @@
+{% extends "shop/base_client.html.twig" %}
+
+{% block title %}Nos produits - TGV Delivery{% endblock %}
+
+{% block hero %}
+<div class="hero">
+    <h1>Nos Produits</h1>
+    <p>Découvrez notre sélection de produits livrés rapidement à votre domicile</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-bag"></i> Catalogue de produits</h2>
+
+<!-- FILTRES (optionnel) -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" placeholder="Rechercher un produit...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option>Tous les statuts</option>
+                            <option>Actif</option>
+                            <option>Inactif</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100"><i class="bi bi-search"></i> Chercher</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AFFICHAGE DES PRODUITS -->
+{% if produits|length > 0 %}
+    <div class="row">
+        {% for produit in produits %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="product-card">
+                    <!-- IMAGE PLACEHOLDER -->
+                    <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-image" style="font-size: 3rem; color: white; opacity: 0.5;"></i>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- STATUT -->
+                        <span class="product-status {% if produit.statut == 'actif' %}active{% else %}inactive{% endif %}">
+                            <i class="bi bi-{% if produit.statut == 'actif' %}check-circle{% else %}x-circle{% endif %}"></i>
+                            {{ produit.statut|capitalize }}
+                        </span>
+
+                        <!-- TITRE -->
+                        <h5 class="product-title">{{ produit.nom }}</h5>
+
+                        <!-- DESCRIPTION -->
+                        <p class="text-muted small mb-2">
+                            {{ produit.description|slice(0, 60) }}{% if produit.description|length > 60 %}...{% endif %}
+                        </p>
+
+                        <!-- PRIX -->
+                        <div class="product-price">{{ produit.prix }}€</div>
+
+                        <!-- STOCK -->
+                        <p class="small">
+                            <i class="bi bi-box"></i> 
+                            {% if produit.stock > 0 %}
+                                <span class="badge bg-success">{{ produit.stock }} en stock</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rupture de stock</span>
+                            {% endif %}
+                        </p>
+
+                        <!-- BOUTONS -->
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ path('app_produit_show', {'id': produit.id}) }}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                            {% if produit.stock > 0 %}
+                                <button class="btn btn-sm btn-success">
+                                    <i class="bi bi-cart-plus"></i> Ajouter
+                                </button>
+                            {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="bi bi-cart-x"></i> Rupture
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info text-center py-5">
+        <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+        <h4 class="mt-3">Aucun produit disponible</h4>
+        <p>Revenez bientôt pour découvrir nos nouveaux produits !</p>
+    </div>
+{% endif %}
+{% endblock %}

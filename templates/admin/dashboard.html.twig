@@ -1,0 +1,101 @@
+{% extends "admin/base_admin.html.twig" %}
+
+{% block title %}Tableau de bord - TGV Delivery{% endblock %}   
+{% block content %}
+<div class="page-header">
+    <div>
+        <img src="{{ asset('images/logo.png') }}" alt="TGV Delivery Logo" style="max-width: 150px; margin-bottom: 15px;">
+        <h1><i class="bi bi-speedometer2"></i> Tableau de bord</h1>
+        <p class="text-muted">Bienvenue dans l'administration TGV Delivery</p>
+    </div>
+</div>
+
+<!-- STATISTIQUES -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-primary">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Commandes</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-success">
+                <i class="bi bi-bag"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Produits</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-warning">
+                <i class="bi bi-currency-euro"></i>
+            </div>
+            <div class="stat-value">0€</div>
+            <div class="stat-label">Revenus</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon text-info">
+                <i class="bi bi-truck"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Livraisons</div>
+        </div>
+    </div>
+</div>
+
+<!-- ACTIONS RAPIDES -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning"></i> Actions rapides
+            </div>
+            <div class="card-body">
+                <a href="{{ path('app_produit_new') }}" class="btn btn-primary me-2">
+                    <i class="bi bi-plus-circle"></i> Ajouter un produit
+                </a>
+                <a href="{{ path('app_commande_new') }}" class="btn btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Nouvelle commande
+                </a>
+                <a href="{{ path('app_produit_index') }}" class="btn btn-info me-2">
+                    <i class="bi bi-list-check"></i> Voir tous les produits
+                </a>
+                <a href="{{ path('app_commande_index') }}" class="btn btn-warning">
+                    <i class="bi bi-list-check"></i> Voir toutes les commandes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GRAPHIQUES -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-graph-up"></i> Commandes par mois
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-center">Graphique à intégrer...</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-pie-chart"></i> Produits populaires
+            </div>
+            <div class="card-body">
+                <p class="text-muted text-center">Graphique à intégrer...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

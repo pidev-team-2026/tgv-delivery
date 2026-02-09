@@ -1,0 +1,24 @@
+{# templates/shop/commande/_suivi_search.html.twig #}
+
+<div class="row mb-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-search"></i> Rechercher ma commande</h5>
+                <form method="get" action="{{ path('app_shop_suivi') }}">
+                    <div class="input-group">
+                        <input type="text" 
+                               name="reference" 
+                               class="form-control form-control-lg" 
+                               placeholder="Entrez votre référence de commande (ex: CMD-2026-123)" 
+                               value="{{ reference|default('') }}"
+                               required>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-search"></i> Suivre
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
