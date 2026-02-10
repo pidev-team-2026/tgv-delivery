@@ -1,0 +1,75 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}{{ reclamation.subject }} - Admin{% endblock %}
+{% block page_title %}Détail réclamation{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_back_reclamation_index') }}">Réclamations</a></li>
+    <li class="breadcrumb-item">#{{ reclamation.id }}</li>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">{{ reclamation.subject }}</h5>
+                {% set status_class = {'open': 'warning', 'in_progress': 'info', 'closed': 'success'} %}
+                <span class="badge bg-{{ status_class[reclamation.status] ?? 'secondary' }}">{{ reclamation.statusLabel }}</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">
+                    <strong>{{ reclamation.user.name }}</strong> ({{ reclamation.user.email }}) · {{ reclamation.createdAt|date('d/m/Y à H:i') }}
+                </p>
+                <p class="mb-0">{{ reclamation.message|nl2br }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier statut</a>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Réponses</h5>
+        {% for reponse in reclamation.reponses %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>{{ reponse.author ?? 'Admin' }}</strong>
+                            <span class="text-muted ms-2 fs-12">{{ reponse.createdAt|date('d/m/Y à H:i') }}</span>
+                        </div>
+                        <div>
+                            <a href="{{ path('app_back_reponse_edit', {reclamationId: reclamation.id, id: reponse.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                            <form method="post" action="{{ path('app_back_reponse_delete', {reclamationId: reclamation.id, id: reponse.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette réponse ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_reponse' ~ reponse.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </div>
+                    <p class="mb-0 mt-2">{{ reponse.content|nl2br }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="card">
+            <div class="card-body">
+                <h6>Ajouter une réponse</h6>
+                <a href="{{ path('app_back_reponse_new', {id: reclamation.id}) }}" class="btn btn-primary">Nouvelle réponse</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ path('app_back_reclamation_index') }}" class="btn btn-outline-secondary w-100 mb-2">← Retour à la liste</a>
+                <form method="post" action="{{ path('app_back_reclamation_delete', {id: reclamation.id}) }}" onsubmit="return confirm('Supprimer cette réclamation et toutes ses réponses ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                    <button type="submit" class="btn btn-outline-danger w-100">Supprimer la réclamation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

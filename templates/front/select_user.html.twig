@@ -1,0 +1,36 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Connexion - TGV Delivery{% endblock %}
+
+{% block body %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-xl-5">
+                <div class="tgv-hero-card">
+                    <div class="card-body p-5">
+                        <h2 class="mb-3">Connexion</h2>
+                        <p class="text-muted mb-4">
+                            Choisissez votre compte pour accéder à l’espace <strong>“Mes Réclamations”</strong> 
+                            et suivre vos demandes en temps réel.
+                        </p>
+
+                        <form method="post">
+                            <div class="mb-3">
+                                <label for="user_id" class="form-label">Mon compte</label>
+                                <select name="user_id" id="user_id" class="form-select" required>
+                                    <option value="">-- Choisir un compte --</option>
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-primary w-100">Accéder à mes réclamations</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

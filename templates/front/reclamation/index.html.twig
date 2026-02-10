@@ -1,0 +1,80 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Mes Réclamations{% endblock %}
+
+{% block body %}
+<section class="py-5 tgv-section">
+    <div class="container">
+        <!-- Titre centré -->
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">Mes Réclamations</h1>
+            <p class="text-muted">Liste de toutes vos réclamations – <strong>{{ user.name }}</strong></p>
+        </div>
+
+        <!-- Boutons -->
+        <div class="d-flex justify-content-center mb-4 gap-2 flex-wrap">
+            <a href="http://127.0.0.1:8000/select-user" class="btn btn-outline-secondary">Changer de compte</a>
+            <a href="{{ path('app_front_reclamation_new') }}" class="btn btn-primary">Nouvelle Réclamation</a>
+        </div>
+
+        {% if reclamations is empty %}
+            <div class="alert alert-info text-center">
+                Vous n'avez aucune réclamation. 
+                <a href="{{ path('app_front_reclamation_new') }}" class="alert-link">Créer une réclamation</a>
+            </div>
+        {% else %}
+            <div class="table-responsive shadow-sm bg-dark rounded">
+                <table class="table table-hover align-middle mb-0 text-white-50">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Sujet</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                            <th>Réponses</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reclamation in reclamations %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('app_front_reclamation_show', {id: reclamation.id}) }}" class="text-decoration-none fw-semibold">
+                                        {{ reclamation.subject }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% set status_class = {
+                                        'open': 'warning',
+                                        'in_progress': 'info',
+                                        'closed': 'success'
+                                    } %}
+                                    <span class="badge bg-{{ status_class[reclamation.status] ?? 'secondary' }}">
+                                        {{ reclamation.statusLabel }}
+                                    </span>
+                                </td>
+                                <td>{{ reclamation.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ reclamation.reponses|length }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ path('app_front_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                    <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                    <form method="post" action="{{ path('app_front_reclamation_delete', {id: reclamation.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette réclamation ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <!-- Footer note -->
+        <div class="text-center mt-5 text-muted">
+            Plateforme de gestion des réclamations clients.
+        </div>
+    </div>
+</section>
+{% endblock %}

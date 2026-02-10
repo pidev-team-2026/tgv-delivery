@@ -1,0 +1,104 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Accueil - TGV Delivery Réclamations{% endblock %}
+
+{% block body %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="tgv-hero-card">
+                    <div class="d-flex justify-content-center justify-content-md-start">
+                        <div class="tgv-badge">
+                            <span class="tgv-badge-dot"></span>
+                            <span>PROJET PIDEV &amp; SYMFONY</span>
+                        </div>
+                    </div>
+
+                    <h1 class="tgv-hero-title">
+                        Pilotez vos réclamations clients comme un professionnel.
+                    </h1>
+
+                    <p class="tgv-hero-description">
+                        TGV Delivery vous aide à centraliser, suivre et traiter les réclamations de vos clients dans une
+                        interface simple, fiable et en temps réel. Donnez de la visibilité à votre équipe et améliorez
+                        la satisfaction client à chaque échange.
+                    </p>
+
+                    <div class="tgv-hero-actions">
+                        <a href="{{ path('app_front_select_user') }}" class="btn btn-gradient-primary">
+                            Se connecter / choisir mon compte
+                        </a>
+                        <a href="{{ path('app_front_reclamation_index') }}" class="btn btn-outline-light-rounded">
+                            Voir mes réclamations
+                        </a>
+                    </div>
+
+                    <div class="tgv-metrics">
+                        <div class="row gy-4">
+                            <div class="col-md-4">
+                                <div class="pe-md-3 text-center text-md-start">
+                                    <div class="tgv-metric-title">Experts de la réclamation</div>
+                                    <div class="tgv-metric-text">
+                                        Une plateforme pensée pour les équipes support et qualité qui gèrent les retours clients au quotidien.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="px-md-3 text-center text-md-start">
+                                    <div class="tgv-metric-title">Vue centralisée</div>
+                                    <div class="tgv-metric-text">
+                                        Toutes vos réclamations regroupées au même endroit pour suivre les priorités, les statuts et les délais.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="ps-md-3 text-center text-md-start">
+                                    <div class="tgv-metric-title">Expérience client soignée</div>
+                                    <div class="tgv-metric-text">
+                                        Une communication claire, des réponses structurées et un suivi qui rassure vos clients à chaque étape.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 tgv-section">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="card-glass h-100">
+                    <h3>Plateforme pour les pros</h3>
+                    <p>
+                        Centralisez la gestion de vos réclamations dans une interface unique, claire
+                        et adaptée aux besoins des équipes support et relation client.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-glass h-100">
+                    <h3>Pilotage des réclamations</h3>
+                    <p>
+                        Suivez l’activité, les statuts et les délais de traitement pour garder le contrôle
+                        sur chaque réclamation, du premier message jusqu’à la résolution.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card-glass h-100">
+                    <h3>Fiabilité &amp; transparence</h3>
+                    <p>
+                        Des informations claires pour vos équipes comme pour vos clients, afin de construire
+                        une relation de confiance durable autour de chaque dossier.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

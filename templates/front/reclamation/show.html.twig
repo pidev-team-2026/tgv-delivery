@@ -1,0 +1,54 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}{{ reclamation.subject }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <div class="mb-3">
+            <a href="{{ path('app_front_reclamation_index') }}" class="btn btn-outline-secondary btn-sm">← Retour à mes réclamations</a>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">{{ reclamation.subject }}</h4>
+                {% set status_class = {
+                    'open': 'warning',
+                    'in_progress': 'info',
+                    'closed': 'success'
+                } %}
+                <span class="badge bg-{{ status_class[reclamation.status] ?? 'secondary' }} fs-6">{{ reclamation.statusLabel }}</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">Créée le {{ reclamation.createdAt|date('d/m/Y à H:i') }}{% if reclamation.updatedAt != reclamation.createdAt %} · Modifiée le {{ reclamation.updatedAt|date('d/m/Y à H:i') }}{% endif %}</p>
+                <p class="mb-0">{{ reclamation.message|nl2br }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier</a>
+                <form method="post" action="{{ path('app_front_reclamation_delete', {id: reclamation.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette réclamation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>
+                </form>
+            </div>
+        </div>
+
+        {% if reclamation.reponses|length > 0 %}
+            <h5 class="mb-3">Réponses ({{ reclamation.reponses|length }})</h5>
+            {% for reponse in reclamation.reponses %}
+                <div class="card shadow-sm mb-3 border-start border-primary border-4">
+                    <div class="card-body">
+                        <p class="text-muted mb-1">
+                            <strong>{{ reponse.author ?? 'Admin' }}</strong> · {{ reponse.createdAt|date('d/m/Y à H:i') }}
+                        </p>
+                        <p class="mb-0">{{ reponse.content|nl2br }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-light">
+                Aucune réponse pour le moment. Notre équipe vous répondra prochainement.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

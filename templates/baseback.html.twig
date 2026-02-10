@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword" content="">
+    <title>{% block title %}Admin - Réclamations{% endblock %}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('back/assets/images/favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('back/assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('back/assets/vendors/css/vendors.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('back/assets/css/theme.min.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <nav class="nxl-navigation">
+        <div class="navbar-wrapper">
+            <div class="m-header">
+                <a href="{{ path('app_back_reclamation_index') }}" class="b-brand">
+                    <img src="{{ asset('back/assets/images/logo-full.png') }}" alt="" class="logo logo-lg">
+                    <img src="{{ asset('back/assets/images/logo-abbr.png') }}" alt="" class="logo logo-sm">
+                </a>
+            </div>
+            <div class="navbar-content">
+                <ul class="nxl-navbar">
+                    <li class="nxl-item nxl-caption">
+                        <label>Administration</label>
+                    </li>
+                    <li class="nxl-item">
+                        <a href="{{ path('app_back_reclamation_index') }}" class="nxl-link {{ app.request.attributes.get('_route') starts with 'app_back_reclamation' ? 'active' : '' }}">
+                            <span class="nxl-micon"><i class="feather-alert-circle"></i></span>
+                            <span class="nxl-mtext">Réclamations</span>
+                        </a>
+                    </li>
+                    <li class="nxl-item">
+                        <a href="{{ path('app_back_user_index') }}" class="nxl-link {{ app.request.attributes.get('_route') starts with 'app_back_user' ? 'active' : '' }}">
+                            <span class="nxl-micon"><i class="feather-users"></i></span>
+                            <span class="nxl-mtext">Utilisateurs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="nxl-header">
+        <div class="header-wrapper">
+            <div class="header-left d-flex align-items-center gap-4">
+                <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse">
+                    <div class="hamburger hamburger--arrowturn">
+                        <div class="hamburger-box">
+                            <div class="hamburger-inner"></div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="header-right ms-auto">
+                <a href="{{ path('app_front_home') }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                    <i class="feather-external-link me-1"></i>
+                    Voir le site
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="nxl-container">
+        <div class="nxl-content">
+            <div class="page-header">
+                <div class="page-header-left d-flex align-items-center">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">{% block page_title %}Tableau de bord{% endblock %}</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ path('app_back_reclamation_index') }}">Admin</a></li>
+                        {% block breadcrumb %}{% endblock %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main-content">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ asset('back/assets/vendors/js/vendors.min.js') }}"></script>
+    <script src="{{ asset('back/assets/js/common-init.min.js') }}"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
