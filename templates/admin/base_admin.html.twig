@@ -1,52 +1,103 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TGV Delivery - Administration{% endblock %}</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="{% block meta_description %}TGV Delivery - Administration{% endblock %}" />
+    <meta name="author" content="TGV Delivery" />
+    
+    <title>{% block title %}Dashboard{% endblock %} - TGV Delivery Admin</title>
+    
+    {# Favicon #}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}" />
     
     {# Bootstrap CSS #}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}" />
     
-    {# CSS personnalisé #}
-    <link rel="stylesheet" href="{{ asset('admin/admin.css') }}">
+    {# Vendors CSS #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/daterangepicker.min.css') }}" />
+    
+    {# Custom Theme CSS #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}" />
     
     {% block stylesheets %}{% endblock %}
 </head>
+
 <body>
-    <!-- Overlay mobile -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Navbar -->
-    {% include 'admin/navbar.html.twig' %}
-
-    <!-- Sidebar -->
-    {% include 'admin/sidebar.html.twig' %}
-
-    <!-- Main Content -->
-    <div class="main-content">
-        {# Flash messages #}
-        {% if app.flashes %}
+    {# Navigation Sidebar #}
+    {% include 'admin/partials/sidebar.html.twig' %}
+    
+    {# Main Container #}
+    <main class="nxl-container">
+        {# Header #}
+        {% include 'admin/partials/navbar.html.twig' %}
+        
+        {# Main Content #}
+        <div class="nxl-content">
+            {# Page Header #}
+            <div class="page-header">
+                <div class="page-header-left d-flex align-items-center">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">{% block page_title %}Dashboard{% endblock %}</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        {% block breadcrumb %}
+                        <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">Accueil</a></li>
+                        {% endblock %}
+                    </ul>
+                </div>
+                <div class="page-header-right ms-auto">
+                    <div class="page-header-right-items">
+                        <div class="d-flex d-md-none">
+                            <a href="javascript:void(0)" class="page-header-right-close-toggle">
+                                <i class="feather-arrow-left me-2"></i>
+                                <span>Back</span>
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
+                            {% block page_actions %}{% endblock %}
+                        </div>
+                    </div>
+                    <div class="d-md-none d-flex align-items-center">
+                        <a href="javascript:void(0)" class="page-header-right-open-toggle">
+                            <i class="feather-align-right fs-20"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            {# Flash Messages #}
             {% for type, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show" role="alert">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             {% endfor %}
-        {% endif %}
-
-        {# Contenu de la page #}
-        {% block content %}{% endblock %}
-    </div>
-
-    {# Bootstrap JS #}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            
+            {# Main Content Body #}
+            <div class="main-content">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+        
+        {# Footer #}
+        {% include 'admin/partials/footer.html.twig' %}
+    </main>
     
-    <script src="{{ asset('js/admin.js') }}"></script>
+    {# Customizer (optional - can be removed) #}
+    {# {% include 'admin/partials/customizer.html.twig' %} #}
     
+    {# Bootstrap & Vendors JS #}
+    <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+    
+    {# Common Init JS #}
+    <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    
+    {# Dashboard Charts (only for dashboard page) #}
     {% block javascripts %}{% endblock %}
 </body>
 </html>

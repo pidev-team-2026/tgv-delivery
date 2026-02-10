@@ -1,49 +1,206 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
 {% block title %}Produit{% endblock %}
 
 {% block body %}
-    <h1>Produit </h1>
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-bag"></i> Produits</h1>
+        <p class="text-muted">Gérer le catalogue de produits</p>
+    </div>
+    <a href="{{ path('app_produit_new') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Ajouter un produit
+    </a>
+</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>IdProd</th>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>Prix</th>
-                <th>Statut</th>
-                <th>Stock</th>
-                <th>Date_création</th>
-                <th>Date_misAjour</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for produit in produits %}
-            <tr>
-                <td>{{ produit.id }}</td>
-                <td>{{ produit.idProd }}</td>
-                <td>{{ produit.nom }}</td>
-                <td>{{ produit.description }}</td>
-                <td>{{ produit.prix }}</td>
-                <td>{{ produit.statut }}</td>
-                <td>{{ produit.stock }}</td>
-                <td>{{ produit.dateCréation ? produit.dateCréation|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ produit.dateMisAjour ? produit.dateMisAjour|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_produit_show', {'id': produit.id}) }}">show</a>
-                    <a href="{{ path('app_produit_edit', {'id': produit.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="10">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<!-- BARRE DE RECHERCHE -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_produit_index') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control" 
+                                   placeholder="Rechercher par nom, description ou ID..." 
+                                   value="{{ search|default('') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-search"></i> Chercher
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ path('app_produit_index') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Garder les paramètres de tri -->
+                    <input type="hidden" name="sort" value="{{ sortBy|default('id') }}">
+                    <input type="hidden" name="order" value="{{ order|default('ASC') }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_produit_new') }}">Creé un nouveau produit</a>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'id', 
+                            order: (sortBy|default('id') == 'id' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            #
+                            {% if sortBy|default('id') == 'id' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'idProd', 
+                            order: (sortBy|default('id') == 'idProd' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            ID Prod
+                            {% if sortBy|default('id') == 'idProd' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'nom', 
+                            order: (sortBy|default('id') == 'nom' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Nom
+                            {% if sortBy|default('id') == 'nom' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Description</th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'prix', 
+                            order: (sortBy|default('id') == 'prix' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Prix
+                            {% if sortBy|default('id') == 'prix' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'statut', 
+                            order: (sortBy|default('id') == 'statut' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Statut
+                            {% if sortBy|default('id') == 'statut' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'stock', 
+                            order: (sortBy|default('id') == 'stock' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Stock
+                            {% if sortBy|default('id') == 'stock' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_produit_index', {
+                            search: search|default(''), 
+                            sort: 'dateCreation', 
+                            order: (sortBy|default('id') == 'dateCreation' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Date création
+                            {% if sortBy|default('id') == 'dateCreation' %}
+                                <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produit in produits %}
+                <tr>
+                    <td>{{ produit.id }}</td>
+                    <td>{{ produit.idProd }}</td>
+                    <td><strong>{{ produit.nom }}</strong></td>
+                    <td>{{ produit.description }}</td>
+                    <td><strong class="text-success">{{ produit.prix }}€</strong></td>
+                    <td>
+                        {% if produit.statut == 'actif' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Actif</span>
+                        {% elseif produit.statut == 'inactif' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inactif</span>
+                        {% else %}
+                            <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> {{ produit.statut }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if produit.stock > 0 %}
+                            <span class="badge bg-info">{{ produit.stock }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">0</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">
+                        {{ produit.dateCreation ? produit.dateCreation|date('d/m/Y H:i') : '-' }}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{{ path('app_produit_show', {'id': produit.id}) }}" 
+                               class="btn btn-sm btn-outline-info" 
+                               title="Voir les détails"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ path('app_produit_edit', {'id': produit.id}) }}" 
+                               class="btn btn-sm btn-outline-warning" 
+                               title="Modifier ce produit"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" 
+                                  action="{{ path('app_produit_delete', {'id': produit.id}) }}" 
+                                  style="display:inline;" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        title="Supprimer ce produit"
+                                        data-bs-toggle="tooltip">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                
+            
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

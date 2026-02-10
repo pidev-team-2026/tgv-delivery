@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
 {% block title %}Produit{% endblock %}
 
@@ -36,11 +36,11 @@
                 <td>{{ produit.stock }}</td>
             </tr>
             <tr>
-                <th>Date_création</th>
-                <td>{{ produit.dateCréation ? produit.dateCréation|date('Y-m-d H:i:s') : '' }}</td>
+                <th>DateCreation</th>
+                <td>{{ produit.dateCreation ? produit.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>Date_misAjour</th>
+                <th>DateMisAjour</th>
                 <td>{{ produit.dateMisAjour ? produit.dateMisAjour|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
         </tbody>

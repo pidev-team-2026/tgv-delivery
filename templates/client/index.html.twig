@@ -1,0 +1,226 @@
+{% extends "client/base_client.html.twig" %}
+
+{% block title %}TGV Delivery - Votre livraison rapide{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ asset('assets/css/client.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/client-animations.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/client-responsive.css') }}">
+{% endblock %}
+
+{% block hero %}
+<div class="hero">
+    <h1><i class="bi bi-truck"></i> TGV Delivery</h1>
+    <p>Votre livraison rapide et fiable à domicile</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- STATISTIQUES -->
+    <div class="row mb-5">
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary">
+                    <i class="bi bi-box"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ totalProduits }}</h3>
+                    <p>Produits</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-success">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ totalCommandes }}</h3>
+                    <p>Commandes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-info">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ totalLivraisons }}</h3>
+                    <p>Livraisons</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ totalEnCours }}</h3>
+                    <p>En cours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS RAPIDES -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="action-card">
+                <div class="action-content">
+                    <h4><i class="bi bi-bag"></i> Nos Produits</h4>
+                    <p>Découvrez notre catalogue de produits disponibles</p>
+                    <a href="{{ path('client_produits') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-right"></i> Voir les produits
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="action-card">
+                <div class="action-content">
+                    <h4><i class="bi bi-clipboard-check"></i> Mes Commandes</h4>
+                    <p>Suivez l'état de vos commandes</p>
+                    <a href="{{ path('client_commandes') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-right"></i> Voir mes commandes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DERNIERS PRODUITS -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-star"></i> Derniers produits ajoutés</h5>
+                </div>
+                <div class="card-body">
+                    {% if derniersProduits|length > 0 %}
+                        <div class="row">
+                            {% for produit in derniersProduits %}
+                                <div class="col-md-6 col-lg-3 mb-3">
+                                    <div class="mini-product-card">
+                                        <div class="mini-product-image">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                        <div class="mini-product-info">
+                                            <h6>{{ produit.nom }}</h6>
+                                            <p class="text-muted small">{{ produit.prix }}€</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center">Aucun produit récent</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+.stat-content p {
+    margin: 0;
+    color: #6c757d;
+}
+
+.action-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+    height: 100%;
+    padding: 2rem;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.action-content h4 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.mini-product-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.mini-product-card:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.mini-product-image {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    opacity: 0.8;
+}
+
+.mini-product-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.mini-product-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+</style>
+{% endblock %}

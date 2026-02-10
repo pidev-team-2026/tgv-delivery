@@ -1,0 +1,217 @@
+{% extends "client/base_client.html.twig" %}
+
+{% block title %}Mes commandes - TGV Delivery{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ asset('assets/css/client.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/client-animations.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/client-responsive.css') }}">
+{% endblock %}
+
+{% block hero %}
+<div class="hero">
+    <h1><i class="bi bi-clipboard-check"></i> Mes Commandes</h1>
+    <p>Suivez l'état de vos commandes et vos livraisons</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- FILTRES -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" placeholder="Rechercher une commande..." id="searchInput">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="statusFilter">
+                                <option value="">Tous les statuts</option>
+                                <option value="en attente">En attente</option>
+                                <option value="confirmée">Confirmée</option>
+                                <option value="expédiée">Expédiée</option>
+                                <option value="livrée">Livrée</option>
+                                <option value="annulée">Annulée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="filterCommandes()">
+                                <i class="bi bi-search"></i> Filtrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRILLE DE COMMANDES -->
+    {% if commandes|length > 0 %}
+        <div class="row" id="commandesGrid">
+            {% for commande in commandes %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="order-card">
+                        <!-- EN-TÊTE CARTE -->
+                        <div class="order-header">
+                            <div class="order-number">
+                                <small>Commande #</small>
+                                <strong>{{ commande.reference }}</strong>
+                            </div>
+                            <div class="order-status">
+                                {% if commande.statut == 'en attente' %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-hourglass"></i> En attente
+                                    </span>
+                                {% elseif commande.statut == 'confirmée' %}
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-check-circle"></i> Confirmée
+                                    </span>
+                                {% elseif commande.statut == 'expédiée' %}
+                                    <span class="badge bg-primary">
+                                        <i class="bi bi-box"></i> Expédiée
+                                    </span>
+                                {% elseif commande.statut == 'livrée' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-lg"></i> Livrée
+                                    </span>
+                                {% elseif commande.statut == 'annulée' %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle"></i> Annulée
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ commande.statut }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- CORPS CARTE -->
+                        <div class="order-body">
+                            <!-- PRIX -->
+                            <div class="order-price">
+                                <small>Total</small>
+                                <strong>{{ commande.totalPrix }}€</strong>
+                            </div>
+
+                            <!-- DATE -->
+                            <div class="order-date">
+                                <small>Commandée le</small>
+                                <i class="bi bi-calendar"></i>
+                                {{ commande.dateCreation ? commande.dateCreation|date('d/m/Y') : '-' }}
+                            </div>
+
+                            <!-- PRODUITS -->
+                            <div class="order-products">
+                                <small><i class="bi bi-box"></i> {{ commande.produits|length }} article(s)</small>
+                            </div>
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="order-footer">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{{ path('app_commande_show', {'id': commande.id}) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i> Détails
+                                </a>
+                                {% if commande.statut != 'livrée' and commande.statut != 'annulée' %}
+                                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-clipboard" style="font-size: 2rem;"></i>
+            <h4 class="mt-3">Aucune commande trouvée</h4>
+            <p>Vous n'avez pas encore passé de commande.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.order-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+    overflow: hidden;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.order-header {
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-number {
+    font-size: 0.9rem;
+}
+
+.order-status .badge {
+    font-size: 0.8rem;
+}
+
+.order-body {
+    padding: 1.5rem;
+    background: white;
+}
+
+.order-price {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.order-date {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.order-products {
+    color: #6c757d;
+}
+
+.order-footer {
+    padding: 1rem 0 0 0;
+    background: #f8f9fa;
+}
+</style>
+
+<script>
+function filterCommandes() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('statusFilter').value;
+    const cards = document.querySelectorAll('#commandesGrid .order-card');
+    
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const matchesSearch = !search || text.includes(search);
+        const matchesStatus = !status || text.includes(status.toLowerCase());
+        
+        if (matchesSearch && matchesStatus) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Activer les filtres au chargement
+document.getElementById('searchInput').addEventListener('input', filterCommandes);
+document.getElementById('statusFilter').addEventListener('change', filterCommandes);
+</script>
+{% endblock %}
