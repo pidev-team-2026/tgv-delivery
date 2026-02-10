@@ -24,7 +24,9 @@
                 <p class="mb-0">{{ reclamation.message|nl2br }}</p>
             </div>
             <div class="card-footer">
-                <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier</a>
+                {% if reclamation.reponses|length == 0 %}
+                    <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier</a>
+                {% endif %}
                 <form method="post" action="{{ path('app_front_reclamation_delete', {id: reclamation.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette réclamation ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
                     <button type="submit" class="btn btn-outline-danger btn-sm">Supprimer</button>

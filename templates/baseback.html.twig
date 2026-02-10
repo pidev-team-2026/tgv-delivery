@@ -39,6 +39,12 @@
                             <span class="nxl-mtext">Utilisateurs</span>
                         </a>
                     </li>
+                    <li class="nxl-item">
+                        <a href="{{ path('app_back_statistics_index') }}" class="nxl-link {{ app.request.attributes.get('_route') starts with 'app_back_statistics' ? 'active' : '' }}">
+                            <span class="nxl-micon"><i class="feather-bar-chart-2"></i></span>
+                            <span class="nxl-mtext">Statistiques</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>

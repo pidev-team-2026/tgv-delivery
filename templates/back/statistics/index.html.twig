@@ -1,0 +1,160 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Statistiques - Réclamations{% endblock %}
+{% block page_title %}Statistiques & Prédictions{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item">Tendances & IA</li>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    <i class="feather-info me-1"></i>
+                    Analyse de l'évolution des réclamations par jour, semaine et mois. Les prédictions sont calculées à partir des données historiques par régression linéaire pour anticiper les périodes critiques et optimiser les ressources.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Prédictions IA #}
+<div class="row mb-4">
+    <div class="col-12">
+        <h5 class="mb-3"><i class="feather-trending-up me-1"></i> Prédictions (analyse de tendance)</h5>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">Prochains 7 jours</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for val in prediction_day %}
+                        <li class="d-flex justify-content-between py-1"><span>J+{{ loop.index }}</span><strong>{{ val|number_format(1) }}</strong></li>
+                    {% else %}
+                        <li class="text-muted">Données insuffisantes</li>
+                    {% endfor %}
+                </ul>
+                <p class="small text-muted mt-2 mb-0">Réclamations prévues par jour</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">Prochaines 4 semaines</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for val in prediction_week %}
+                        <li class="d-flex justify-content-between py-1"><span>S+{{ loop.index }}</span><strong>{{ val|number_format(1) }}</strong></li>
+                    {% else %}
+                        <li class="text-muted">Données insuffisantes</li>
+                    {% endfor %}
+                </ul>
+                <p class="small text-muted mt-2 mb-0">Réclamations prévues par semaine</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0">Prochains 3 mois</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {% for val in prediction_month %}
+                        <li class="d-flex justify-content-between py-1"><span>M+{{ loop.index }}</span><strong>{{ val|number_format(1) }}</strong></li>
+                    {% else %}
+                        <li class="text-muted">Données insuffisantes</li>
+                    {% endfor %}
+                </ul>
+                <p class="small text-muted mt-2 mb-0">Réclamations prévues par mois</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Graphiques de tendance #}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Tendance par jour (30 derniers jours)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chart-day" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Tendance par semaine (12 semaines)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chart-week" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Tendance par mois (12 mois)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chart-month" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    var opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } };
+
+    var chartDay = document.getElementById('chart-day');
+    if (chartDay) {
+        new Chart(chartDay, {
+            type: 'line',
+            data: {
+                labels: {{ stats_day_labels|json_encode|raw }},
+                datasets: [{ label: 'Réclamations', data: {{ stats_day_values|json_encode|raw }}, borderColor: '#7367f0', backgroundColor: 'rgba(115, 103, 240, 0.1)', fill: true, tension: 0.3 }]
+            },
+            options: opts
+        });
+    }
+
+    var chartWeek = document.getElementById('chart-week');
+    if (chartWeek) {
+        new Chart(chartWeek, {
+            type: 'bar',
+            data: {
+                labels: {{ stats_week_labels|json_encode|raw }},
+                datasets: [{ label: 'Réclamations', data: {{ stats_week_values|json_encode|raw }}, backgroundColor: 'rgba(0, 207, 232, 0.6)', borderColor: '#00cfe8', borderWidth: 1 }]
+            },
+            options: opts
+        });
+    }
+
+    var chartMonth = document.getElementById('chart-month');
+    if (chartMonth) {
+        new Chart(chartMonth, {
+            type: 'bar',
+            data: {
+                labels: {{ stats_month_labels|json_encode|raw }},
+                datasets: [{ label: 'Réclamations', data: {{ stats_month_values|json_encode|raw }}, backgroundColor: 'rgba(40, 199, 111, 0.6)', borderColor: '#28c76f', borderWidth: 1 }]
+            },
+            options: opts
+        });
+    }
+})();
+</script>
+{% endblock %}

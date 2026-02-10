@@ -11,16 +11,31 @@
             <p class="text-muted">Liste de toutes vos réclamations – <strong>{{ user.name }}</strong></p>
         </div>
 
-        <!-- Boutons -->
-        <div class="d-flex justify-content-center mb-4 gap-2 flex-wrap">
-            <a href="http://127.0.0.1:8000/select-user" class="btn btn-outline-secondary">Changer de compte</a>
-            <a href="{{ path('app_front_reclamation_new') }}" class="btn btn-primary">Nouvelle Réclamation</a>
+        <!-- Recherche + Boutons -->
+        <div class="row mb-4 align-items-center g-3">
+            <div class="col-lg-5 col-md-6">
+                <form method="get" action="{{ path('app_front_reclamation_index') }}" id="form-search-front" class="d-flex gap-2">
+                    <div class="input-group flex-grow-1">
+                        <span class="input-group-text bg-transparent border-secondary text-muted"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></span>
+                        <input type="text" name="q" value="{{ search }}" id="input-search-front" class="form-control bg-dark border-secondary text-white" placeholder="Rechercher par sujet ou message..." aria-label="Recherche">
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                </form>
+            </div>
+            <div class="col-lg-7 col-md-6 d-flex justify-content-md-end gap-2 flex-wrap">
+                <a href="{{ path('app_front_select_user') }}" class="btn btn-outline-secondary">Changer de compte</a>
+                <a href="{{ path('app_front_reclamation_new') }}" class="btn btn-primary">Nouvelle Réclamation</a>
+            </div>
         </div>
 
         {% if reclamations is empty %}
             <div class="alert alert-info text-center">
-                Vous n'avez aucune réclamation. 
-                <a href="{{ path('app_front_reclamation_new') }}" class="alert-link">Créer une réclamation</a>
+                {% if search %}
+                    Aucune réclamation ne correspond à « {{ search }} ». <a href="{{ path('app_front_reclamation_index') }}" class="alert-link">Voir toutes mes réclamations</a>
+                {% else %}
+                    Vous n'avez aucune réclamation. 
+                    <a href="{{ path('app_front_reclamation_new') }}" class="alert-link">Créer une réclamation</a>
+                {% endif %}
             </div>
         {% else %}
             <div class="table-responsive shadow-sm bg-dark rounded">
@@ -58,7 +73,9 @@
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ path('app_front_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                    <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                    {% if reclamation.reponses|length == 0 %}
+                                        <a href="{{ path('app_front_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                    {% endif %}
                                     <form method="post" action="{{ path('app_front_reclamation_delete', {id: reclamation.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette réclamation ?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
@@ -77,4 +94,19 @@
         </div>
     </div>
 </section>
+{% block javascripts %}
+{{ parent() }}
+<script>
+(function() {
+    var form = document.getElementById('form-search-front');
+    var input = document.getElementById('input-search-front');
+    if (!form || !input) return;
+    var debounce = null;
+    input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(function() { form.submit(); }, 400);
+    });
+})();
+</script>
+{% endblock %}
 {% endblock %}

@@ -11,9 +11,9 @@
 <div class="card stretch stretch-full">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <h5 class="card-title mb-0">Liste des réclamations</h5>
-        <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+        <form method="get" id="form-search-back" class="d-flex gap-2 flex-wrap align-items-center">
             <div class="input-group" style="max-width: 280px;">
-                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Rechercher (sujet, message, client)...">
+                <input type="text" name="search" value="{{ search }}" id="input-search-back" class="form-control" placeholder="Rechercher (sujet, message, client)...">
                 <button type="submit" class="btn btn-primary"><i class="feather-search"></i></button>
             </div>
             <select name="sort_by" class="form-select" style="width: auto;" onchange="this.form.submit()">
@@ -63,7 +63,9 @@
                             <td>{{ reclamation.reponses|length }}</td>
                             <td class="text-end">
                                 <a href="{{ path('app_back_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                {% if reclamation.reponses|length == 0 %}
+                                    <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}
@@ -76,4 +78,19 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function() {
+    var form = document.getElementById('form-search-back');
+    var input = document.getElementById('input-search-back');
+    if (!form || !input) return;
+    var debounce = null;
+    input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(function() { form.submit(); }, 400);
+    });
+})();
+</script>
 {% endblock %}

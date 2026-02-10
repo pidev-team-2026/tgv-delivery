@@ -67,11 +67,13 @@ class FrontController extends AbstractController
             return $this->redirectToRoute('app_front_select_user');
         }
 
-        $reclamations = $reclamationRepository->findByUser($user);
+        $search = $request->query->get('q', '');
+        $reclamations = $reclamationRepository->findByUserAndSearch($user, $search ?: null);
 
         return $this->render('front/reclamation/index.html.twig', [
             'reclamations' => $reclamations,
             'user' => $user,
+            'search' => $search,
         ]);
     }
 
