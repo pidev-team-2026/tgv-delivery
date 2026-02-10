@@ -1,0 +1,19 @@
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteCommercant{{ commercant.id }}">Supprimer</button>
+<div class="modal fade" id="modalDeleteCommercant{{ commercant.id }}" tabindex="-1" aria-labelledby="modalDeleteCommercantLabel{{ commercant.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteCommercantLabel{{ commercant.id }}">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">Êtes-vous sûr de vouloir supprimer ce commerçant ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_commercant_delete', {'id': commercant.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commercant.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

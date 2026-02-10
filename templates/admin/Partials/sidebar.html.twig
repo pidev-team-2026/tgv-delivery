@@ -1,0 +1,15 @@
+<aside class="admin-sidebar bg-white border-end">
+    <nav class="nav flex-column py-3">
+        <a class="nav-link {% if app.request.attributes.get('_route') is defined and app.request.attributes.get('_route') == 'app_back_dashboard' %}active{% endif %}" href="{{ path('app_back_dashboard') }}">
+            Tableau de bord
+        </a>
+        <a class="nav-link {% if app.request.attributes.get('_route') is defined and app.request.attributes.get('_route') starts with 'app_commercant_' and app.request.attributes.get('_route') != 'app_back_dashboard' %}active{% endif %}" href="{{ path('app_commercant_index') }}">
+            Commerçants
+        </a>
+        <a class="nav-link {% if app.request.attributes.get('_route') is defined and app.request.attributes.get('_route') starts with 'app_rendez_vous_' %}active{% endif %}" href="{{ path('app_rendez_vous_index') }}">
+            Rendez-vous
+        </a>
+        <hr class="my-2 mx-3">
+        <a class="nav-link text-muted" href="{{ path('app_front_accueil') }}">Accueil</a>
+    </nav>
+</aside>

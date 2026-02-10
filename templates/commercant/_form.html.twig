@@ -1,0 +1,10 @@
+{{ form_start(form, { attr: { novalidate: 'novalidate' }, row_attr: { class: 'form-group-custom' } }) }}
+    {{ form_row(form.nom, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    {{ form_row(form.email, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    {{ form_row(form.Numero_telephone, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    {{ form_row(form.ville, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-select' } }) }}
+    {{ form_row(form.metier, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-select' } }) }}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+{{ form_end(form) }}

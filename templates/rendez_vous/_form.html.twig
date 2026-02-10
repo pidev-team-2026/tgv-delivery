@@ -1,0 +1,9 @@
+{{ form_start(form, { attr: { novalidate: 'novalidate' }, row_attr: { class: 'form-group-custom' } }) }}
+    {{ form_row(form.commercant, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-select' } }) }}
+    {{ form_row(form.dateRdv, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    {{ form_row(form.message, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-control' } }) }}
+    {{ form_row(form.etat, { row_attr: { class: 'form-group-custom' }, label_attr: { class: 'form-label' }, attr: { class: 'form-select' } }) }}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+{{ form_end(form) }}

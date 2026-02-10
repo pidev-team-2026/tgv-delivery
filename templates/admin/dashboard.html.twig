@@ -1,0 +1,70 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord — Back Office{% endblock %}
+
+{% block breadcrumb %}
+{% set breadcrumb = [{ label: 'Tableau de bord', url: '' }] %}
+{{ include('admin/Partials/breadcrumb.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<h1 class="admin-page-title">Tableau de bord</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-lg-4">
+        <div class="card admin-card h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted small text-uppercase fw-semibold mb-2">Commerçants</h5>
+                <p class="card-text display-6 mb-3">{{ nb_commercants }}</p>
+                <a href="{{ path('app_commercant_index') }}" class="btn btn-primary btn-sm">Voir la liste</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card admin-card h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted small text-uppercase fw-semibold mb-2">Rendez-vous</h5>
+                <p class="card-text display-6 mb-3">{{ nb_rdv }}</p>
+                <a href="{{ path('app_rendez_vous_index') }}" class="btn btn-primary btn-sm">Voir la liste</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card admin-card h-100">
+            <div class="card-body">
+                <h5 class="card-title text-muted small text-uppercase fw-semibold mb-2">En attente</h5>
+                <p class="card-text display-6 mb-3">{{ nb_en_attente }}</p>
+                <a href="{{ path('app_rendez_vous_index') }}?q=&sort=etat" class="btn btn-primary btn-sm">Gérer les RDV</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card admin-card">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Commerçants par ville</h5>
+        {% if stats_par_ville is defined and stats_par_ville|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>Ville</th>
+                            <th class="text-end">Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in stats_par_ville %}
+                            <tr>
+                                <td>{{ row.ville ?? 'Non renseignée' }}</td>
+                                <td class="text-end">{{ row.total }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted mb-0 small">Aucune donnée de ville pour l’instant.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

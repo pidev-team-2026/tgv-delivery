@@ -1,0 +1,283 @@
+/**
+ * UI/UX theme — Bootstrap 5 only.
+ * Professional layout: fixed sidebar, clean content area, form and table styling.
+ */
+
+:root {
+  --app-primary: #4f6c9e;
+  --app-primary-hover: #3d5a8a;
+  --app-success: #5b7c99;
+  --app-success-hover: #4a6a85;
+  --app-edit: #64748b;
+  --app-edit-hover: #475569;
+  --app-delete: #94a3b8;
+  --app-delete-hover: #64748b;
+  --app-nav: #334155;
+  --app-nav-front: #475569;
+  --app-sidebar-width: 240px;
+  --app-table-head: #475569;
+  --app-badge-wait: #64748b;
+  --app-badge-confirm: #5b7c99;
+  --app-badge-cancel: #78716c;
+}
+
+/* ========== Back Office layout ========== */
+/* WHY: Full-height layout with fixed sidebar and scrollable content for a real dashboard feel. */
+.admin-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-navbar {
+  flex-shrink: 0;
+  z-index: 1030;
+}
+
+.admin-sidebar {
+  width: var(--app-sidebar-width);
+  min-width: var(--app-sidebar-width);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    position: relative;
+  }
+}
+
+/* WHY: Clear page titles and consistent spacing for content blocks. */
+.admin-page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: #1e293b;
+}
+
+.admin-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ========== Sidebar nav ========== */
+.admin-sidebar .nav-link {
+  padding: 0.6rem 1rem;
+  color: #475569;
+  border-radius: 0.375rem;
+  margin: 0 0.5rem;
+}
+
+.admin-sidebar .nav-link:hover {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.admin-sidebar .nav-link.active {
+  background-color: rgba(79, 108, 158, 0.12);
+  color: var(--app-primary);
+  font-weight: 600;
+}
+
+/* ========== Tables ========== */
+/* WHY: Readable tables with clear borders and row hover. */
+.admin-table {
+  margin-bottom: 0;
+}
+
+.admin-table thead th {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.admin-table .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+/* WHY: Action buttons in table cells need spacing and no wrap. */
+.admin-table .btn-group-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+/* ========== Forms ========== */
+/* WHY: Form groups with consistent spacing and visible validation errors. */
+.form-group-custom {
+  margin-bottom: 1.25rem;
+}
+
+.form-group-custom label {
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 0.375rem;
+  display: block;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ========== Buttons ========== */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--app-primary-hover) !important;
+  border-color: var(--app-primary-hover) !important;
+}
+
+.btn-success,
+.btn-success:focus {
+  background-color: var(--app-success) !important;
+  border-color: var(--app-success) !important;
+  color: #fff !important;
+}
+
+.btn-success:hover {
+  background-color: var(--app-success-hover) !important;
+  border-color: var(--app-success-hover) !important;
+  color: #fff !important;
+}
+
+.btn-info,
+.btn-info:hover,
+.btn-info:focus {
+  background-color: var(--app-primary) !important;
+  border-color: var(--app-primary) !important;
+  color: #fff !important;
+}
+
+.btn-warning,
+.btn-warning:hover,
+.btn-warning:focus {
+  background-color: var(--app-edit) !important;
+  border-color: var(--app-edit) !important;
+  color: #fff !important;
+}
+
+.btn-warning:hover {
+  background-color: var(--app-edit-hover) !important;
+  border-color: var(--app-edit-hover) !important;
+}
+
+.btn-danger,
+.btn-danger:hover,
+.btn-danger:focus {
+  background-color: var(--app-delete) !important;
+  border-color: var(--app-delete) !important;
+  color: #fff !important;
+}
+
+.btn-danger:hover {
+  background-color: var(--app-delete-hover) !important;
+  border-color: var(--app-delete-hover) !important;
+}
+
+/* ========== Table header ========== */
+.table-dark {
+  background-color: var(--app-table-head) !important;
+  border-color: var(--app-table-head);
+}
+
+.table-dark th a {
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.table-dark th a:hover {
+  text-decoration: underline;
+}
+
+/* ========== Badges (RDV state) ========== */
+.badge-etat-wait {
+  background-color: var(--app-badge-wait);
+  color: #fff;
+}
+
+.badge-etat-confirm {
+  background-color: var(--app-badge-confirm);
+  color: #fff;
+}
+
+.badge-etat-cancel {
+  background-color: var(--app-badge-cancel);
+  color: #fff;
+}
+
+/* ========== Navbar ========== */
+.navbar-app-back {
+  background-color: var(--app-nav) !important;
+}
+
+.navbar-app-front {
+  background-color: var(--app-nav-front) !important;
+}
+
+/* Footer Back Office */
+.admin-footer {
+  flex-shrink: 0;
+}
+
+/* Breadcrumb */
+.breadcrumb-item + .breadcrumb-item::before {
+  content: "›";
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+.empty-state .empty-state-icon {
+  font-size: 3rem;
+  opacity: 0.4;
+}

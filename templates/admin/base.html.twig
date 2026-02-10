@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Back Office — Gestion des services{% endblock %}</title>
+    <link rel="icon" href="{{ asset('admin/images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/theme.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/app-theme.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="admin-wrapper">
+    {% include 'admin/Partials/navbar.html.twig' %}
+    <div class="d-flex flex-grow-1">
+        {% include 'admin/Partials/sidebar.html.twig' %}
+        <main class="admin-main">
+            {% block breadcrumb %}{% endblock %}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% block body %}{% endblock %}
+        </main>
+    </div>
+    {% include 'admin/Partials/footer.html.twig' %}
+    <script src="{{ asset('admin/vendors/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/vendors/js/bootstrap.min.js') }}"></script>
+    <script>
+    document.querySelectorAll('form').forEach(function(f) {
+        f.addEventListener('submit', function() {
+            var btn = this.querySelector('button[type="submit"]');
+            if (btn && !btn.disabled) btn.disabled = true;
+        });
+    });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

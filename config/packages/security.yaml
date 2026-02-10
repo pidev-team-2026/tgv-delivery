@@ -23,9 +23,7 @@ security:
             # switch_user: true
 
     # Note: Only the *first* matching rule is applied
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    access_control: []
 
 when@test:
     security:
