@@ -1,0 +1,59 @@
+{% extends 'layout/base_back.html.twig' %}
+
+{% block title %}Fiche zone{% endblock %}
+
+{% block page_title %}Détail d’une zone de livraison{% endblock %}
+
+{% block body %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">{{ zone.nom }}</h2>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Identifiant</dt>
+                        <dd class="col-sm-8">#{{ zone.id }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Ville</dt>
+                        <dd class="col-sm-8">{{ zone.ville }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Code postal</dt>
+                        <dd class="col-sm-8">{{ zone.codepostal }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Description</dt>
+                        <dd class="col-sm-8">{{ zone.description }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Active</dt>
+                        <dd class="col-sm-8">
+                            {% if zone.actif %}
+                                <span class="badge bg-success-subtle text-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h3 class="h6 mb-3">Actions</h3>
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_zone_edit', {'id': zone.id}) }}"
+                           class="btn btn-primary">
+                            Modifier la zone
+                        </a>
+                        <a href="{{ path('app_zone_index') }}" class="btn btn-outline-secondary">
+                            Retour à la liste
+                        </a>
+                        {{ include('zone/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Back Office - TGV Delivery{% endblock %}</title>
+
+    {# CSS du template admin (déjà présent dans public/admin) #}
+    <link rel="stylesheet" href="{{ asset('admin/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/theme.min.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="bg-body">
+<div class="d-flex">
+    {# Sidebar #}
+    <nav class="navbar navbar-vertical navbar-expand-lg navbar-light bg-white border-end vh-100">
+        <div class="container-fluid flex-lg-column">
+            <a class="navbar-brand mb-3 d-flex align-items-center" href="{{ path('app_partenaire_index') }}">
+                <img src="{{ asset('images/tgv-logo.jpg') }}" alt="TGV Delivery" style="height:28px;">
+            </a>
+
+            <div class="collapse navbar-collapse flex-column" id="sidebarNav">
+                <ul class="navbar-nav flex-column w-100">
+                    <li class="nav-item mb-1">
+                        <a class="nav-link" href="{{ path('app_partenaire_index') }}">
+                            Gestion des partenaires
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1">
+                        <a class="nav-link" href="{{ path('app_zone_index') }}">
+                            Gestion des zones
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {# Contenu principal #}
+    <div class="flex-grow-1 d-flex flex-column min-vh-100">
+        <header class="border-bottom bg-white">
+            <div class="container-fluid py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h5 mb-0">{% block page_title %}Tableau de bord{% endblock %}</h1>
+                    <small class="text-muted">
+                        Back Office - Administration des partenaires et zones de livraison
+                    </small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ path('app_home') }}" class="btn btn-sm btn-outline-secondary">
+                        Voir le site
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow-1 py-4">
+            <div class="container-fluid">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="border-top bg-white py-3 mt-auto">
+            <div class="container-fluid d-flex justify-content-between small text-muted">
+                <span>© {{ "now"|date("Y") }} TGV Delivery - Back Office</span>
+                <span>PIDEV - Symfony & Doctrine</span>
+            </div>
+        </footer>
+    </div>
+</div>
+
+{# JS admin #}
+<script src="{{ asset('admin/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('admin/js/common-init.min.js') }}"></script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>
+
