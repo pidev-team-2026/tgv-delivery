@@ -1,0 +1,13 @@
+{#
+  Header extracted from the original HTML template.
+  This avoids duplicating ~2000 lines of header markup here.
+  Requires the Twig path alias `@ui_template` (already configured).
+#}
+{% set _full = include('@ui_template/index.html') %}
+{% set _afterHeaderOpen = _full|split('<header class="nxl-header">') %}
+
+{% if _afterHeaderOpen|length > 1 %}
+    {% set _afterHeaderOpen = _afterHeaderOpen[1] %}
+    {% set _beforeHeaderClose = _afterHeaderOpen|split('</header>') %}
+    <header class="nxl-header">{{ _beforeHeaderClose[0]|raw }}</header>
+{% endif %}

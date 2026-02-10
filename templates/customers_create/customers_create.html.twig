@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>Duralux || Create Account</title>
+
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}"/>
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendors.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('assets/css/theme.min.css') }}"/>
+</head>
+
+<body>
+
+{% include 'partials/duralux_navbar.html.twig' %}
+{% include 'partials/duralux_header.html.twig' %}
+
+<main class="nxl-container">
+    <div class="nxl-content">
+
+        <!-- ===== Page Header ===== -->
+        <div class="page-header mb-4">
+            <div class="page-header-left d-flex align-items-center">
+                <div class="page-header-title">
+                    <h5>Create Account</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== Flash Messages ===== -->
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-12">
+
+                <!-- ===== Role Switcher ===== -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Create account as:</label>
+                    <div class="btn-group" role="group">
+
+                        <a href="{{ path('app_register', { role: 'client' }) }}"
+                           class="btn btn-outline-primary {{ role == 'client' ? 'active' : '' }}">
+                            Client
+                        </a>
+
+                        <a href="{{ path('app_register', { role: 'merchant' }) }}"
+                           class="btn btn-outline-primary {{ role == 'merchant' ? 'active' : '' }}">
+                            Merchant
+                        </a>
+
+                        <a href="{{ path('app_register', { role: 'courier' }) }}"
+                           class="btn btn-outline-primary {{ role == 'courier' ? 'active' : '' }}">
+                            Courier
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- ===== Registration Form ===== -->
+                <div class="card">
+                    <div class="card-body">
+
+                        <h6 class="mb-4 text-capitalize">
+                            {{ role }} information
+                        </h6>
+
+                        {{ form_start(form, {
+                            action: path('app_register', { role: role }),
+                            method: 'POST'
+                        }) }}
+
+                        <div class="row g-3">
+
+                            <!-- Common fields -->
+                            <div class="col-md-6">
+                                {{ form_row(form.firstName) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.lastName) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.email) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.phone) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.password) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.confirmPassword) }}
+                            </div>
+
+                            <!-- Merchant fields -->
+                            {% if role == 'merchant' %}
+                                <div class="col-md-6">
+                                    {{ form_row(form.cin) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.businessName) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.businessType) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.location) }}
+                                </div>
+                            {% endif %}
+
+                            <!-- Courier fields -->
+                            {% if role == 'courier' %}
+                                <div class="col-md-6">
+                                    {{ form_row(form.cin) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.licenseNumber) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.vehicleType) }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                Create Account
+                            </button>
+                        </div>
+
+                        {{ form_end(form) }}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    {% include 'partials/duralux_footer.html.twig' %}
+</main>
+
+<!-- ===== JS ===== -->
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
+
+</body>
+</html>
