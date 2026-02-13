@@ -20,6 +20,15 @@ class StatisticsController extends AbstractController
     {
         $now = new \DateTimeImmutable('today');
 
+        // Aperçu hebdomadaire (du lundi au dimanche en cours)
+        $weekStart = $now->modify('monday this week')->setTime(0, 0);
+        $weekEnd = $weekStart->modify('+6 days')->setTime(23, 59, 59);
+        $weeklyOverview = $this->buildWeeklyOverview(
+            $this->reclamationRepository->findCreatedBetween($weekStart, $weekEnd),
+            $weekStart,
+            $weekEnd
+        );
+
         // Données par jour (30 derniers jours)
         $fromDay = $now->modify('-30 days')->setTime(0, 0);
         $reclamationsByDay = $this->groupByDay(
@@ -48,6 +57,7 @@ class StatisticsController extends AbstractController
         $predictionMonth = $this->predictNext($reclamationsByMonth, 3);
 
         return $this->render('back/statistics/index.html.twig', [
+            'weekly_overview' => $weeklyOverview,
             'stats_day' => $reclamationsByDay,
             'stats_day_labels' => array_keys($reclamationsByDay),
             'stats_day_values' => array_values($reclamationsByDay),
@@ -138,6 +148,82 @@ class StatisticsController extends AbstractController
         }
         ksort($result);
         return $result;
+    }
+
+    /**
+     * Vue hebdomadaire (lundi-dimanche) avec pour chaque jour :
+     * - nombre total de réclamations,
+     * - pourcentage par rapport au volume global de la semaine,
+     * - niveau d'activité (faible, moyen, élevé, critique) basé sur un score de pression.
+     *
+     * @param Reclamation[] $reclamations
+     * @return array<int, array{
+     *     label: string,
+     *     count: int,
+     *     percentage: float,
+     *     level: string,
+     *     badge_color: string
+     * }>
+     */
+    private function buildWeeklyOverview(array $reclamations, \DateTimeInterface $weekStart, \DateTimeInterface $weekEnd): array
+    {
+        $daysLabels = [
+            1 => 'Lundi',
+            2 => 'Mardi',
+            3 => 'Mercredi',
+            4 => 'Jeudi',
+            5 => 'Vendredi',
+            6 => 'Samedi',
+            7 => 'Dimanche',
+        ];
+
+        // Initialisation des compteurs par jour de la semaine
+        $counts = [];
+        foreach ($daysLabels as $index => $label) {
+            $counts[$index] = 0;
+        }
+
+        foreach ($reclamations as $reclamation) {
+            $dayIndex = (int) $reclamation->getCreatedAt()->format('N'); // 1 (lundi) à 7 (dimanche)
+            if (isset($counts[$dayIndex])) {
+                $counts[$dayIndex]++;
+            }
+        }
+
+        $totalWeek = array_sum($counts);
+        $averagePerDay = $totalWeek > 0 ? $totalWeek / 7 : 0;
+
+        $overview = [];
+        foreach ($counts as $dayIndex => $count) {
+            $percentage = $totalWeek > 0 ? round(($count / $totalWeek) * 100, 1) : 0.0;
+
+            // Score de pression relatif à la moyenne hebdomadaire
+            $pressureScore = $averagePerDay > 0 ? $count / $averagePerDay : 0.0;
+
+            if ($pressureScore < 0.5) {
+                $level = 'faible';
+                $badgeColor = 'success';
+            } elseif ($pressureScore < 1.0) {
+                $level = 'moyen';
+                $badgeColor = 'info';
+            } elseif ($pressureScore < 1.5) {
+                $level = 'élevé';
+                $badgeColor = 'warning';
+            } else {
+                $level = 'critique';
+                $badgeColor = 'danger';
+            }
+
+            $overview[] = [
+                'label' => $daysLabels[$dayIndex],
+                'count' => $count,
+                'percentage' => $percentage,
+                'level' => $level,
+                'badge_color' => $badgeColor,
+            ];
+        }
+
+        return $overview;
     }
 
     /**

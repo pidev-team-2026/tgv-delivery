@@ -99,8 +99,43 @@ class FrontController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $mode = $request->request->get('reclamation_mode', 'text');
+            $voicePayload = $request->request->get('voice_payload');
+
+            // En mode vocal, si aucun texte n'a été saisi, on met un message par défaut
+            if ($mode === 'voice' && (!$reclamation->getMessage() || trim((string) $reclamation->getMessage()) === '')) {
+                $reclamation->setMessage('Message vocal enregistré (transcription et analyse IA à traiter côté serveur).');
+            }
+
             $entityManager->persist($reclamation);
             $entityManager->flush();
+
+            // Sauvegarde du fichier audio sur le disque (sans toucher à la base de données)
+            if ($mode === 'voice' && \is_string($voicePayload) && str_starts_with($voicePayload, 'data:audio')) {
+                $parts = explode(',', $voicePayload, 2);
+                if (\count($parts) === 2) {
+                    $meta = $parts[0];
+                    $data = $parts[1];
+                    $extension = 'webm';
+                    if (str_contains($meta, 'audio/ogg')) {
+                        $extension = 'ogg';
+                    } elseif (str_contains($meta, 'audio/mp3') || str_contains($meta, 'audio/mpeg')) {
+                        $extension = 'mp3';
+                    }
+
+                    $binary = base64_decode($data);
+                    if ($binary !== false) {
+                        $projectDir = $this->getParameter('kernel.project_dir');
+                        $uploadDir = $projectDir . '/public/uploads/reclamations';
+                        if (!is_dir($uploadDir)) {
+                            @mkdir($uploadDir, 0775, true);
+                        }
+                        $filePath = $uploadDir . '/reclamation_' . $reclamation->getId() . '.' . $extension;
+                        @file_put_contents($filePath, $binary);
+                    }
+                }
+            }
+
             $this->addFlash('success', 'Votre réclamation a été créée avec succès.');
             return $this->redirectToRoute('app_front_reclamation_index');
         }

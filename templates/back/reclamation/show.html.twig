@@ -21,7 +21,14 @@
                 <p class="text-muted mb-2">
                     <strong>{{ reclamation.user.name }}</strong> ({{ reclamation.user.email }}) · {{ reclamation.createdAt|date('d/m/Y à H:i') }}
                 </p>
-                <p class="mb-0">{{ reclamation.message|nl2br }}</p>
+                <p class="mb-3">{{ reclamation.message|nl2br }}</p>
+
+                {# Lecture du message vocal associé (si présent sur le disque) #}
+                {% set voice_path = 'uploads/reclamations/reclamation_' ~ reclamation.id ~ '.webm' %}
+                <audio controls class="w-100" onerror="this.classList.add('d-none')">
+                    <source src="{{ asset(voice_path) }}" type="audio/webm">
+                    Votre navigateur ne supporte pas la lecture audio.
+                </audio>
             </div>
             <div class="card-footer">
                 {% if reclamation.reponses|length == 0 %}
