@@ -3,79 +3,100 @@
 {% block title %}Nouvelle Réclamation{% endblock %}
 
 {% block body %}
-<section class="section">
+<section class="tgv-new-claim py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="mb-4">Nouvelle Réclamation</h2>
+            <div class="col-12 col-lg-9 col-xl-8">
+                <div class="tgv-card card border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+                            <div>
+                                <div class="tgv-eyebrow mb-2">Réclamations</div>
+                                <h1 class="tgv-title mb-1">Nouvelle Réclamation</h1>
+                                <p class="tgv-subtitle mb-0">
+                                    Choisissez un mode de saisie puis envoyez votre demande. L'interface est optimisée pour une expérience claire et rapide.
+                                </p>
+                            </div>
+                            <a href="{{ path('app_front_reclamation_index') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="feather-arrow-left me-1"></i>
+                                Retour
+                            </a>
+                        </div>
 
                         <div class="mb-4">
-                            <h5 class="mb-2">Choisissez le mode de saisie</h5>
-                            <p class="text-muted mb-3">
-                                Vous pouvez créer votre réclamation en <strong>tapant un texte</strong> ou en <strong>enregistrant un message vocal</strong> qui sera ensuite transcrit et analysé automatiquement par notre système d’IA.
-                            </p>
-
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="button" class="btn btn-outline-primary active" id="mode-text-btn">
-                                    <span class="d-flex align-items-center">
-                                        <i class="feather-type me-2"></i>
-                                        <span>Mode texte</span>
-                                    </span>
+                            <div class="tgv-mode-switch" role="tablist" aria-label="Mode de saisie">
+                                <button type="button" class="tgv-mode-btn is-active" id="mode-text-btn" role="tab" aria-selected="true">
+                                    <i class="feather-type"></i>
+                                    <span>Texte</span>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" id="mode-voice-btn">
-                                    <span class="d-flex align-items-center">
-                                        <i class="feather-mic me-2"></i>
-                                        <span>Mode vocal (avec IA)</span>
-                                    </span>
+                                <button type="button" class="tgv-mode-btn" id="mode-voice-btn" role="tab" aria-selected="false">
+                                    <i class="feather-mic"></i>
+                                    <span>Vocal</span>
                                 </button>
+                                <span class="tgv-mode-indicator" aria-hidden="true"></span>
                             </div>
+                            <p class="text-muted mt-3 mb-0">
+                                En mode vocal, votre message est enregistré puis traité automatiquement.
+                            </p>
                         </div>
 
                         {{ form_start(form) }}
                             <input type="hidden" name="reclamation_mode" id="reclamation-mode-field" value="text">
-                            {{ form_row(form.subject) }}
+
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-floating tgv-floating">
+                                        {{ form_widget(form.subject, { attr: { class: 'form-control', placeholder: 'Sujet' } }) }}
+                                        {{ form_label(form.subject, 'Sujet') }}
+                                        {{ form_errors(form.subject) }}
+                                    </div>
+                                </div>
+                            </div>
 
                             {# Zone texte classique #}
-                            <div id="text-mode-wrapper">
-                                {{ form_row(form.message) }}
+                            <div id="text-mode-wrapper" class="mt-3">
+                                <div class="form-floating tgv-floating">
+                                    {{ form_widget(form.message, { attr: { class: 'form-control', placeholder: 'Décrivez votre réclamation...', style: 'height: 180px;' } }) }}
+                                    {{ form_label(form.message, 'Votre message') }}
+                                    {{ form_errors(form.message) }}
+                                </div>
                             </div>
 
                             {# Zone vocale (UI métier avancée) #}
-                            <div id="voice-mode-wrapper" class="border rounded p-3 bg-light d-none">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div>
-                                        <h6 class="mb-1">Enregistrement vocal</h6>
-                                        <p class="small text-muted mb-0">
-                                            Expliquez votre situation à l’oral. Votre message sera ensuite traité par l’IA (transcription, catégorisation, urgence, sentiment).
-                                        </p>
+                            <div id="voice-mode-wrapper" class="tgv-voice card border-0 d-none mt-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-3">
+                                        <div>
+                                            <h6 class="mb-1" style="font-weight: 800;">Enregistrement vocal</h6>
+                                            <p class="small text-muted mb-0">
+                                                Expliquez votre situation à l’oral. Vous pourrez réécouter avant d’envoyer.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <button type="button" class="btn btn-danger" id="voice-record-btn">
+                                            <i class="feather-mic me-1"></i>
+                                            <span id="voice-record-label">Démarrer l’enregistrement</span>
+                                        </button>
+                                        <span class="text-muted small" id="voice-status-label">Aucun enregistrement en cours.</span>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <audio id="voice-preview" class="w-100 d-none" controls></audio>
+                                    </div>
+
+                                    <input type="hidden" name="voice_payload" id="voice-payload-field">
+
+                                    <div class="small text-muted mt-3">
+                                        Une fois envoyée, la réclamation vocale est associée à votre dossier.
                                     </div>
                                 </div>
-
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <button type="button" class="btn btn-danger" id="voice-record-btn">
-                                        <span id="voice-record-label">Démarrer l’enregistrement</span>
-                                    </button>
-                                    <span class="text-muted small" id="voice-status-label">
-                                        Aucun enregistrement en cours.
-                                    </span>
-                                </div>
-
-                                <div class="mb-2">
-                                    <audio id="voice-preview" class="w-100 d-none" controls></audio>
-                                </div>
-
-                                <input type="hidden" name="voice_payload" id="voice-payload-field">
-
-                                <p class="small text-muted mb-0">
-                                    Une fois la réclamation envoyée, le message vocal est associé à votre dossier pour un traitement ultérieur par l’IA.
-                                </p>
                             </div>
 
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Envoyer</button>
+                            <div class="d-flex flex-wrap gap-2 justify-content-end mt-4">
                                 <a href="{{ path('app_front_reclamation_index') }}" class="btn btn-outline-secondary">Annuler</a>
+                                <button type="submit" class="btn btn-primary tgv-submit">Envoyer</button>
                             </div>
                         {{ form_end(form) }}
                     </div>
@@ -84,6 +105,27 @@
         </div>
     </div>
 </section>
+
+<style>
+.tgv-new-claim{background:#f5f7fb}
+.tgv-card{border-radius:18px;box-shadow:0 14px 40px rgba(15,23,42,.10);background:#fff}
+.tgv-eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:#64748b;font-weight:700}
+.tgv-title{font-size:1.9rem;font-weight:900;color:#0b1b35}
+.tgv-subtitle{color:#64748b;max-width:52ch}
+.tgv-mode-switch{position:relative;display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:#eef2ff;border:1px solid rgba(15,23,42,.08)}
+.tgv-mode-btn{position:relative;z-index:2;border:0;background:transparent;padding:10px 14px;border-radius:999px;display:flex;align-items:center;gap:8px;font-weight:800;color:#0b1b35;transition:color .2s ease}
+.tgv-mode-btn i{font-size:16px}
+.tgv-mode-btn:not(.is-active){color:#475569}
+.tgv-mode-indicator{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:#ffffff;box-shadow:0 10px 20px rgba(15,23,42,.10);transition:transform .25s ease}
+.tgv-mode-switch.is-voice .tgv-mode-indicator{transform:translateX(100%)}
+.tgv-floating .form-control{border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#fff;color:#0b1b35}
+.tgv-floating .form-control:focus{border-color:rgba(37,99,235,.55);box-shadow:0 0 0 .25rem rgba(37,99,235,.12)}
+.tgv-floating label{color:#64748b;font-weight:600}
+.tgv-voice{border-radius:16px;background:#f8fafc;border:1px solid rgba(15,23,42,.08)}
+.tgv-submit{background:#1d4ed8;border-color:#1d4ed8;font-weight:900;border-radius:12px;padding:.6rem 1.1rem}
+.tgv-submit:hover{background:#1e40af;border-color:#1e40af}
+@media (max-width: 575.98px){.tgv-title{font-size:1.6rem}}
+</style>
 {% endblock %}
 
 {% block javascripts %}
@@ -92,6 +134,7 @@
     (function() {
         const modeTextBtn = document.getElementById('mode-text-btn');
         const modeVoiceBtn = document.getElementById('mode-voice-btn');
+        const modeSwitch = document.querySelector('.tgv-mode-switch');
         const textWrapper = document.getElementById('text-mode-wrapper');
         const voiceWrapper = document.getElementById('voice-mode-wrapper');
 
@@ -109,13 +152,17 @@
 
         function setMode(mode) {
             const isText = mode === 'text';
-            modeTextBtn.classList.toggle('active', isText);
-            modeTextBtn.classList.toggle('btn-primary', isText);
-            modeTextBtn.classList.toggle('btn-outline-primary', !isText);
-
-            modeVoiceBtn.classList.toggle('active', !isText);
-            modeVoiceBtn.classList.toggle('btn-primary', !isText);
-            modeVoiceBtn.classList.toggle('btn-outline-primary', isText);
+            if (modeTextBtn) {
+                modeTextBtn.classList.toggle('is-active', isText);
+                modeTextBtn.setAttribute('aria-selected', isText ? 'true' : 'false');
+            }
+            if (modeVoiceBtn) {
+                modeVoiceBtn.classList.toggle('is-active', !isText);
+                modeVoiceBtn.setAttribute('aria-selected', !isText ? 'true' : 'false');
+            }
+            if (modeSwitch) {
+                modeSwitch.classList.toggle('is-voice', !isText);
+            }
 
             textWrapper.classList.toggle('d-none', !isText);
             voiceWrapper.classList.toggle('d-none', isText);

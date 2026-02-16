@@ -97,7 +97,8 @@
                             </td>
                             <td>{{ reclamation.createdAt|date('d/m/Y H:i') }}</td>
                             <td class="text-center">
-                                <span class="badge bg-light text-dark">{{ reclamation.reponses|length }}</span>
+                                {% set replies_count = reclamation.reponses|length + (reclamation.message starts with 'Message vocal enregistré' ? 1 : 0) %}
+                                <span class="badge bg-light text-dark">{{ replies_count }}</span>
                             </td>
                             <td class="text-end">
                                 <a href="{{ path('app_back_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
