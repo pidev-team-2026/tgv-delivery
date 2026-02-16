@@ -52,6 +52,8 @@ class FrontController extends AbstractController
         return $this->redirectToRoute('app_front_home');
     }
 
+
+
     #[Route('reclamations', name: 'app_front_reclamation_index', methods: ['GET'])]
     public function reclamationIndex(Request $request, ReclamationRepository $reclamationRepository, UserRepository $userRepository): Response
     {
