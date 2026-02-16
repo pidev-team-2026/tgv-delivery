@@ -3,9 +3,7 @@
 {% block title %}Nos produits - TGV Delivery{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ asset('assets/css/client.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/client-animations.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/client-responsive.css') }}">
+<link rel="stylesheet" href="{{ asset('css/client-pages.css') }}">
 {% endblock %}
 
 {% block hero %}
@@ -29,9 +27,10 @@
                         <div class="col-md-3">
                             <select class="form-select" id="statusFilter">
                                 <option value="">Tous les statuts</option>
-                                <option value="actif">Actif</option>
-                                <option value="inactif">Inactif</option>
-                                <option value="en rupture">En rupture</option>
+                                <option value="disponible">Disponible</option>
+                                <option value="rupture">En rupture</option>
+                                <option value="bientot_disponible">Bientôt disponible</option>
+                                <option value="archive">Archivé</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -53,15 +52,21 @@
                     <div class="product-card">
                         <!-- IMAGE PLACEHOLDER -->
                         <div class="product-image">
-                            <div class="image-placeholder">
-                                <i class="bi bi-image"></i>
-                            </div>
-                            {% if produit.statut == 'actif' %}
-                                <span class="product-badge active">Disponible</span>
-                            {% elseif produit.statut == 'inactif' %}
-                                <span class="product-badge inactive">Indisponible</span>
+                            {% if produit.image %}
+                                <img class="product-img" src="{{ asset(produit.image) }}" alt="{{ produit.nom }}">
                             {% else %}
+                                <div class="image-placeholder">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                            {% endif %}
+                            {% if produit.statut == 'disponible' %}
+                                <span class="product-badge active">Disponible</span>
+                            {% elseif produit.statut == 'bientot_disponible' %}
+                                <span class="product-badge inactive">Bientôt dispo</span>
+                            {% elseif produit.statut == 'rupture' %}
                                 <span class="product-badge out-of-stock">Rupture</span>
+                            {% else %}
+                                <span class="product-badge inactive">Indisponible</span>
                             {% endif %}
                         </div>
 
@@ -141,11 +146,18 @@
 
 .product-image {
     position: relative;
-    height: 200px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 150px;
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .image-placeholder {
@@ -183,21 +195,20 @@
 }
 
 .product-body {
-    padding: 1.5rem;
+    padding: 0.85rem 0.9rem;
     background: white;
 }
 
 .product-title {
     color: var(--secondary-color);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
 }
 
 .product-description {
     color: #6c757d;
     font-size: 0.9rem;
-    line-height: 1.4;
-    margin-bottom: 1rem;
+    margin-bottom: 0.65rem;
     min-height: 2.8rem;
 }
 
@@ -205,7 +216,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+     margin-bottom: 0.75rem;
+}
+.product-actions .btn {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
 }
 
 .product-price {
@@ -253,16 +268,25 @@ function filterProducts() {
         }
     });
 }
-
 function addToCart(id, name, price) {
-    // Animation de confirmation
-    const button = event.target;
+    // Récupérer les infos du produit
+    const productCard = event.target.closest('.product-card');
+    const image = productCard.querySelector('.product-img')?.src || null;
+    const stockText = productCard.querySelector('.stock-available')?.textContent;
+    const stock = stockText ? parseInt(stockText.match(/\d+/)[0]) : 99;
+    
+    // Ajouter au panier
+    cart.addItem(id, name, price, image, stock);
+    
+    // Animation bouton
+    const button = event.target.closest('button');
+    const originalHTML = button.innerHTML;
     button.innerHTML = '<i class="bi bi-check"></i> Ajouté !';
     button.classList.remove('btn-success');
     button.classList.add('btn-outline-success');
     
     setTimeout(() => {
-        button.innerHTML = '<i class="bi bi-cart-plus"></i> Ajouter';
+        button.innerHTML = originalHTML;
         button.classList.remove('btn-outline-success');
         button.classList.add('btn-success');
     }, 1500);

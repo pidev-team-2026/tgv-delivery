@@ -5,33 +5,73 @@
     
     <div class="form-row">
         <div class="form-group">
-            {{ form_row(form.idCommande) }}
+            {{ form_row(form.reference) }}
         </div>
         <div class="form-group">
-            {{ form_row(form.reference) }}
+            {{ form_row(form.totalPrix) }}
         </div>
     </div>
 
     <div class="form-row">
         <div class="form-group">
-            {{ form_row(form.totalPrix) }}
+            {{ form_row(form.statut) }}
         </div>
         <div class="form-group">
-            {{ form_row(form.statut) }}
+            {{ form_row(form.modePaiement) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.nomClient) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.telephone) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.email) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.paiementEffectue) }}
         </div>
     </div>
 
     <div class="form-group form-group-full">
-        {{ form_row(form.produits) }}
+        {{ form_row(form.adresseLivraison) }}
     </div>
 
     <div class="form-row">
         <div class="form-group">
-            {{ form_row(form.dateCreation) }}
+            {{ form_row(form.ville) }}
         </div>
         <div class="form-group">
-            {{ form_row(form.dateMisAjour) }}
+            {{ form_row(form.codePostal) }}
         </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.fraisLivraison) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.dateLivraisonSouhaitee) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.livreur) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.produits) }}
+        </div>
+    </div>
+
+    <div class="form-group form-group-full">
+        {{ form_row(form.notes) }}
     </div>
 
     <div style="display: flex; gap: 1rem; margin-top: 2rem;">

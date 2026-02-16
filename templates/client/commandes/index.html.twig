@@ -3,9 +3,7 @@
 {% block title %}Mes commandes - TGV Delivery{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ asset('assets/css/client.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/client-animations.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/css/client-responsive.css') }}">
+<link rel="stylesheet" href="{{ asset('css/client-pages.css') }}">
 {% endblock %}
 
 {% block hero %}
@@ -29,11 +27,13 @@
                         <div class="col-md-3">
                             <select class="form-select" id="statusFilter">
                                 <option value="">Tous les statuts</option>
-                                <option value="en attente">En attente</option>
-                                <option value="confirmée">Confirmée</option>
-                                <option value="expédiée">Expédiée</option>
-                                <option value="livrée">Livrée</option>
-                                <option value="annulée">Annulée</option>
+                                <option value="en_attente">En attente</option>
+                                <option value="confirmee">Confirmée</option>
+                                <option value="en_preparation">En préparation</option>
+                                <option value="prete">Prête</option>
+                                <option value="en_livraison">En livraison</option>
+                                <option value="livree">Livrée</option>
+                                <option value="annulee">Annulée</option>
                             </select>
                         </div>
                         <div class="col-md-3">

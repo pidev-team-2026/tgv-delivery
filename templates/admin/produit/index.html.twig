@@ -150,12 +150,16 @@
                         <strong class="text-success">{{ produit.prix }}€</strong>
                     </td>
                     <td>
-                        {% if produit.statut == 'actif' %}
-                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Actif</span>
-                        {% elseif produit.statut == 'inactif' %}
-                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inactif</span>
+                        {% if produit.statut == 'disponible' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Disponible</span>
+                        {% elseif produit.statut == 'rupture' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> En rupture</span>
+                        {% elseif produit.statut == 'bientot_disponible' %}
+                            <span class="badge bg-warning"><i class="bi bi-clock"></i> Bientôt disponible</span>
+                        {% elseif produit.statut == 'archive' %}
+                            <span class="badge bg-secondary"><i class="bi bi-archive"></i> Archivé</span>
                         {% else %}
-                            <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> Rupture</span>
+                            <span class="badge bg-light text-dark">{{ produit.statut }}</span>
                         {% endif %}
                     </td>
                     <td>

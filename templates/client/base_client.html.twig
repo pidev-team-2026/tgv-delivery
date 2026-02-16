@@ -6,163 +6,136 @@
     <title>{% block title %}TGV Delivery - Votre livraison rapide{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/client-navbar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/client-pages.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/client-footer.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/client.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/client-animations.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/client-responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/cart.css') }}">
     
     {% block styles %}{% endblock %}
-    
-    <style>
-        /* Only essential inline styles */
-        :root {
-            --primary-color: #7AA95C;
-            --secondary-color: #004e89;
-            --light-bg: #f8f9fa;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-bg);
-        }
-        
-        /* ===================================
-        NAVBAR STYLES
-        =================================== */
-        .navbar-shop {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 0.5rem 0;
-        }
-
-        .navbar-brand img {
-            height: 60px;
-            width: auto;
-            transition: transform 0.3s ease;
-            filter: brightness(0) invert(1);
-        }
-
-        .navbar-brand:hover img {
-            transform: scale(1.1);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .navbar-brand:hover {
-            color: #ffd700 !important;
-            transform: translateY(-2px);
-        }
-
-        .nav-link-shop {
-            color: white !important;
-            margin: 0 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .nav-link-shop:hover {
-            color: #ffd700 !important;
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-link-shop::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background-color: #ffd700;
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
-        }
-
-        
-
-        .cart-icon {
-            position: relative;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .cart-icon:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
-            color: white;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-    </style>
 </head>
 <body>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-shop sticky-top">
+    <!-- NAVBAR PROFESSIONNELLE -->
+    <nav class="navbar-modern">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ path('client_') }}">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="TGV Delivery" width="60" height="60">
+            <!-- Logo -->
+            <a class="brand" href="{{ path('client_') }}">
+                <img src="{{ asset('assets/images/logo.png') }}">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link-shop" href="{{ path('client_') }}"><i class="bi bi-house-door"></i> Accueil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-shop" href="{{ path('client_produits') }}"><i class="bi bi-bag"></i> Produits</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-shop" href="{{ path('client_commandes') }}"><i class="bi bi-clipboard-check"></i> Mes Commandes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-shop" href="#"><i class="bi bi-info-circle"></i> À propos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-shop" href="#"><i class="bi bi-telephone"></i> Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <div class="cart-icon">
-                            <i class="bi bi-cart3"></i>
-                            <span class="cart-count">0</span>
-                        </div>
-                    </li>
-                </ul>
+
+            <!-- Menu Principal -->
+            <ul class="nav-menu">
+                <!-- Accueil -->
+                <li class="nav-item">
+                    <a href="{{ path('client_') }}" class="nav-link">
+                        <i class="bi bi-house-door"></i>
+                        <span>Accueil</span>
+                    </a>
+                </li>
+
+                <!-- Shop avec Dropdown -->
+                <li class="nav-item dropdown-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-shop"></i>
+                        <span>Shop</span>
+                        <i class="bi bi-chevron-down arrow"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ path('client_produits') }}" class="dropdown-link">
+                            <i class="bi bi-bag"></i>
+                            <span>Produits</span>
+                        </a>
+                        <a href="{{ path('client_commandes') }}" class="dropdown-link">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span>Mes Commandes</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- Services avec Dropdown -->
+                <li class="nav-item dropdown-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-tools"></i>
+                        <span>Services</span>
+                        <i class="bi bi-chevron-down arrow"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ path('client_services') }}" class="dropdown-link">
+                            <i class="bi bi-gear"></i>
+                            <span>Nos Services</span>
+                        </a>
+                        <a href="{{ path('client_services') }}#express" class="dropdown-link">
+                            <i class="bi bi-lightning"></i>
+                            <span>Livraison Express</span>
+                        </a>
+                        <a href="{{ path('client_services') }}#standard" class="dropdown-link">
+                            <i class="bi bi-box-seam"></i>
+                            <span>Livraison Standard</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- Support & Réclamations -->
+                <li class="nav-item dropdown-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-headset"></i>
+                        <span>Support</span>
+                        <i class="bi bi-chevron-down arrow"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="{{ path('client_reclamations') }}" class="dropdown-link">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span>Réclamations</span>
+                        </a>
+                        <a href="{{ path('client_support') }}" class="dropdown-link">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>Contactez-nous</span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- Partenaires -->
+                <li class="nav-item">
+                    <a href="{{ path('client_partenaires') }}" class="nav-link">
+                        <i class="bi bi-people"></i>
+                        <span>Partenaires</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Actions (Panier, Connexion, Inscription) -->
+            <div class="nav-actions">
+
+              <div class="cart-icon" onclick="openCartModal()">
+                <i class="bi bi-cart3"></i>
+               <span class="cart-badge" style="display: none;">0</span>
+              </div>
+
+                <!-- Connexion -->
+                <a href="" class="btn-auth btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Connexion</span>
+                </a>
+
+                <!-- Inscription -->
+                <a href="" class="btn-auth btn-register">
+                    <i class="bi bi-person-plus"></i>
+                    <span>S'inscrire</span>
+                </a>
             </div>
+
+            <!-- Mobile Toggle -->
+            <button class="mobile-toggle" id="mobileToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </nav>
+ 
+
 
     <!-- ALERTS -->
     {% if app.flashes %}
@@ -181,44 +154,54 @@
     <!-- MAIN CONTENT -->
     <main class="main-content">
         {% block hero %}{% endblock %}
-        <div class="container">
+        <div class="container py-4">
             {% block content %}{% endblock %}
         </div>
     </main>
 
     <!-- FOOTER -->
-    <footer class="footer-shop">
+    <footer class="footer-modern">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 mb-4">
                     <h5><i class="bi bi-truck"></i> TGV Delivery</h5>
                     <p>Votre service de livraison rapide et fiable à domicile.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h5>Liens utiles</h5>
-                    <ul>
-                        <li><a href="{{ path('client_') }}">Accueil</a></li>
+                <div class="col-md-2 mb-4">
+                    <h5>Shop</h5>
+                    <ul class="footer-links">
                         <li><a href="{{ path('client_produits') }}">Produits</a></li>
                         <li><a href="{{ path('client_commandes') }}">Mes Commandes</a></li>
-                        <li><a href="#">À propos</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4">
-                    <h5>Contact</h5>
-                    <ul>
-                        <li><a href="#">Conditions d'utilisation</a></li>
-                        <li><a href="#">Politique de confidentialité</a></li>
+                <div class="col-md-2 mb-4">
+                    <h5>Services</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ path('client_services') }}">Nos Services</a></li>
+                        <li><a href="#">Livraison Express</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5>Support</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ path('client_reclamations') }}">Réclamations</a></li>
+                        <li><a href="{{ path('client_support') }}">Contact</a></li>
                         <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Support</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3">
-                    <h5>Nous contacter</h5>
-                    <p>
-                        <i class="bi bi-telephone"></i> +33 1 23 45 67 89<br>
-                        <i class="bi bi-envelope"></i> contact@tgvdelivery.com<br>
-                        <i class="bi bi-geo-alt"></i> Paris, France
-                    </p>
+                <div class="col-md-2 mb-4">
+                    <h5>Contact</h5>
+                    <ul class="footer-contact">
+                        <li><i class="bi bi-telephone"></i> +33 1 23 45 67 89</li>
+                        <li><i class="bi bi-envelope"></i> contact@tgv.com</li>
+                        <li><i class="bi bi-geo-alt"></i> Paris, France</li>
+                    </ul>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -227,6 +210,168 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+       <!-- MODAL PANIER -->
+<!-- MODAL PANIER -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="bi bi-cart3"></i> Mon Panier
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- VUE PANIER -->
+                <div id="cartView">
+                    <div id="emptyCartMessage" class="text-center py-5" style="display: none;">
+                        <i class="bi bi-cart-x" style="font-size: 4rem; color: #ccc;"></i>
+                        <h4 class="mt-3">Votre panier est vide</h4>
+                    </div>
+                    <div id="cartItemsList"></div>
+                    <div id="checkoutSection" style="display: none;">
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <button class="btn btn-outline-secondary" onclick="cart.clearCart()">
+                                    <i class="bi bi-trash"></i> Vider le panier
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6>Récapitulatif</h6>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Sous-total:</span>
+                                            <strong id="cartTotal">0.00€</strong>
+                                        </div>
+                                        <button class="btn btn-success w-100 mt-3" onclick="proceedToCheckout()">
+                                            Passer la commande
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VUE COMMANDE -->
+                <div id="checkoutView" style="display: none;">
+                    <form id="checkoutForm" onsubmit="submitOrder(event)">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <button type="button" class="btn btn-link ps-0 mb-3" onclick="backToCart()">
+                                    <i class="bi bi-arrow-left"></i> Retour au panier
+                                </button>
+
+                                <div class="card mb-3">
+                                    
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Prénom </label>
+                                                <input type="text" class="form-control" name="firstName" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Nom </label>
+                                                <input type="text" class="form-control" name="lastName" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" class="form-control" name="email" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Téléphone </label>
+                                                <input type="tel" class="form-control" name="phone" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Adresse complète *</label>
+                                            <input type="text" class="form-control" name="address" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Code postal *</label>
+                                                <input type="text" class="form-control" name="postalCode" required>
+                                            </div>
+                                            <div class="col-md-8 mb-3">
+                                                <label class="form-label">Ville *</label>
+                                                <input type="text" class="form-control" name="city" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    
+                                   
+                                </div>
+
+                                <div class="card">
+
+                                    <div class="card-body">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" value="card" id="paymentCard" checked>
+                                            <label class="form-check-label" for="paymentCard">
+                                                <i class="bi bi-credit-card"></i> Carte bancaire
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" value="paypal" id="paymentPaypal">
+                                            <label class="form-check-label" for="paymentPaypal">
+                                                <i class="bi bi-paypal"></i> PayPal
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="paymentMethod" value="cash" id="paymentCash">
+                                            <label class="form-check-label" for="paymentCash">
+                                                <i class="bi bi-cash"></i> Paiement à la livraison
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5">
+                                <div class="card sticky-top" style="top: 20px;">
+                            
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Sous-total:</span>
+                                            <span id="summarySubtotal">0.00€</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Livraison:</span>
+                                            <span id="summaryShipping">0.00€</span>
+                                        </div>
+                                        <hr>
+                                        <div class="d-flex justify-content-between mb-3">
+                                            <strong>TOTAL:</strong>
+                                            <strong class="text-success" style="font-size: 1.5rem;" id="summaryTotal">0.00€</strong>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100 btn-lg">
+                                            <i class="bi bi-check-circle"></i> Valider
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('js/cart.js') }}"></script>
+<script src="{{ asset('js/navbar.js') }}"></script>
 </body>
 </html>
+

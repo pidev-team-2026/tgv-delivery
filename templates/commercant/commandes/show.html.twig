@@ -1,0 +1,286 @@
+{% extends 'commercant/base_commercant.html.twig' %}
+
+{% block title %}Détails de la commande - Espace Commerçant{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-clipboard-check"></i> Détails de la commande</h1>
+        <p class="text-muted">Commande : {{ commande.reference }}</p>
+    </div>
+    <div>
+        <a href="{{ path('app_commercant_commandes') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- INFORMATIONS COMMANDE -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Informations de la commande</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th width="30%">Référence</th>
+                            <td><strong>{{ commande.reference }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Statut</th>
+                            <td>
+                                {% if commande.statut == 'en_attente' %}
+                                    <span class="badge bg-warning"><i class="bi bi-hourglass"></i> En attente</span>
+                                {% elseif commande.statut == 'confirmee' %}
+                                    <span class="badge bg-info"><i class="bi bi-check-circle"></i> Confirmée</span>
+                                {% elseif commande.statut == 'en_preparation' %}
+                                    <span class="badge bg-primary"><i class="bi bi-gear"></i> En préparation</span>
+                                {% elseif commande.statut == 'prete' %}
+                                    <span class="badge bg-info"><i class="bi bi-check2"></i> Prête</span>
+                                {% elseif commande.statut == 'en_livraison' %}
+                                    <span class="badge bg-primary"><i class="bi bi-truck"></i> En livraison</span>
+                                {% elseif commande.statut == 'livree' %}
+                                    <span class="badge bg-success"><i class="bi bi-check-lg"></i> Livrée</span>
+                                {% elseif commande.statut == 'annulee' %}
+                                    <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Annulée</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Date de création</th>
+                            <td>{{ commande.dateCreation|date('d/m/Y H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total</th>
+                            <td><span class="text-success fw-bold" style="font-size: 1.2rem;">{{ commande.totalPrix }}€</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- INFORMATIONS CLIENT -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-person"></i> Informations client</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th width="30%">Nom</th>
+                            <td><strong>{{ commande.nomClient }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Téléphone</th>
+                            <td>{{ commande.telephone }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ commande.email ? commande.email : 'Non spécifié' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ADRESSE DE LIVRAISON -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-geo-alt"></i> Adresse de livraison</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th width="30%">Adresse</th>
+                            <td>{{ commande.adresseLivraison|nl2br }}</td>
+                        </tr>
+                        <tr>
+                            <th>Ville</th>
+                            <td>{{ commande.ville }}</td>
+                        </tr>
+                        <tr>
+                            <th>Code postal</th>
+                            <td>{{ commande.codePostal }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PRODUITS -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-box"></i> Produits commandés</h5>
+            </div>
+            <div class="card-body">
+                {% if commande.produits|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Prix unitaire</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for produit in commande.produits %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ produit.nom }}</strong>
+                                        {% if produit.image %}
+                                            <br>
+                                            <img src="{{ produit.image }}" alt="{{ produit.nom }}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ produit.prix }}€</td>
+                                    <td class="text-end fw-bold">{{ produit.prix }}€</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" class="text-end">Total :</th>
+                                    <th class="text-end text-success">{{ commande.totalPrix }}€</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucun produit dans cette commande</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- ACTIONS -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-gear"></i> Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if commande.statut == 'en_attente' %}
+                        <form method="POST" action="{{ path('app_commercant_commande_confirm', {'id': commande.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ commande.id) }}">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-check-lg"></i> Confirmer la commande
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    <!-- Changer statut -->
+                    <div class="btn-group w-100">
+                        <button type="button" class="btn btn-warning dropdown-toggle w-100" data-bs-toggle="dropdown">
+                            <i class="bi bi-arrow-repeat"></i> Changer le statut
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li>
+                                <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}">
+                                    <input type="hidden" name="status" value="en_preparation">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-gear"></i> En préparation
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}">
+                                    <input type="hidden" name="status" value="prete">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-check2"></i> Prête
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}">
+                                    <input type="hidden" name="status" value="livree">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-check-lg"></i> Livrée
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Affecter livreur -->
+                    {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                        <form method="POST" action="{{ path('app_commercant_commande_assign_livreur', {'id': commande.id}) }}">
+                            <input type="hidden" name="livreur" value="Livreur par défaut">
+                            <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ commande.id) }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-truck"></i> Affecter un livreur
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    <!-- Contacter client -->
+                    <a href="{{ path('app_commercant_commande_contact', {'id': commande.id}) }}" class="btn btn-secondary w-100">
+                        <i class="bi bi-envelope"></i> Contacter le client
+                    </a>
+                    
+                    <!-- Annuler -->
+                    {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                        <form method="POST" action="{{ path('app_commercant_commande_cancel', {'id': commande.id}) }}" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ commande.id) }}">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="bi bi-x-circle"></i> Annuler la commande
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- INFORMATIONS PAIEMENT -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-credit-card"></i> Paiement</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th>Mode de paiement</th>
+                            <td>
+                                {% if commande.modePaiement == 'especes' %}
+                                    <span class="badge bg-success">Espèces</span>
+                                {% elseif commande.modePaiement == 'carte' %}
+                                    <span class="badge bg-info">Carte bancaire</span>
+                                {% elseif commande.modePaiement == 'mobile_money' %}
+                                    <span class="badge bg-warning">Mobile Money</span>
+                                {% elseif commande.modePaiement == 'virement' %}
+                                    <span class="badge bg-primary">Virement bancaire</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Paiement effectué</th>
+                            <td>
+                                {% if commande.paiementEffectue %}
+                                    <span class="badge bg-success">Oui</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Non</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Frais de livraison</th>
+                            <td>{{ commande.fraisLivraison ? commande.fraisLivraison ~ '€' : 'Gratuit' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

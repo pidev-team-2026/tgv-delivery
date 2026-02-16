@@ -135,18 +135,22 @@
                         </span>
                     </td>
                     <td>
-                        {% if commande.statut == 'en attente' %}
+                        {% if commande.statut == 'en_attente' %}
                             <span class="badge bg-warning"><i class="bi bi-hourglass"></i> En attente</span>
-                        {% elseif commande.statut == 'confirmée' %}
+                        {% elseif commande.statut == 'confirmee' %}
                             <span class="badge bg-info"><i class="bi bi-check-circle"></i> Confirmée</span>
-                        {% elseif commande.statut == 'expédiée' %}
-                            <span class="badge bg-primary"><i class="bi bi-box"></i> Expédiée</span>
-                        {% elseif commande.statut == 'livrée' %}
+                        {% elseif commande.statut == 'en_preparation' %}
+                            <span class="badge bg-primary"><i class="bi bi-gear"></i> En préparation</span>
+                        {% elseif commande.statut == 'prete' %}
+                            <span class="badge bg-info"><i class="bi bi-check2"></i> Prête</span>
+                        {% elseif commande.statut == 'en_livraison' %}
+                            <span class="badge bg-primary"><i class="bi bi-truck"></i> En livraison</span>
+                        {% elseif commande.statut == 'livree' %}
                             <span class="badge bg-success"><i class="bi bi-check-lg"></i> Livrée</span>
-                        {% elseif commande.statut == 'annulée' %}
+                        {% elseif commande.statut == 'annulee' %}
                             <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Annulée</span>
                         {% else %}
-                            <span class="badge bg-secondary">{{ commande.statut }}</span>
+                            <span class="badge bg-secondary">{{ commande.statutLibelle }}</span>
                         {% endif %}
                     </td>
                     <td>

@@ -24,12 +24,10 @@ public function findBySearchAndSort(string $search = '', string $sortBy = 'id', 
     if (!empty($search)) {
         $qb->where('p.nom LIKE :search')
            ->orWhere('p.description LIKE :search')
-           ->orWhere('p.idProd LIKE :search') 
            ->setParameter('search', '%' . $search . '%');
     }
     
-    // Tri (sécurisation des champs autorisés)
-    $allowedSortFields = ['id', 'idProd', 'nom', 'prix', 'stock', 'dateCreation']; // Adaptez selon vos champs
+    $allowedSortFields = ['id', 'nom', 'prix', 'stock', 'statut', 'categorie', 'promotion', 'dateCreation', 'dateMisAjour'];
     if (in_array($sortBy, $allowedSortFields)) {
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy('p.' . $sortBy, $order);

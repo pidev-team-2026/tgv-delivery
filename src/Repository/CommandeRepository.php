@@ -23,19 +23,17 @@ public function findBySearchAndSort(string $search = '', string $sortBy = 'id', 
     
  
     if (!empty($search)) {
-        $qb->where('c.idCommande LIKE :search')
-           ->orWhere('c.reference LIKE :search')
+        $qb->where('c.reference LIKE :search')
            ->orWhere('c.statut LIKE :search')
+           ->orWhere('c.nomClient LIKE :search')
            ->setParameter('search', '%' . $search . '%');
     }
     
-    // Tri avec sécurisation
-    $allowedSortFields = ['id', 'idCommande', 'reference', 'totalPrix', 'statut', 'dateCreation', 'dateMisAjour'];
+    $allowedSortFields = ['id', 'reference', 'totalPrix', 'statut', 'nomClient', 'ville', 'modePaiement', 'paiementEffectue', 'fraisLivraison', 'dateCreation', 'dateMisAjour', 'dateLivraisonEffective'];
     if (in_array($sortBy, $allowedSortFields)) {
         $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
         $qb->orderBy('c.' . $sortBy, $order);
     } else {
-        // Par défaut, trier par ID décroissant (commandes récentes en premier)
         $qb->orderBy('c.id', 'DESC');
     }
     

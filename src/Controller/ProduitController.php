@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Produit;
-use App\Form\Produit1Type;
+use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,12 +17,10 @@ final class ProduitController extends AbstractController
     #[Route(name: 'app_produit_index', methods: ['GET'])]
 public function index(Request $request, ProduitRepository $produitRepository): Response
 {
-    // Récupérer les paramètres de recherche et tri
     $search = $request->query->get('search', '');
     $sortBy = $request->query->get('sort', 'id'); 
     $order = $request->query->get('order', 'ASC'); 
     
-    // Récupérer les produits avec filtres
     $produits = $produitRepository->findBySearchAndSort($search, $sortBy, $order);
     
     return $this->render('produit/index.html.twig', [
@@ -36,7 +34,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $produit = new Produit();
-        $form = $this->createForm(Produit1Type::class, $produit);
+        $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -63,7 +61,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
     #[Route('/{id}/edit', name: 'app_produit_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(Produit1Type::class, $produit);
+        $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

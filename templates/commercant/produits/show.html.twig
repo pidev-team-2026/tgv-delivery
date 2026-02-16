@@ -1,0 +1,128 @@
+{% extends 'commercant/base_commercant.html.twig' %}
+
+{% block title %}Détails du produit - Espace Commerçant{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-box"></i> Détails du produit</h1>
+        <p class="text-muted">Informations complètes du produit : {{ produit.nom }}</p>
+    </div>
+    <div>
+        <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        <a href="{{ path('app_commercant_produits') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Informations générales</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                            <th width="30%">ID</th>
+                            <td>{{ produit.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nom</th>
+                            <td><strong>{{ produit.nom }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Description</th>
+                            <td>{{ produit.description|nl2br }}</td>
+                        </tr>
+                        <tr>
+                            <th>Prix</th>
+                            <td><span class="text-success fw-bold" style="font-size: 1.2rem;">{{ produit.prix }} TND</span></td>
+                        </tr>
+                        <tr>
+                            <th>Catégorie</th>
+                            <td><span class="badge bg-light text-dark">{{ produit.categorie }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Statut</th>
+                            <td>
+                                {% if produit.statut == 'disponible' %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Disponible</span>
+                                {% elseif produit.statut == 'rupture' %}
+                                    <span class="badge bg-danger"><i class="bi bi-x-circle"></i> En rupture</span>
+                                {% elseif produit.statut == 'bientot_disponible' %}
+                                    <span class="badge bg-warning"><i class="bi bi-clock"></i> Bientôt disponible</span>
+                                {% elseif produit.statut == 'archive' %}
+                                    <span class="badge bg-secondary"><i class="bi bi-archive"></i> Archivé</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Stock</th>
+                            <td>
+                                {% if produit.stock > 0 %}
+                                    <span class="badge bg-info">{{ produit.stock }} unités</span>
+                                {% else %}
+                                    <span class="badge bg-danger">En rupture</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-image"></i> Image</h5>
+            </div>
+            <div class="card-body text-center">
+                {% if produit.image %}
+                    <img src="{{ asset(produit.image) }}" alt="{{ produit.nom }}" class="img-fluid rounded" style="max-height: 200px;">
+                {% else %}
+                    <div class="bg-secondary rounded d-inline-flex align-items-center justify-content-center" style="width: 200px; height: 200px;">
+                        <i class="bi bi-image text-white" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-gear"></i> Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    
+                    <form method="POST" action="{{ path('app_commercant_produit_toggle', {'id': produit.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ produit.id) }}">
+                        <button type="submit" class="btn {% if produit.statut == 'disponible' %}btn-danger{% else %}btn-success{% endif %} w-100">
+                            <i class="bi bi-{% if produit.statut == 'disponible' %}x-lg{% else %}check-lg{% endif %}"></i>
+                            {% if produit.statut == 'disponible' %}Désactiver{% else %}Activer{% endif %}
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ path('app_commercant_produit_delete', {'id': produit.id}) }}" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 
+{% endblock %}

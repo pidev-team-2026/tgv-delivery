@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Commande;
-use App\Form\Commande1Type;
+use App\Form\CommandeType;
 use App\Repository\CommandeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,18 +17,12 @@ final class CommandeController extends AbstractController
     #[Route(name: 'app_commande_index', methods: ['GET'])]
     public function index(Request $request, CommandeRepository $commandeRepository): Response
     {
-        // Récupérer les paramètres de recherche et tri
         $search = $request->query->get('search', '');
         $sortBy = $request->query->get('sort', 'id');
         $order = $request->query->get('order', 'DESC'); 
         
-        // Récupérer les commandes avec filtres
         $commandes = $commandeRepository->findBySearchAndSort($search, $sortBy, $order);
         
-        // Debug pour voir les commandes
-        dump($commandes); // Temporaire pour debug
-        
-        // Test avec une requête simple si ça ne marche pas
         if (empty($commandes)) {
             $commandes = $commandeRepository->findAll();
             dump('Toutes les commandes:', $commandes);
@@ -46,7 +40,7 @@ final class CommandeController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $commande = new Commande();
-        $form = $this->createForm(Commande1Type::class, $commande);
+        $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -73,7 +67,7 @@ final class CommandeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(Commande1Type::class, $commande);
+        $form = $this->createForm(CommandeType::class, $commande);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

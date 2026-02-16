@@ -1,3 +1,3 @@
 <a href="{{ path('app_produit_delete', {'id': produit.id}) }}" 
-   class="btn btn-danger" 
-   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">Supprimer</a>
+   onclick="this.href = 'javascript:fetch(\'' + this.href + '\', {method: \'POST\'}).then(() => window.location.reload())" 
+   class="btn btn-danger" style="text-decoration: none;">Supprimer</a>

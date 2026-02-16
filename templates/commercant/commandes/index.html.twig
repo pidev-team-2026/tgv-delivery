@@ -1,0 +1,292 @@
+{% extends 'commercant/base_commercant.html.twig' %}
+
+{% block title %}Gestion des commandes - Espace Commerçant{% endblock %}
+
+{% block body %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-clipboard-check"></i> Mes Commandes</h1>
+        <p class="text-muted">Gérer les commandes client</p>
+    </div>
+</div>
+
+<!-- BARRE DE RECHERCHE -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_commercant_commandes') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control" 
+                                   placeholder="Rechercher une commande (référence, client)..." 
+                                   value="{{ search|default('') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-search"></i> Chercher
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ path('app_commercant_commandes') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Garder les paramètres de tri -->
+                    <input type="hidden" name="sort" value="{{ sortBy|default('id') }}">
+                    <input type="hidden" name="order" value="{{ order|default('DESC') }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLEAU DES COMMANDES -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list"></i> Liste des commandes ({{ commandes|length }})</span>
+        {% if search|default('') %}
+            <span class="badge bg-info">Recherche: "{{ search }}"</span>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <a href="{{ path('app_commercant_commandes', {
+                            search: search|default(''), 
+                            sort: 'id', 
+                            order: (sortBy|default('id') == 'id' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            # 
+                            {% if sortBy|default('id') == 'id' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_commercant_commandes', {
+                            search: search|default(''), 
+                            sort: 'reference', 
+                            order: (sortBy|default('id') == 'reference' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Référence
+                            {% if sortBy|default('id') == 'reference' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Client</th>
+                    <th>
+                        <a href="{{ path('app_commercant_commandes', {
+                            search: search|default(''), 
+                            sort: 'totalPrix', 
+                            order: (sortBy|default('id') == 'totalPrix' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Prix total
+                            {% if sortBy|default('id') == 'totalPrix' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_commercant_commandes', {
+                            search: search|default(''), 
+                            sort: 'statut', 
+                            order: (sortBy|default('id') == 'statut' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Statut
+                            {% if sortBy|default('id') == 'statut' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Livreur</th>
+                    <th>
+                        <a href="{{ path('app_commercant_commandes', {
+                            search: search|default(''), 
+                            sort: 'dateCreation', 
+                            order: (sortBy|default('id') == 'dateCreation' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Date création
+                            {% if sortBy|default('id') == 'dateCreation' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if commandes|length > 0 %}
+                {% for commande in commandes %}
+                <tr>
+                    <td><strong>{{ commande.id }}</strong></td>
+                    <td><strong>{{ commande.reference }}</strong></td>
+                    <td>
+                        <div>
+                            <strong>{{ commande.nomClient }}</strong>
+                            <br>
+                            <small class="text-muted">{{ commande.telephone }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="text-success" style="font-size: 1.1rem; font-weight: bold;">
+                            {{ commande.totalPrix }}€
+                        </span>
+                    </td>
+                    <td>
+                        {% if commande.statut == 'en_attente' %}
+                            <span class="badge bg-warning"><i class="bi bi-hourglass"></i> En attente</span>
+                        {% elseif commande.statut == 'confirmee' %}
+                            <span class="badge bg-info"><i class="bi bi-check-circle"></i> Confirmée</span>
+                        {% elseif commande.statut == 'en_preparation' %}
+                            <span class="badge bg-primary"><i class="bi bi-gear"></i> En préparation</span>
+                        {% elseif commande.statut == 'prete' %}
+                            <span class="badge bg-info"><i class="bi bi-check2"></i> Prête</span>
+                        {% elseif commande.statut == 'en_livraison' %}
+                            <span class="badge bg-primary"><i class="bi bi-truck"></i> En livraison</span>
+                        {% elseif commande.statut == 'livree' %}
+                            <span class="badge bg-success"><i class="bi bi-check-lg"></i> Livrée</span>
+                        {% elseif commande.statut == 'annulee' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Annulée</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ commande.statut }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if commande.livreur %}
+                            <span class="badge bg-info">{{ commande.livreur }}</span>
+                        {% else %}
+                            <span class="text-muted">Non assigné</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">
+                        {{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : '-' }}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{{ path('app_commercant_commande_show', {'id': commande.id}) }}" 
+                               class="btn btn-sm btn-outline-info" 
+                               title="Voir les détails"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            
+                            {% if commande.statut == 'en_attente' %}
+                                <form method="POST" 
+                                      action="{{ path('app_commercant_commande_confirm', {'id': commande.id}) }}" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ commande.id) }}">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-success" 
+                                            title="Confirmer la commande"
+                                            data-bs-toggle="tooltip">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            
+                            <!-- Dropdown pour changer le statut -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" 
+                                        data-bs-toggle="dropdown" title="Changer le statut">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="status" value="en_preparation">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-gear"></i> En préparation
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="status" value="prete">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-check2"></i> Prête
+                                            </button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="status" value="livree">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-check-lg"></i> Livrée
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Affecter livreur -->
+                            {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                                <form method="POST" 
+                                      action="{{ path('app_commercant_commande_assign_livreur', {'id': commande.id}) }}" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="livreur" value="Livreur par défaut">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ commande.id) }}">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-primary" 
+                                            title="Affecter un livreur"
+                                            data-bs-toggle="tooltip">
+                                        <i class="bi bi-truck"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            
+                            <!-- Contacter client -->
+                            <a href="{{ path('app_commercant_commande_contact', {'id': commande.id}) }}" 
+                               class="btn btn-sm btn-outline-secondary" 
+                               title="Contacter le client"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-envelope"></i>
+                            </a>
+                            
+                            <!-- Annuler -->
+                            {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                                <form method="POST" 
+                                      action="{{ path('app_commercant_commande_cancel', {'id': commande.id}) }}" 
+                                      style="display:inline;" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ commande.id) }}">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-danger" 
+                                            title="Annuler la commande"
+                                            data-bs-toggle="tooltip">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                        <p class="mt-2">
+                            {% if search|default('') %}
+                                Aucune commande trouvée pour "{{ search }}"
+                            {% else %}
+                                Aucune commande trouvée
+                            {% endif %}
+                        </p>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

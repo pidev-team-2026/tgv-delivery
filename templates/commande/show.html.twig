@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/base_admin.html.twig' %}
 
 {% block title %}Commande{% endblock %}
 
@@ -8,39 +8,111 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ commande.id }}</td>
-            </tr>
-            <tr>
-                <th>IdCommande</th>
-                <td>{{ commande.idCommande }}</td>
-            </tr>
-            <tr>
-                <th>TotalPrix</th>
-                <td>{{ commande.totalPrix }}</td>
+                <th>Référence</th>
+                <td><strong>{{ commande.reference }}</strong></td>
             </tr>
             <tr>
                 <th>Statut</th>
-                <td>{{ commande.statut }}</td>
+                <td>
+                    <span class="badge badge-{{ commande.statut == 'livree' ? 'success' : commande.statut == 'annulee' ? 'danger' : 'primary' }}">
+                        {{ commande.statutLibelle }}
+                    </span>
+                </td>
             </tr>
             <tr>
-                <th>Date_création</th>
+                <th>Prix total</th>
+                <td>{{ commande.totalPrix }}€</td>
+            </tr>
+            <tr>
+                <th>Frais de livraison</th>
+                <td>{{ commande.fraisLivraison ? commande.fraisLivraison ~ '€' : '0€' }}</td>
+            </tr>
+            <tr>
+                <th>Montant total</th>
+                <td><strong>{{ commande.montantTotal }}€</strong></td>
+            </tr>
+            <tr>
+                <th>Nom du client</th>
+                <td>{{ commande.nomClient }}</td>
+            </tr>
+            <tr>
+                <th>Téléphone</th>
+                <td>{{ commande.telephone }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ commande.email ? commande.email : 'Non spécifié' }}</td>
+            </tr>
+            <tr>
+                <th>Adresse de livraison</th>
+                <td>{{ commande.adresseLivraison }}</td>
+            </tr>
+            <tr>
+                <th>Ville</th>
+                <td>{{ commande.ville }}</td>
+            </tr>
+            <tr>
+                <th>Code postal</th>
+                <td>{{ commande.codePostal }}</td>
+            </tr>
+            <tr>
+                <th>Mode de paiement</th>
+                <td>{{ commande.modePaiement }}</td>
+            </tr>
+            <tr>
+                <th>Paiement effectué</th>
+                <td>
+                    {% if commande.paiementEffectue %}
+                        <span class="badge badge-success">Oui</span>
+                    {% else %}
+                        <span class="badge badge-warning">Non</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Date de livraison souhaitée</th>
+                <td>{{ commande.dateLivraisonSouhaitee ? commande.dateLivraisonSouhaitee|date('Y-m-d H:i') : 'Non spécifiée' }}</td>
+            </tr>
+            <tr>
+                <th>Date de livraison effective</th>
+                <td>{{ commande.dateLivraisonEffective ? commande.dateLivraisonEffective|date('Y-m-d H:i') : 'Non livrée' }}</td>
+            </tr>
+            <tr>
+                <th>Livreur</th>
+                <td>{{ commande.livreur ? commande.livreur : 'Non assigné' }}</td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ commande.notes ? commande.notes : 'Aucune note' }}</td>
+            </tr>
+            <tr>
+                <th>Produits</th>
+                <td>
+                    {% if commande.produits|length > 0 %}
+                        <ul class="list-unstyled">
+                            {% for produit in commande.produits %}
+                                <li>{{ produit.nom }} - {{ produit.prix }}€</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted">Aucun produit</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Date de création</th>
                 <td>{{ commande.dateCreation ? commande.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
             </tr>
             <tr>
-                <th>Date_misAjour</th>
+                <th>Date de mise à jour</th>
                 <td>{{ commande.dateMisAjour ? commande.dateMisAjour|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Reference</th>
-                <td>{{ commande.reference }}</td>
             </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_commande_index') }}">Retourner à la liste</a>
-
-    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">Modifier</a>
-
-    {{ include('commande/_delete_form.html.twig') }}
+    <div class="mt-3">
+        <a href="{{ path('app_commande_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" class="btn btn-primary ms-2">Modifier</a>
+        {{ include('commande/_delete_form.html.twig') }}
+    </div>
 {% endblock %}

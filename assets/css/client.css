@@ -195,12 +195,12 @@
 }
 
 .product-badge.active {
-    background: #28a745;
+    background: #2aa668;
     color: white;
 }
 
 .product-badge.inactive {
-    background: #dc3545;
+    background: #2aa668;
     color: white;
 }
 
@@ -250,7 +250,7 @@
 }
 
 .stock-unavailable {
-    color: #dc3545;
+    color: #28a745;
 }
 
 .product-actions {
@@ -359,7 +359,7 @@
 }
 
 .product-badge-large.inactive {
-    background: #dc3545;
+    background: #4651cb;
     color: white;
 }
 
@@ -400,7 +400,7 @@
 }
 
 .stock-unavailable-large {
-    color: #dc3545;
+    color: #dd4050;
     font-weight: 600;
 }
 

@@ -1,0 +1,186 @@
+{% extends "client/base_client.html.twig" %}
+
+{% block title %}Nos Services - TGV Delivery{% endblock %}
+
+{% block styles %}
+<style>
+.services-hero {
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.services-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.service-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 2px solid transparent;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: #2ecc71;
+}
+
+.service-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+}
+
+.service-card h3 {
+    color: #1e3a5f;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.service-card p {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.service-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+}
+
+.service-features li {
+    padding: 0.5rem 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.service-features li i {
+    color: #2ecc71;
+    font-size: 1.2rem;
+}
+
+.cta-section {
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    color: white;
+    padding: 3rem;
+    border-radius: 16px;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.cta-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.btn-cta {
+    background: white;
+    color: #1e3a5f;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+    color: #1e3a5f;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="services-hero">
+    <div class="container">
+        <h1><i class="bi bi-tools"></i> Nos Services</h1>
+        <p class="lead">Des solutions de livraison adaptées à tous vos besoins</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-5">
+        <!-- Livraison Express -->
+        <div class="col-md-4 mb-4" id="express">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+                <h3>Livraison Express</h3>
+                <p>Recevez vos commandes en moins de 2 heures dans votre zone</p>
+                <ul class="service-features">
+                    <li><i class="bi bi-check-circle-fill"></i> Livraison en 2h maximum</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Suivi en temps réel</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Notification SMS/Email</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Service 7j/7</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Livraison Standard -->
+        <div class="col-md-4 mb-4" id="standard">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <h3>Livraison Standard</h3>
+                <p>Livraison économique sous 24-48h partout en France</p>
+                <ul class="service-features">
+                    <li><i class="bi bi-check-circle-fill"></i> Livraison sous 24-48h</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Tarifs avantageux</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Suivi de commande</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Emballage sécurisé</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Livraison Programmée -->
+        <div class="col-md-4 mb-4">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <h3>Livraison Programmée</h3>
+                <p>Choisissez votre créneau de livraison à l'avance</p>
+                <ul class="service-features">
+                    <li><i class="bi bi-check-circle-fill"></i> Choix du créneau</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Rappel automatique</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Reprogrammation facile</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Service flexible</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <h2>Prêt à profiter de nos services ?</h2>
+        <p class="lead">Commandez maintenant et bénéficiez de notre expertise en livraison</p>
+        <a href="{{ path('client_produits') }}" class="btn-cta">
+            <i class="bi bi-cart"></i> Commander maintenant
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="{% block meta_description %}TGV Delivery - Administration{% endblock %}" />
+    <meta name="author" content="TGV Delivery" />
+    
+    <title>{% block title %}Dashboard{% endblock %} - TGV Delivery Admin</title>
+    
+    {# Favicon #}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    
+    {# Bootstrap CSS #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}" />
+    
+    {# Vendors CSS #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/daterangepicker.min.css') }}" />
+    
+    {# Custom Theme CSS #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}" />
+    
+    <style>
+        :root {
+            --nxl-sidebar-width: 280px;
+            --nxl-header-height: 70px;
+        }
+
+        .nxl-navigation {
+            width: var(--nxl-sidebar-width);
+        }
+
+        .nxl-header {
+            position: fixed;
+            top: 0;
+            left: var(--nxl-sidebar-width);
+            width: calc(100% - var(--nxl-sidebar-width));
+            z-index: 1030;
+            transition: none !important;
+        }
+
+        .nxl-container {
+            margin-left: var(--nxl-sidebar-width);
+        }
+
+        .nxl-content {
+            padding-top: var(--nxl-header-height);
+        }
+
+        .nxl-page {
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .card {
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            background: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        @media (max-width: 991.98px) {
+            .nxl-container {
+                margin-left: 0;
+            }
+
+            .nxl-header {
+                left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    <!-- NAVIGATION -->>
+             {# Navigation Sidebar #}
+    {% include 'commercant/partials/sidebar.html.twig' %}
+            
+             {# Main Container #}
+    <main class="nxl-container">
+        {# Header #}
+        {% include 'commercant/partials/navbar.html.twig' %}
+        
+        {# Main Content #}
+        <div class="nxl-content">
+            {# Page Header #}
+            <div class="page-header">
+                <div class="page-header-left d-flex align-items-center">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">{% block page_title %}Dashboard{% endblock %}</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        {% block breadcrumb %}
+                        <li class="breadcrumb-item"><a href="{{ path('app_commercant_dashboard') }}">Accueil</a></li>
+                        {% endblock %}
+                    </ul>
+                </div>
+                <div class="page-header-right ms-auto">
+                    <div class="page-header-right-items">
+                        <div class="d-flex d-md-none">
+                            <a href="javascript:void(0)" class="page-header-right-close-toggle">
+                                <i class="feather-arrow-left me-2"></i>
+                                <span>Back</span>
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
+                            {% block page_actions %}{% endblock %}
+                        </div>
+                    </div>
+                    <div class="d-md-none d-flex align-items-center">
+                        <a href="javascript:void(0)" class="page-header-right-open-toggle">
+                            <i class="feather-align-right fs-20"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+    <!-- FLASH MESSAGES -->
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade show m-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <!-- MAIN CONTENT -->
+    <main class="container-fluid py-4 nxl-page">
+        {% block body %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+    <!-- Theme JS -->
+    <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
