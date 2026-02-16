@@ -1,0 +1,82 @@
+<div class="form-container">
+    <h2 class="form-title">{{ button_label|default('Gérer Commande') }}</h2>
+    
+    {{ form_start(form) }}
+    
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.reference) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.totalPrix) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.statut) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.modePaiement) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.nomClient) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.telephone) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.email) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.paiementEffectue) }}
+        </div>
+    </div>
+
+    <div class="form-group form-group-full">
+        {{ form_row(form.adresseLivraison) }}
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.ville) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.codePostal) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.fraisLivraison) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.dateLivraisonSouhaitee) }}
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            {{ form_row(form.livreur) }}
+        </div>
+        <div class="form-group">
+            {{ form_row(form.produits) }}
+        </div>
+    </div>
+
+    <div class="form-group form-group-full">
+        {{ form_row(form.notes) }}
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn-form btn-form-primary">{{ button_label|default('Enregistrer') }}</button>
+        <a href="{{ path('app_commande_index') }}" class="btn-form btn-form-secondary" style="text-decoration: none; display: inline-flex; align-items: center;">Annuler</a>
+    </div>
+    {{ form_end(form) }}
+</div>

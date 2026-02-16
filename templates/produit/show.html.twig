@@ -1,0 +1,79 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Produit{% endblock %}
+
+{% block body %}
+    <h1>Produit</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ produit.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ produit.nom }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ produit.description }}</td>
+            </tr>
+            <tr>
+                <th>Prix</th>
+                <td>{{ produit.prix }} TND</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>
+                    {% if produit.image %}
+                        <img src="{{ asset(produit.image) }}" alt="{{ produit.nom }}" style="max-width: 100px; max-height: 100px;">
+                    {% else %}
+                        <span class="text-muted">Aucune image</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Catégorie</th>
+                <td>{{ produit.categorie }}</td>
+            </tr>
+            <tr>
+                <th>Statut</th>
+                <td>
+                    <span class="badge badge-{{ produit.statut == 'disponible' ? 'success' : produit.statut == 'rupture' ? 'danger' : 'warning' }}">
+                        {{ produit.statut }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>Stock</th>
+                <td>{{ produit.stock }} unités</td>
+            </tr>
+            <tr>
+                <th>Promotion</th>
+                <td>
+                    {% if produit.promotion > 0 %}
+                        <span class="badge badge-info">{{ produit.promotion }}%</span>
+                        <small class="text-muted">(Prix final: {{ produit.prixApresPromotion }} TND)</small>
+                    {% else %}
+                        <span class="text-muted">Aucune promotion</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Date de création</th>
+                <td>{{ produit.dateCreation ? produit.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Date de mise à jour</th>
+                <td>{{ produit.dateMisAjour ? produit.dateMisAjour|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="mt-3">
+        <a href="{{ path('app_produit_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <a href="{{ path('app_produit_edit', {'id': produit.id}) }}" class="btn btn-primary ms-2">Modifier</a>
+        {{ include('produit/_delete_form.html.twig') }}
+    </div>
+{% endblock %}

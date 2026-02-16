@@ -1,0 +1,343 @@
+// ===================================
+// CONFIGURATION
+// ===================================
+const TUNISIA_CENTER = [33.8869, 9.5375];
+const DEFAULT_ZOOM = 7;
+const CITY_ZOOM = 13;
+
+const TUNISIAN_CITIES = {
+    'Tunis': { coords: [36.8065, 10.1815], fullName: 'Tunis, Tunisie' },
+    'Sfax': { coords: [34.7406, 10.7603], fullName: 'Sfax, Tunisie' },
+    'Sousse': { coords: [35.8256, 10.6369], fullName: 'Sousse, Tunisie' },
+    'Kairouan': { coords: [35.6819, 10.0972], fullName: 'Kairouan, Tunisie' },
+    'Bizerte': { coords: [37.2745, 9.8739], fullName: 'Bizerte, Tunisie' },
+    'Gabès': { coords: [33.8815, 10.0982], fullName: 'Gabès, Tunisie' },
+    'Ariana': { coords: [36.8625, 10.1956], fullName: 'Ariana, Tunisie' },
+    'Ben Arous': { coords: [36.7553, 10.1516], fullName: 'Ben Arous, Tunisie' },
+    'Monastir': { coords: [35.7643, 10.8113], fullName: 'Monastir, Tunisie' },
+    'Nabeul': { coords: [36.4561, 10.7376], fullName: 'Nabeul, Tunisie' },
+    'Médenine': { coords: [33.3540, 10.5055], fullName: 'Médenine, Tunisie' },
+    'Mahdia': { coords: [35.5047, 11.0622], fullName: 'Mahdia, Tunisie' },
+    'La Marsa': { coords: [36.8781, 10.3247], fullName: 'La Marsa, Tunis, Tunisie' },
+    'Carthage': { coords: [36.8531, 10.3231], fullName: 'Carthage, Tunis, Tunisie' },
+    'Hammamet': { coords: [36.4000, 10.6167], fullName: 'Hammamet, Nabeul, Tunisie' },
+    'Djerba': { coords: [33.8076, 10.8451], fullName: 'Djerba, Médenine, Tunisie' },
+    'Tozeur': { coords: [33.9197, 8.1338], fullName: 'Tozeur, Tunisie' },
+    'Gafsa': { coords: [34.4250, 8.7842], fullName: 'Gafsa, Tunisie' }
+};
+
+// Variables globales
+let map;
+let currentMarker;
+let selectedLocation = null;
+let mapInitialized = false;
+
+// ===================================
+// INITIALISATION
+// ===================================
+document.addEventListener('DOMContentLoaded', function() {
+    initAutocomplete();
+    initMapToggle();
+    initForm();
+});
+
+// ===================================
+// AUTOCOMPLETE SUR CHAMP
+// ===================================
+function initAutocomplete() {
+    const input = document.getElementById('addressInput');
+    const suggestions = document.getElementById('autocompleteSuggestions');
+    let searchTimeout;
+    
+    input.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            suggestions.classList.remove('active');
+            return;
+        }
+        
+        searchTimeout = setTimeout(() => searchAddresses(query), 300);
+    });
+    
+    // Fermer suggestions au clic extérieur
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.address-input-group')) {
+            suggestions.classList.remove('active');
+        }
+    });
+}
+
+async function searchAddresses(query) {
+    const suggestions = document.getElementById('autocompleteSuggestions');
+    
+    // Recherche locale d'abord
+    const localResults = Object.keys(TUNISIAN_CITIES)
+        .filter(city => city.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 3)
+        .map(city => ({
+            name: city,
+            fullName: TUNISIAN_CITIES[city].fullName,
+            coords: TUNISIAN_CITIES[city].coords,
+            type: 'city'
+        }));
+    
+    if (localResults.length > 0) {
+        displayAutocomplete(localResults);
+        return;
+    }
+    
+    // Recherche via API
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Tunisie')}&format=json&limit=5&accept-language=fr`
+        );
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            const results = data.map(item => ({
+                name: item.display_name.split(',')[0],
+                fullName: item.display_name,
+                coords: [parseFloat(item.lat), parseFloat(item.lon)],
+                type: 'api'
+            }));
+            displayAutocomplete(results);
+        } else {
+            suggestions.innerHTML = '<div class="suggestion-item">Aucun résultat trouvé</div>';
+            suggestions.classList.add('active');
+        }
+    } catch (error) {
+        console.error('Erreur recherche:', error);
+    }
+}
+
+function displayAutocomplete(results) {
+    const suggestions = document.getElementById('autocompleteSuggestions');
+    suggestions.innerHTML = '';
+    
+    results.forEach(result => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `
+            <i class="bi bi-geo-alt-fill"></i>
+            <div>
+                <div class="suggestion-main">${result.name}</div>
+                <div class="suggestion-sub">${result.fullName}</div>
+            </div>
+        `;
+        item.addEventListener('click', () => selectAddress(result));
+        suggestions.appendChild(item);
+    });
+    
+    suggestions.classList.add('active');
+}
+
+function selectAddress(result) {
+    document.getElementById('addressInput').value = result.fullName;
+    document.getElementById('autocompleteSuggestions').classList.remove('active');
+    document.getElementById('deliverBtn').disabled = false;
+    
+    selectedLocation = {
+        lat: result.coords[0],
+        lng: result.coords[1],
+        address: result.fullName
+    };
+    
+    // Si la carte est ouverte, centrer dessus
+    if (mapInitialized && map) {
+        map.setView(result.coords, CITY_ZOOM);
+        setMarker(result.coords[0], result.coords[1]);
+    }
+}
+
+// ===================================
+// TOGGLE CARTE INLINE
+// ===================================
+function initMapToggle() {
+    const toggleBtn = document.getElementById('toggleMapBtn');
+    const mapContainer = document.getElementById('inlineMapContainer');
+    
+    toggleBtn.addEventListener('click', function() {
+        const isActive = mapContainer.classList.toggle('active');
+        
+        if (isActive) {
+            this.classList.add('active');
+            this.innerHTML = '<i class="bi bi-x-lg"></i><span class="btn-text">Fermer la carte</span>';
+            
+            // Initialiser la carte si première ouverture
+            if (!mapInitialized) {
+                setTimeout(() => initMap(), 100);
+            } else {
+                map.invalidateSize();
+            }
+        } else {
+            this.classList.remove('active');
+            this.innerHTML = '<i class="bi bi-map"></i><span class="btn-text">Localiser sur la carte</span>';
+        }
+    });
+}
+
+// ===================================
+// INITIALISATION CARTE
+// ===================================
+function initMap() {
+    const loading = document.getElementById('mapLoading');
+    loading.classList.add('active');
+    
+    map = L.map('inlineMap', {
+        center: TUNISIA_CENTER,
+        zoom: DEFAULT_ZOOM,
+        zoomControl: true
+    });
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    map.on('click', onMapClick);
+    
+    setTimeout(() => {
+        loading.classList.remove('active');
+        map.invalidateSize();
+        mapInitialized = true;
+    }, 1000);
+    
+    initMapButtons();
+}
+
+function onMapClick(e) {
+    const { lat, lng } = e.latlng;
+    setMarker(lat, lng);
+    reverseGeocode(lat, lng);
+}
+
+function setMarker(lat, lng) {
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
+    
+    const icon = L.divIcon({
+        className: 'custom-marker',
+        html: '<i class="bi bi-geo-alt-fill"></i>',
+        iconSize: [40, 40]
+    });
+    
+    currentMarker = L.marker([lat, lng], {
+        icon: icon,
+        draggable: true
+    }).addTo(map);
+    
+    currentMarker.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        reverseGeocode(pos.lat, pos.lng);
+    });
+    
+    selectedLocation = { lat, lng };
+    document.getElementById('selectedInfo').classList.add('active');
+}
+
+async function reverseGeocode(lat, lng) {
+    const loading = document.getElementById('mapLoading');
+    loading.classList.add('active');
+    
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=fr`
+        );
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            const address = data.display_name;
+            selectedLocation.address = address;
+            document.getElementById('mapSelectedAddress').textContent = address;
+            
+            if (currentMarker) {
+                currentMarker.bindPopup(`
+                    <div style="font-weight: 600; color: #1e3a5f;">${address}</div>
+                    <div style="font-size: 0.85rem; color: #6c757d; margin-top: 0.3rem;">
+                        ${lat.toFixed(6)}, ${lng.toFixed(6)}
+                    </div>
+                `).openPopup();
+            }
+        }
+    } catch (error) {
+        console.error('Erreur reverse geocoding:', error);
+    } finally {
+        loading.classList.remove('active');
+    }
+}
+
+function initMapButtons() {
+    // Bouton géolocalisation
+    document.getElementById('geolocateBtn').addEventListener('click', function() {
+        const loading = document.getElementById('mapLoading');
+        
+        if (!navigator.geolocation) {
+            alert('Géolocalisation non supportée');
+            return;
+        }
+        
+        loading.classList.add('active');
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                map.setView([latitude, longitude], 15);
+                setMarker(latitude, longitude);
+                reverseGeocode(latitude, longitude);
+                loading.classList.remove('active');
+            },
+            (error) => {
+                console.error('Erreur géolocalisation:', error);
+                alert('Impossible de récupérer votre position');
+                loading.classList.remove('active');
+            }
+        );
+    });
+    
+    // Bouton reset
+    document.getElementById('resetMapBtn').addEventListener('click', function() {
+        map.setView(TUNISIA_CENTER, DEFAULT_ZOOM);
+        if (currentMarker) {
+            map.removeLayer(currentMarker);
+            currentMarker = null;
+        }
+        document.getElementById('selectedInfo').classList.remove('active');
+        selectedLocation = null;
+    });
+    
+    // Bouton utiliser cette adresse
+    document.getElementById('useLocationBtn').addEventListener('click', function() {
+        if (selectedLocation && selectedLocation.address) {
+            document.getElementById('addressInput').value = selectedLocation.address;
+            document.getElementById('deliverBtn').disabled = false;
+            
+            // Fermer la carte
+            document.getElementById('toggleMapBtn').click();
+        }
+    });
+}
+
+// ===================================
+// FORMULAIRE
+// ===================================
+function initForm() {
+    document.getElementById('addressForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const address = document.getElementById('addressInput').value.trim();
+        
+        if (!address) {
+            alert('Veuillez entrer une adresse de livraison');
+            return;
+        }
+        
+        if (selectedLocation) {
+            window.location.href = `/client/produits?lat=${selectedLocation.lat}&lng=${selectedLocation.lng}&address=${encodeURIComponent(address)}`;
+        } else {
+            window.location.href = `/client/produits?address=${encodeURIComponent(address)}`;
+        }
+    });
+}

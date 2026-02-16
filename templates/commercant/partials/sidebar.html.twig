@@ -1,0 +1,126 @@
+<nav class="nxl-navigation">
+    <div class="navbar-wrapper">
+        {# Logo / Brand #}
+        <div class="m-header">
+            <a href="{{ path('app_commercant_dashboard') }}" class="b-brand">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="TGV Delivery" class="logo logo-lg" style="height: 150px; width: auto; margin: 15px 0;" />
+                <img src="{{ asset('assets/images/logo.png') }}" alt="TGV" class="logo logo-sm" style="height: 100px; width: auto; margin: 12px 0;" />
+            </a>
+        </div>
+        
+        {# Navigation Content #}
+        <div class="navbar-content">
+            <ul class="nxl-navbar">
+                {# Navigation Title #}
+                <li class="nxl-item nxl-caption">
+                    <label>Navigation</label>
+                </li>
+                
+                {# Dashboard #}
+                {# Dashboard #}
+                <li class="nxl-item">
+                    <a href="{{ path('app_commercant_dashboard') }}" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                        <span class="nxl-mtext">Dashboard</span>
+                    </a>
+                </li>
+                
+                {# GESTION Section #}
+                <li class="nxl-item nxl-caption">
+                    <label>Gestion</label>
+                </li>
+                
+
+                {# Commandes #}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-shopping-cart"></i></span>
+                        <span class="nxl-mtext">Commandes</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ path('app_commercant_commandes') }}">Liste des commandes</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                 {# Produits #}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-package"></i></span>
+                        <span class="nxl-mtext">Produits</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ path('app_commercant_produits') }}">Liste des produits</a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ path('app_commercant_produit_new') }}">Ajouter un produit</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                {# Ventes Section #}
+                <li class="nxl-item nxl-caption">
+                    <label>Ventes</label>
+                </li>
+                
+                {# Statistiques #}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-bar-chart-2"></i></span>
+                        <span class="nxl-mtext">Statistiques</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Rapport des ventes</a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Rapport des livraisons</a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Statistiques générales</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                {# PARAMÈTRES Section #}
+                <li class="nxl-item nxl-caption">
+                    <label>Paramètres</label>
+                </li>
+                
+                {# Paramètres généraux #}
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link">
+                        <span class="nxl-micon"><i class="feather-settings"></i></span>
+                        <span class="nxl-mtext">Configuration</span>
+                        <span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                    </a>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Informations du magasin</a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Horaires d'ouverture</a>
+                        </li>
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="#">Zone de livraison</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            
+            {# Card Promo (optional - you can remove this) #}
+            <div class="card text-center mt-4">
+                <div class="card-body">
+                    <i class="feather-truck fs-4 text-primary"></i>
+                    <h6 class="mt-4 text-dark fw-bolder">Espace Commerçant</h6>
+                    <p class="fs-11 my-3 text-muted">Gérez votre activité commerciale</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

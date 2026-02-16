@@ -1,0 +1,212 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Gestion des commandes - TGV Delivery{% endblock %}
+
+{% block body %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-clipboard-check"></i> Commandes</h1>
+        <p class="text-muted">Gérer toutes les commandes client</p>
+    </div>
+    <a href="{{ path('app_commande_new') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Nouvelle commande
+    </a>
+</div>
+
+<!-- BARRE DE RECHERCHE -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_commande_index') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" 
+                                   name="search" 
+                                   class="form-control" 
+                                   placeholder="Rechercher par référence, ID ou prix..." 
+                                   value="{{ search|default('') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-search"></i> Chercher
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <a href="{{ path('app_commande_index') }}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Garder les paramètres de tri -->
+                    <input type="hidden" name="sort" value="{{ sortBy|default('id') }}">
+                    <input type="hidden" name="order" value="{{ order|default('DESC') }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLEAU DES COMMANDES -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list"></i> Liste des commandes ({{ commandes|length }})</span>
+        {% if search|default('') %}
+            <span class="badge bg-info">Recherche: "{{ search }}"</span>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <a href="{{ path('app_commande_index', {
+                            search: search|default(''), 
+                            sort: 'id', 
+                            order: (sortBy|default('id') == 'id' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            # 
+                            {% if sortBy|default('id') == 'id' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_commande_index', {
+                            search: search|default(''), 
+                            sort: 'reference', 
+                            order: (sortBy|default('id') == 'reference' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Référence
+                            {% if sortBy|default('id') == 'reference' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_commande_index', {
+                            search: search|default(''), 
+                            sort: 'totalPrix', 
+                            order: (sortBy|default('id') == 'totalPrix' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Prix total
+                            {% if sortBy|default('id') == 'totalPrix' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_commande_index', {
+                            search: search|default(''), 
+                            sort: 'statut', 
+                            order: (sortBy|default('id') == 'statut' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Statut
+                            {% if sortBy|default('id') == 'statut' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th>Produits</th>
+                    <th>
+                        <a href="{{ path('app_commande_index', {
+                            search: search|default(''), 
+                            sort: 'dateCreation', 
+                            order: (sortBy|default('id') == 'dateCreation' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
+                        }) }}" class="text-decoration-none text-dark">
+                            Date création
+                            {% if sortBy|default('id') == 'dateCreation' %}
+                                <i class="bi bi-arrow-{{ order|default('DESC') == 'ASC' ? 'up' : 'down' }}"></i>
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if commandes|length > 0 %}
+                {% for commande in commandes %}
+                <tr>
+                    <td><strong>{{ commande.id }}</strong></td>
+                    <td><strong>{{ commande.reference }}</strong></td>
+                    <td>
+                        <span class="text-success" style="font-size: 1.1rem; font-weight: bold;">
+                            {{ commande.totalPrix }}€
+                        </span>
+                    </td>
+                    <td>
+                        {% if commande.statut == 'en_attente' %}
+                            <span class="badge bg-warning"><i class="bi bi-hourglass"></i> En attente</span>
+                        {% elseif commande.statut == 'confirmee' %}
+                            <span class="badge bg-info"><i class="bi bi-check-circle"></i> Confirmée</span>
+                        {% elseif commande.statut == 'en_preparation' %}
+                            <span class="badge bg-primary"><i class="bi bi-gear"></i> En préparation</span>
+                        {% elseif commande.statut == 'prete' %}
+                            <span class="badge bg-info"><i class="bi bi-check2"></i> Prête</span>
+                        {% elseif commande.statut == 'en_livraison' %}
+                            <span class="badge bg-primary"><i class="bi bi-truck"></i> En livraison</span>
+                        {% elseif commande.statut == 'livree' %}
+                            <span class="badge bg-success"><i class="bi bi-check-lg"></i> Livrée</span>
+                        {% elseif commande.statut == 'annulee' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Annulée</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ commande.statutLibelle }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">
+                            {{ commande.produits|length }} article(s)
+                        </span>
+                    </td>
+                    <td class="text-muted small">
+                        {{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : '-' }}
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{{ path('app_commande_show', {'id': commande.id}) }}" 
+                               class="btn btn-sm btn-outline-info" 
+                               title="Voir les détails"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ path('app_commande_edit', {'id': commande.id}) }}" 
+                               class="btn btn-sm btn-outline-warning" 
+                               title="Modifier cette commande"
+                               data-bs-toggle="tooltip">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" 
+                                  action="{{ path('app_commande_delete', {'id': commande.id}) }}" 
+                                  style="display:inline;" 
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.id) }}">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        title="Supprimer cette commande"
+                                        data-bs-toggle="tooltip">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                        <p class="mt-2">
+                            {% if search|default('') %}
+                                Aucune commande trouvée pour "{{ search }}"
+                            {% else %}
+                                Aucune commande trouvée
+                            {% endif %}
+                        </p>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "client/base_client.html.twig" %}
+
+{% block title %}{{ produit.nom }} - TGV Delivery{% endblock %}
+
+{% block hero %}
+<div class="hero">
+    <h1><i class="bi bi-bag"></i> Détails du produit</h1>
+    <p>Informations complètes sur le produit sélectionné</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-box"></i> {{ produit.nom }}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- IMAGE PRINCIPALE -->
+                    <div class="product-main-image mb-4">
+                        <div class="image-placeholder-large">
+                            <i class="bi bi-image"></i>
+                        </div>
+                        {% if produit.statut == 'actif' %}
+                            <span class="product-badge-large active">Disponible</span>
+                        {% elseif produit.statut == 'inactif' %}
+                            <span class="product-badge-large inactive">Indisponible</span>
+                        {% else %}
+                            <span class="product-badge-large out-of-stock">Rupture</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- INFORMATIONS -->
+                    <div class="product-details">
+                        <div class="detail-row">
+                            <strong>Référence :</strong>
+                            <span>{{ produit.idProd }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Description :</strong>
+                            <p>{{ produit.description }}</p>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Prix :</strong>
+                            <span class="price-large">{{ produit.prix }}€</span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Stock :</strong>
+                            <span>
+                                {% if produit.stock > 0 %}
+                                    <span class="stock-available-large">{{ produit.stock }} unités</span>
+                                {% else %}
+                                    <span class="stock-unavailable-large">Rupture de stock</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Statut :</strong>
+                            <span class="badge bg-{{ produit.statut == 'actif' ? 'success' : (produit.statut == 'inactif' ? 'danger' : 'warning') }}">
+                                {{ produit.statut|capitalize }}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <strong>Date d'ajout :</strong>
+                            <span>{{ produit.dateCreation ? produit.dateCreation|date('d/m/Y H:i') : '-' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="product-actions-large">
+                        {% if produit.stock > 0 %}
+                            <button class="btn btn-success btn-lg" onclick="addToCart({{ produit.id }}, '{{ produit.nom }}', {{ produit.prix }})">
+                                <i class="bi bi-cart-plus"></i> Ajouter au panier
+                            </button>
+                        {% else %}
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-cart-x"></i> Rupture de stock
+                            </button>
+                        {% endif %}
+                        <a href="{{ path('client_produits') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Retour aux produits
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- PRODUITS SIMILAIRES -->
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="bi bi-grid"></i> Produits similaires</h6>
+                </div>
+                <div class="card-body">
+                    {% if produitsSimilaires|length > 0 %}
+                        {% for produitSimilaire in produitsSimilaires %}
+                            <div class="similar-product">
+                                <div class="similar-image">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                <div class="similar-info">
+                                    <h6>{{ produitSimilaire.nom }}</h6>
+                                    <p class="price">{{ produitSimilaire.prix }}€</p>
+                                    {% if produitSimilaire.stock > 0 %}
+                                        <small class="text-success">En stock</small>
+                                    {% else %}
+                                        <small class="text-danger">Rupture</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">Aucun produit similaire trouvé</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-main-image {
+    position: relative;
+    height: 300px;
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.image-placeholder-large {
+    color: white;
+    opacity: 0.7;
+}
+
+.image-placeholder-large i {
+    font-size: 4rem;
+}
+
+.product-badge-large {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.product-badge-large.active {
+    background: #28a745;
+    color: white;
+}
+
+.product-badge-large.inactive {
+    background: #dc3545;
+    color: white;
+}
+
+.product-badge-large.out-of-stock {
+    background: #ffc107;
+    color: #212529;
+}
+
+.product-details {
+    margin-bottom: 2rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-row strong {
+    color: var(--secondary-color);
+}
+
+.price-large {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.stock-available-large {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.stock-unavailable-large {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.product-actions-large {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.similar-product {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+
+.similar-product:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.similar-image {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    opacity: 0.8;
+}
+
+.similar-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.similar-info .price {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+</style>
+
+<script>
+function addToCart(id, name, price) {
+    // Animation de confirmation
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="bi bi-check"></i> Ajouté au panier !';
+    button.classList.remove('btn-success');
+    button.classList.add('btn-outline-success');
+    
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.classList.remove('btn-outline-success');
+        button.classList.add('btn-success');
+    }, 2000);
+}
+</script>
+{% endblock %}

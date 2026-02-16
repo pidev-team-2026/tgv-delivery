@@ -1,0 +1,165 @@
+/* ===================================
+   CLIENT FOOTER - STYLES MODERNES AVEC GRADIENT
+   Palette: Gradient bleu-vert (#1e3a5f → #2ecc71)
+   =================================== */
+
+/* Footer moderne avec palette TGV Delivery */
+.footer-modern, .footer-shop {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2ecc71 100%) !important;
+    color: white !important;
+    padding: 3rem 0 1rem 0 !important;
+    margin-top: 4rem !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-modern::before, .footer-shop::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0.3) 0%, 
+        rgba(255,255,255,0.8) 50%, 
+        rgba(255,255,255,0.3) 100%);
+}
+
+.footer-modern h5, .footer-shop h5 {
+    color: white !important;
+    font-weight: 700 !important;
+    margin-bottom: 1.5rem !important;
+    font-size: 1.2rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+.footer-modern h5 i, .footer-shop h5 i {
+    color: #2ecc71 !important;
+    margin-right: 0.5rem !important;
+}
+
+.footer-modern p, .footer-shop p {
+    color: rgba(255,255,255,0.9) !important;
+    line-height: 1.6 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.footer-links, .footer-shop ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.footer-links li, .footer-shop ul li {
+    margin-bottom: 0.8rem !important;
+}
+
+.footer-links a, .footer-shop a {
+    color: rgba(255,255,255,0.8) !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    padding: 0.3rem 0 !important;
+    display: inline-block !important;
+    position: relative !important;
+}
+
+.footer-links a::before, .footer-shop a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #2ecc71;
+    transition: width 0.3s ease;
+}
+
+.footer-links a:hover, .footer-shop a:hover {
+    color: white !important;
+    transform: translateX(5px) !important;
+}
+
+.footer-links a:hover::before, .footer-shop a:hover::before {
+    width: 100% !important;
+}
+
+.footer-contact {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.footer-contact li {
+    margin-bottom: 1rem !important;
+    color: rgba(255,255,255,0.8) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+}
+
+.footer-contact i {
+    color: #2ecc71 !important;
+    font-size: 1.1rem !important;
+    width: 20px !important;
+}
+
+.social-links {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-top: 1.5rem !important;
+}
+
+.social-links a {
+    width: 40px !important;
+    height: 40px !important;
+    background: rgba(255,255,255,0.1) !important;
+    border: 2px solid rgba(255,255,255,0.2) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    font-size: 1.1rem !important;
+}
+
+.social-links a:hover {
+    background: #2ecc71 !important;
+    border-color: #2ecc71 !important;
+    transform: translateY(-3px) scale(1.1) !important;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4) !important;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.2) !important;
+    margin-top: 2rem !important;
+    padding-top: 1.5rem !important;
+    text-align: center !important;
+}
+
+.footer-bottom p {
+    color: rgba(255,255,255,0.7) !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+/* Logo sans cadre, plus grand */
+.brand img {
+    height: 90px !important;
+    width: auto;
+    filter: brightness(0) invert(1);
+    transition: all 0.2s ease;
+    background: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.brand:hover img {
+    filter: brightness(0) invert(1);
+    transform: scale(1.02);
+}

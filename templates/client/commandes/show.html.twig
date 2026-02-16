@@ -1,0 +1,292 @@
+{% extends "client/base_client.html.twig" %}
+
+{% block title %}Commande #{{ commande.reference }} - TGV Delivery{% endblock %}
+
+{% block hero %}
+<div class="hero">
+    <h1><i class="bi bi-clipboard-check"></i> Détails de la commande</h1>
+    <p>Suivez l'état de votre commande #{{ commande.reference }}</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-receipt"></i> Commande #{{ commande.reference }}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- STATUT DE LA COMMANDE -->
+                    <div class="order-status-large mb-4">
+                        {% if commande.statut == 'en attente' %}
+                            <div class="status-badge-large bg-warning">
+                                <i class="bi bi-hourglass"></i>
+                                <span>En attente de validation</span>
+                            </div>
+                        {% elseif commande.statut == 'confirmée' %}
+                            <div class="status-badge-large bg-info">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Commande confirmée</span>
+                            </div>
+                        {% elseif commande.statut == 'expédiée' %}
+                            <div class="status-badge-large bg-primary">
+                                <i class="bi bi-box"></i>
+                                <span>Commande expédiée</span>
+                            </div>
+                        {% elseif commande.statut == 'livrée' %}
+                            <div class="status-badge-large bg-success">
+                                <i class="bi bi-check-lg"></i>
+                                <span>Commande livrée</span>
+                            </div>
+                        {% elseif commande.statut == 'annulée' %}
+                            <div class="status-badge-large bg-danger">
+                                <i class="bi bi-x-circle"></i>
+                                <span>Commande annulée</span>
+                            </div>
+                        {% else %}
+                            <div class="status-badge-large bg-secondary">
+                                <i class="bi bi-question-circle"></i>
+                                <span>{{ commande.statut }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- INFORMATIONS PRINCIPALES -->
+                    <div class="order-info">
+                        <div class="info-row">
+                            <strong>Date de commande :</strong>
+                            <span>{{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : '-' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>Total TTC :</strong>
+                            <span class="price-xlarge">{{ commande.totalPrix }}€</span>
+                        </div>
+                        <div class="info-row">
+                            <strong>Nombre d'articles :</strong>
+                            <span>{{ commande.produits|length }} article(s)</span>
+                        </div>
+                    </div>
+
+                    <!-- PRODUITS DE LA COMMANDE -->
+                    <div class="order-products-section">
+                        <h6><i class="bi bi-box"></i> Articles de la commande</h6>
+                        <div class="products-list">
+                            {% for item in commande.produits %}
+                                <div class="order-item">
+                                    <div class="item-image">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                    <div class="item-details">
+                                        <h6>{{ item.nom }}</h6>
+                                        <p class="text-muted small">{{ item.description|slice(0, 100) }}{% if item.description|length > 100 %}...{% endif %}</p>
+                                        <div class="item-meta">
+                                            <span class="price">{{ item.prix }}€</span>
+                                            <span class="quantity">× {{ item.quantite|default(1) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="order-actions-section">
+                        {% if commande.statut == 'en attente' or commande.statut == 'confirmée' %}
+                            <a href="{{ path('client_commande_edit', {'id': commande.id}) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Modifier la commande
+                            </a>
+                        {% endif %}
+                        <a href="{{ path('client_commandes') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i> Retour à mes commandes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- INFORMATIONS DE LIVRAISON -->
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="bi bi-truck"></i> Livraison</h6>
+                </div>
+                <div class="card-body">
+                    <div class="delivery-info">
+                        <div class="delivery-row">
+                            <strong>Adresse :</strong>
+                            <p>123 Rue de la Livraison<br>75001 Paris<br>France</p>
+                        </div>
+                        <div class="delivery-row">
+                            <strong>Téléphone :</strong>
+                            <p>+33 1 23 45 67 89</p>
+                        </div>
+                        <div class="delivery-row">
+                            <strong>Email :</strong>
+                            <p>client@tgvdelivery.com</p>
+                        </div>
+                        <div class="delivery-row">
+                            <strong>Mode de livraison :</strong>
+                            <p>Standard (2-3 jours)</p>
+                        </div>
+                    </div>
+                    
+                    <!-- SUIVI -->
+                    <div class="tracking-section">
+                        <h6><i class="bi bi-geo-alt"></i> Suivi de livraison</h6>
+                        <div class="tracking-placeholder">
+                            <p class="text-muted">Le suivi sera disponible lorsque la commande sera expédiée</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.order-status-large {
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.status-badge-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.status-badge-large i {
+    font-size: 1.2rem;
+}
+
+.order-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row strong {
+    color: var(--secondary-color);
+}
+
+.price-xlarge {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.order-products-section {
+    margin-bottom: 2rem;
+}
+
+.products-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.order-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.item-image {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+    opacity: 0.8;
+}
+
+.item-details h6 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.item-details p {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-meta .price {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.item-meta .quantity {
+    background: #e9ecef;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.order-actions-section {
+    display: flex;
+    gap: 1rem;
+}
+
+.delivery-info {
+    margin-bottom: 2rem;
+}
+
+.delivery-row {
+    margin-bottom: 1rem;
+}
+
+.delivery-row strong {
+    color: var(--secondary-color);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.tracking-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.tracking-placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+</style>
+{% endblock %}

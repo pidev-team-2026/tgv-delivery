@@ -1,0 +1,232 @@
+{% extends 'commercant/base_commercant.html.twig' %}
+
+{% block title %}Modifier un produit - Espace Commerçant{% endblock %}
+
+{% block page_title %}Modifier un produit{% endblock %}
+
+{% block page_actions %}
+    <a href="{{ path('app_commercant_produits') }}" class="btn btn-return-list">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+    </a>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-box"></i> Informations du produit</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, { attr: { class: 'product-form-modern' } }) }}
+
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.nom, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.nom, { attr: { class: 'form-control form-control-lg', placeholder: '' } }) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.prix, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.prix, { attr: { class: 'form-control form-control-lg', placeholder: '' } }) }}
+                        {{ form_errors(form.prix) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        <label class="form-label">Image du produit</label>
+                        <div class="upload-box" id="uploadBox">
+                            <div class="upload-content" id="uploadContent">
+                                <div class="upload-icon">
+                                    <i class="bi bi-plus-lg"></i>
+                                </div>
+                                <div class="upload-text">
+                                    Cliquez pour changer l’image
+                                    <div class="upload-subtext">PNG, JPG (recommandé)</div>
+                                </div>
+                            </div>
+                            <img id="imagePreview" class="upload-preview d-none" alt="Aperçu" />
+                            {% if produit.image %}
+                                <img id="existingImage" class="upload-preview" src="{{ asset(produit.image) }}" alt="{{ produit.nom }}" />
+                            {% endif %}
+                        </div>
+                        <div class="d-none">
+                            {{ form_widget(form.image, { attr: { id: 'productImageInput', accept: 'image/*' } }) }}
+                        </div>
+                        {{ form_errors(form.image) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.categorie, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.categorie, { attr: { class: 'form-select form-select-lg' } }) }}
+                        {{ form_errors(form.categorie) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.statut, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.statut, { attr: { class: 'form-select form-select-lg' } }) }}
+                        {{ form_errors(form.statut) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.stock, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.stock, { attr: { class: 'form-control form-control-lg', placeholder: '' } }) }}
+                        {{ form_errors(form.stock) }}
+                    </div>
+
+                    <div class="col-12 col-md-6 mb-3">
+                        {{ form_label(form.promotion, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.promotion, { attr: { class: 'form-control form-control-lg', placeholder: '' } }) }}
+                        {{ form_errors(form.promotion) }}
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        {{ form_label(form.description, null, { label_attr: { class: 'form-label' } }) }}
+                        {{ form_widget(form.description, { attr: { class: 'form-control', rows: 5, placeholder: '' } }) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Mettre à jour
+                    </button>
+                    <a href="{{ path('app_commercant_produits') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+.product-form-modern .form-label {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.btn-return-list {
+    padding: 0.25rem 0.5rem;
+    color: #495057;
+}
+
+.btn-return-list:hover {
+    color: #212529;
+}
+
+.btn-return-list:focus,
+.btn-return-list:active {
+    box-shadow: none;
+    background: transparent;
+}
+
+.upload-box {
+    border: 2px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 14px;
+    background: #fbfdff;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.upload-box:hover {
+    border-color: rgba(25, 135, 84, 0.6);
+    background: #f6fffa;
+}
+
+.upload-content {
+    text-align: center;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.upload-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(25, 135, 84, 0.08);
+    color: #198754;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.upload-subtext {
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.upload-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.form-actions .btn {
+    min-width: 150px;
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const box = document.getElementById('uploadBox');
+    const input = document.getElementById('productImageInput') || document.querySelector('input[type="file"][name$="[image]"]');
+    const preview = document.getElementById('imagePreview');
+    const content = document.getElementById('uploadContent');
+    const existing = document.getElementById('existingImage');
+
+    if (!box || !input || !preview || !content) return;
+
+    box.addEventListener('click', function () {
+        input.click();
+    });
+
+    input.addEventListener('change', function () {
+        const file = input.files && input.files[0];
+        if (!file) {
+            preview.classList.add('d-none');
+            preview.removeAttribute('src');
+            if (existing) existing.classList.remove('d-none');
+            content.classList.toggle('d-none', !!(existing && existing.getAttribute('src')));
+            return;
+        }
+
+        if (!file.type || !file.type.startsWith('image/')) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.classList.remove('d-none');
+            content.classList.add('d-none');
+            if (existing) existing.classList.add('d-none');
+        };
+        reader.readAsDataURL(file);
+    });
+});
+</script>
+{% endblock %}
