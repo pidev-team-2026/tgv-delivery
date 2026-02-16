@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un utilisateur - Delivery App{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'partials/duralux_navbar.html.twig' %}
+    {% include 'partials/duralux_header.html.twig' %}
+
+    <main class="nxl-container">
+        <div class="nxl-content">
+            <!-- ===== Page Header ===== -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Ajouter un utilisateur</h5>
+                    </div>
+                </div>
+                <div class="page-header-right">
+                    <div class="d-flex align-items-center justify-content-end w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path('app_customers') }}">Utilisateurs</a></li>
+                            <li class="breadcrumb-item active">Ajouter un utilisateur</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Flash Messages ===== -->
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show mb-3">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <!-- ===== Create User Form ===== -->
+            <div class="card mx-4 mt-3">
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_customers_create') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('authenticate') }}">
+                        
+                        <!-- Basic Information -->
+                        <h6 class="mb-3">
+                            <i class="feather-user me-2"></i>Informations de base
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Téléphone</label>
+                                <input type="text" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="role" class="form-label">Rôle</label>
+                                <select class="form-select" id="role" name="role" required onchange="toggleRoleSpecificFields()">
+                                    <option value="client">Client</option>
+                                    <option value="merchant">Commerçant</option>
+                                    <option value="courier">Livreur</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Merchant Specific Fields -->
+                        <div id="merchantFields" class="border-top pt-3 mt-3" style="display: none;">
+                            <h6 class="mb-3">
+                                <i class="feather-shopping-bag me-2"></i>Informations commerciales
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="cin" class="form-label">CIN</label>
+                                    <input type="text" class="form-control" id="cin" name="cin">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="businessName" class="form-label">Nom commercial</label>
+                                    <input type="text" class="form-control" id="businessName" name="businessName">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="businessType" class="form-label">Type d'entreprise</label>
+                                    <input type="text" class="form-control" id="businessType" name="businessType">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="location" class="form-label">Localisation</label>
+                                    <input type="text" class="form-control" id="location" name="location">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Courier Specific Fields -->
+                        <div id="courierFields" class="border-top pt-3 mt-3" style="display: none;">
+                            <h6 class="mb-3">
+                                <i class="feather-truck me-2"></i>Informations de livraison
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="cin" class="form-label">CIN</label>
+                                    <input type="text" class="form-control" id="cinCourier" name="cin">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="licenseNumber" class="form-label">Numéro de licence</label>
+                                    <input type="text" class="form-control" id="licenseNumber" name="licenseNumber">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label for="vehicleType" class="form-label">Type de véhicule</label>
+                                    <input type="text" class="form-control" id="vehicleType" name="vehicleType">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ path('app_customers') }}" class="btn btn-secondary">
+                                        <i class="feather-arrow-left me-2"></i>Retour
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="feather-save me-2"></i>Créer l'utilisateur
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% include 'partials/duralux_footer.html.twig' %}
+    </main>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script>
+function toggleRoleSpecificFields() {
+    const role = document.getElementById('role').value;
+    const merchantFields = document.getElementById('merchantFields');
+    const courierFields = document.getElementById('courierFields');
+    
+    // Hide all role-specific fields first
+    merchantFields.style.display = 'none';
+    courierFields.style.display = 'none';
+    
+    // Show relevant fields based on role
+    if (role === 'merchant') {
+        merchantFields.style.display = 'block';
+    } else if (role === 'courier') {
+        courierFields.style.display = 'block';
+    }
+    
+    // Clear CIN field when switching roles to avoid confusion
+    if (role === 'client') {
+        document.getElementById('cin').value = '';
+        document.getElementById('cinCourier').value = '';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleRoleSpecificFields();
+});
+</script>
+{% endblock %}

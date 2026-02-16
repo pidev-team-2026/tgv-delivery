@@ -1,0 +1,230 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register - Delivery App{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    <!--! ================================================================ !-->
+    <!--! [Start] Main Content !-->
+    <!--! ================================================================ !-->
+    <main class="auth-creative-wrapper">
+        <div class="auth-creative-inner">
+            <div class="creative-card-wrapper">
+                <div class="card my-4 overflow-hidden" style="z-index: 1">
+                    <div class="row flex-1 g-0">
+                        <div class="col-lg-6 h-100 my-auto order-1 order-lg-0">
+                            <div class="wd-50 bg-white p-2 rounded-circle shadow-lg position-absolute translate-middle top-50 start-50 d-none d-lg-block">
+                                <img src="{{ asset('assets/images/tgv.png') }}" alt="" class="img-fluid">
+                            </div>
+                            <div class="creative-card-body card-body p-sm-5">
+                                <h2 class="fs-20 fw-bolder mb-4">Register</h2>
+                                <h4 class="fs-13 fw-bold mb-2">Rejoignez notre plateforme de livraison</h4>
+                                <p class="fs-12 fw-medium text-muted">Créez votre compte et commencez à utiliser nos services de livraison.</p>
+
+                                <!-- ===== Flash Messages ===== -->
+                                {% for label, messages in app.flashes %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ label }} alert-dismissible fade show mb-3">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+
+                                <!-- ===== Role Switcher ===== -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold mb-3">Créer un compte en tant que:</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <a href="{{ path('app_register', { role: 'client' }) }}"
+                                           class="btn btn-outline-primary flex-fill {{ role == 'client' ? 'active' : '' }}">
+                                            <i class="feather-user me-1"></i> Client
+                                        </a>
+                                        <a href="{{ path('app_register', { role: 'merchant' }) }}"
+                                           class="btn btn-outline-primary flex-fill {{ role == 'merchant' ? 'active' : '' }}">
+                                            <i class="feather-shopping-bag me-1"></i> Marchand
+                                        </a>
+                                        <a href="{{ path('app_register', { role: 'courier' }) }}"
+                                           class="btn btn-outline-primary flex-fill {{ role == 'courier' ? 'active' : '' }}">
+                                            <i class="feather-truck me-1"></i> Livreur
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {{ form_start(form, {
+                                    action: path('app_register', { role: role }),
+                                    method: 'POST',
+                                    attr: { novalidate: 'novalidate' }
+                                }) }}
+
+                                <div class="row g-3">
+
+                                    <!-- Common fields -->
+                                    <div class="col-md-6">
+                                        {{ form_row(form.firstName, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.lastName, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.email, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.phone, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.password, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.confirmPassword, {
+                                            attr: { class: 'form-control' },
+                                            label_attr: { class: 'form-label fw-semibold' }
+                                        }) }}
+                                    </div>
+
+                                    <!-- Merchant fields -->
+                                    {% if role == 'merchant' %}
+                                        <div class="col-12 mt-3">
+                                            <h6 class="text-primary fw-semibold mb-3">
+                                                <i class="feather-shopping-bag me-2"></i>Informations Entreprise
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.cin, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.businessName, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.businessType, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.location, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Courier fields -->
+                                    {% if role == 'courier' %}
+                                        <div class="col-12 mt-3">
+                                            <h6 class="text-primary fw-semibold mb-3">
+                                                <i class="feather-truck me-2"></i>Informations Livraison
+                                            </h6>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.cin, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.licenseNumber, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.vehicleType, {
+                                                attr: { class: 'form-control' },
+                                                label_attr: { class: 'form-label fw-semibold' }
+                                            }) }}
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="feather-user-plus me-2"></i>Créer Compte {{ role == 'merchant' ? 'Marchand' : role == 'courier' ? 'Livreur' : 'Client' }}
+                                    </button>
+                                </div>
+
+                                {{ form_end(form) }}
+
+                                <div class="mt-4 text-center">
+                                    <span class="text-muted">Vous avez déjà un compte?</span>
+                                    <a href="{{ path('app_login') }}" class="fw-bold text-primary">Connectez-vous ici</a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 bg-success order-0 order-lg-1">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-4">
+                                <div class="text-center text-white">
+                                    <i class="feather-users display-1 mb-4"></i>
+                                    <h3 class="mb-3">Rejoignez Notre Réseau de Livraison</h3>
+                                    <p class="mb-4">Devenez partie de la plateforme de livraison la plus rapide de votre région.</p>
+                                    <div class="row text-start">
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Service Rapide & Fiable</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Suivi en Temps Réel</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Paiements Sécurisés</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Support 24/7</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--! ================================================================ !-->
+    <!--! [End] Main Content !-->
+    <!--! ================================================================ !-->
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
+{% endblock %}

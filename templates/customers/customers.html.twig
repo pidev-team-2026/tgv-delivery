@@ -1,0 +1,760 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clients - Delivery App{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'partials/duralux_navbar.html.twig' %}
+    {% include 'partials/duralux_header.html.twig' %}
+
+    <main class="nxl-container">
+        <div class="nxl-content">
+            <!-- ===== Flash Messages ===== -->
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show mb-3">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <!-- ===== Page Header ===== -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Utilisateurs</h5>
+                    </div>
+                </div>
+                <div class="page-header-right">
+                    <div class="d-flex align-items-center justify-content-end w-100">
+                        <ul class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                            <li class="breadcrumb-item active">Utilisateurs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Search and Filter Bar ===== -->
+            <div class="row mb-4 mx-4 mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <div class="input-group" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Rechercher des clients..." id="searchInput">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="feather-search"></i>
+                                </button>
+                            </div>
+                            <select class="form-select" style="width: 150px;" id="roleFilter">
+                                <option value="">Tous les rôles</option>
+                                <option value="client">Clients</option>
+                                <option value="merchant">Commerçants</option>
+                                <option value="courier">Livreurs</option>
+                            </select>
+                        </div>
+                        <a href="{{ path('app_customers_create') }}" class="btn btn-primary">
+                            <i class="feather-user-plus me-2"></i>Ajouter un client
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Customers Table ===== -->
+            <div class="card mx-4 mt-3">
+
+                <div class="card-body">
+                    {% if users is empty %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="feather-users display-1 text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">Aucun client trouvé</h5>
+                            <p class="text-muted">Commencez par ajouter votre premier client</p>
+                            <a href="{{ path('app_customers_create') }}" class="btn btn-primary">
+                                <i class="feather-user-plus me-2"></i>Ajouter le premier client
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                            </div>
+                                        </th>
+                                        <th class="sortable" data-sort="name">
+                                            Client 
+                                            <i class="feather-chevron-up ms-1 sort-icon" style="font-size: 12px;"></i>
+                                        </th>
+                                        <th class="sortable" data-sort="email">
+                                            Email 
+                                            <i class="feather-chevron-up ms-1 sort-icon" style="font-size: 12px;"></i>
+                                        </th>
+                                        <th>Téléphone</th>
+                                        <th class="sortable" data-sort="role">
+                                            Rôle 
+                                            <i class="feather-chevron-up ms-1 sort-icon" style="font-size: 12px;"></i>
+                                        </th>
+                                        <th>Créé le</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody">
+                                    {% for user in users %}
+                                        <tr data-role="{{ user.role }}" data-user-id="{{ user.id }}">
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input customer-checkbox" type="checkbox" value="{{ user.id }}">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar avatar-sm avatar-rounded me-3">
+                                                        {% if user.role == 'client' %}
+                                                            <i class="feather-user"></i>
+                                                        {% elseif user.role == 'merchant' %}
+                                                            <i class="feather-shopping-bag"></i>
+                                                        {% else %}
+                                                            <i class="feather-truck"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">{{ user.firstName }} {{ user.lastName }}</h6>
+                                                        <small class="text-muted">ID: #{{ user.id }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ user.phone }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if user.role == 'client' %}bg-success
+                                                    {% elseif user.role == 'merchant' %}bg-warning
+                                                    {% else %}bg-info{% endif %}">
+                                                    {{ user.role|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">User #{{ user.id }}</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" title="View" 
+                                                            data-bs-toggle="modal" data-bs-target="#viewModal"
+                                                            onclick="openViewModal({{ user.id }}, '{{ user.firstName }}', '{{ user.lastName }}', '{{ user.email }}', '{{ user.phone }}', '{{ user.role }}')">
+                                                        <i class="feather-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" title="Edit" 
+                                                            data-bs-toggle="modal" data-bs-target="#editModal"
+                                                            onclick="openEditModal({{ user.id }}, '{{ user.firstName }}', '{{ user.lastName }}', '{{ user.email }}', '{{ user.phone }}', '{{ user.role }}')">
+                                                        <i class="feather-edit"></i>
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" 
+                                                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                            onclick="openDeleteModal({{ user.id }}, '{{ user.firstName }} {{ user.lastName }}')">
+                                                        <i class="feather-trash-2"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ===== Pagination ===== -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <span class="text-muted">Showing {{ users|length }} of {{ users|length }} customers</span>
+                            </div>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                    </li>
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">1</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">2</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">3</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% include 'partials/duralux_footer.html.twig' %}
+    </main>
+
+    <!-- ===== View Modal ===== -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Customer Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div id="viewAvatar" class="avatar avatar-lg avatar-rounded bg-primary bg-opacity-10 mb-3">
+                                <i class="feather-user text-primary display-4"></i>
+                            </div>
+                            <h5 id="viewFullName" class="mb-1">Full Name</h5>
+                            <span id="viewRoleBadge" class="badge bg-secondary">Role</span>
+                        </div>
+                        <div class="col-md-8">
+                            <!-- Basic Information -->
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">User ID</label>
+                                    <p id="viewUserId" class="mb-0 fw-semibold">#12345</p>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">Role</label>
+                                    <p id="viewRole" class="mb-0 fw-semibold">Client</p>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">First Name</label>
+                                    <p id="viewFirstName" class="mb-0 fw-semibold">John</p>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">Last Name</label>
+                                    <p id="viewLastName" class="mb-0 fw-semibold">Doe</p>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">Email</label>
+                                    <p id="viewEmail" class="mb-0 fw-semibold">john.doe@example.com</p>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <label class="text-muted small">Phone</label>
+                                    <p id="viewPhone" class="mb-0 fw-semibold">+1234567890</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Role-specific Information -->
+                            <div id="viewMerchantInfo" class="border-top pt-3 mt-3" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="feather-shopping-bag me-2"></i>Informations commerciales
+                                </h6>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">CIN</label>
+                                        <p id="viewCin" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Nom commercial</label>
+                                        <p id="viewBusinessName" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Type d'entreprise</label>
+                                        <p id="viewBusinessType" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Localisation</label>
+                                        <p id="viewLocation" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="viewCourierInfo" class="border-top pt-3 mt-3" style="display: none;">
+                                <h6 class="mb-3">
+                                    <i class="feather-truck me-2"></i>Informations de livraison
+                                </h6>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">CIN</label>
+                                        <p id="viewCinCourier" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Numéro de licence</label>
+                                        <p id="viewLicenseNumber" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Type de véhicule</label>
+                                        <p id="viewVehicleType" class="mb-0 fw-semibold">-</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Information -->
+                            <div class="border-top pt-3 mt-3">
+                                <h6 class="mb-3">Account Information</h6>
+                                <div class="row">
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Account Status</label>
+                                        <p class="mb-0">
+                                            <span class="badge bg-success">Active</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-6 mb-3">
+                                        <label class="text-muted small">Member Since</label>
+                                        <p class="mb-0 fw-semibold">User #<span id="viewUserId2">12345</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" onclick="switchToEdit()">
+                        <i class="feather-edit me-2"></i>Edit Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Edit Modal ===== -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" id="editForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="_token" id="editToken">
+                        <input type="hidden" name="userId" id="editUserId">
+                        
+                        <!-- Basic Information -->
+                        <h6 class="mb-3">
+                            <i class="feather-user me-2"></i>Basic Information
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editFirstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="editLastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="lastName" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="editPhone" class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="editPhone" name="phone">
+                            </div>
+                            
+                            <div class="col-md-12 mb-3">
+                                <label for="editRole" class="form-label">Role</label>
+                                <select class="form-select" id="editRole" name="role" required onchange="toggleRoleSpecificFields()">
+                                    <option value="client">Client</option>
+                                    <option value="merchant">Merchant</option>
+                                    <option value="courier">Courier</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Merchant Specific Fields -->
+                        <div id="editMerchantFields" class="border-top pt-3 mt-3" style="display: none;">
+                            <h6 class="mb-3">
+                                <i class="feather-shopping-bag me-2"></i>Business Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="editCin" class="form-label">CIN</label>
+                                    <input type="text" class="form-control" id="editCin" name="cin">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="editBusinessName" class="form-label">Business Name</label>
+                                    <input type="text" class="form-control" id="editBusinessName" name="businessName">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="editBusinessType" class="form-label">Business Type</label>
+                                    <input type="text" class="form-control" id="editBusinessType" name="businessType">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="editLocation" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="editLocation" name="location">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Courier Specific Fields -->
+                        <div id="editCourierFields" class="border-top pt-3 mt-3" style="display: none;">
+                            <h6 class="mb-3">
+                                <i class="feather-truck me-2"></i>Delivery Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="editCinCourier" class="form-label">CIN</label>
+                                    <input type="text" class="form-control" id="editCinCourier" name="cin">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="editLicenseNumber" class="form-label">License Number</label>
+                                    <input type="text" class="form-control" id="editLicenseNumber" name="licenseNumber">
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="editVehicleType" class="form-label">Vehicle Type</label>
+                                    <select class="form-select" id="editVehicleType" name="vehicleType">
+                                        <option value="motorcycle">Motorcycle</option>
+                                        <option value="car">Car</option>
+                                        <option value="van">Van</option>
+                                        <option value="bicycle">Bicycle</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Delete Modal ===== -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong id="deleteCustomerName"></strong>?</p>
+                    <p class="text-muted">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" id="deleteForm" style="display: inline;">
+                        <input type="hidden" name="_token" id="deleteToken">
+                        <input type="hidden" name="userId" id="deleteUserId">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
+
+<script>
+// Search functionality
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#customersTableBody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+// Role filter functionality
+document.getElementById('roleFilter').addEventListener('change', function(e) {
+    const selectedRole = e.target.value;
+    const rows = document.querySelectorAll('#customersTableBody tr');
+    
+    rows.forEach(row => {
+        const rowRole = row.getAttribute('data-role');
+        row.style.display = (selectedRole === '' || rowRole === selectedRole) ? '' : 'none';
+    });
+});
+
+// Sort functionality
+let sortOrder = {};
+document.querySelectorAll('.sortable').forEach(header => {
+    header.addEventListener('click', function() {
+        const sortKey = this.getAttribute('data-sort');
+        const icon = this.querySelector('.sort-icon');
+        const table = document.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // Toggle sort order
+        sortOrder[sortKey] = sortOrder[sortKey] === 'asc' ? 'desc' : 'asc';
+        
+        // Update icon
+        document.querySelectorAll('.sort-icon').forEach(i => {
+            i.className = 'feather-chevron-up ms-1 sort-icon';
+        });
+        icon.className = sortOrder[sortKey] === 'asc' ? 'feather-chevron-up ms-1 sort-icon' : 'feather-chevron-down ms-1 sort-icon';
+        
+        // Sort rows
+        rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (sortKey === 'name') {
+                aValue = a.querySelector('td:nth-child(2)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(2)').textContent.trim();
+            } else if (sortKey === 'email') {
+                aValue = a.querySelector('td:nth-child(3)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(3)').textContent.trim();
+            } else if (sortKey === 'role') {
+                aValue = a.querySelector('td:nth-child(5)').textContent.trim();
+                bValue = b.querySelector('td:nth-child(5)').textContent.trim();
+            }
+            
+            if (sortOrder[sortKey] === 'asc') {
+                return aValue.localeCompare(bValue);
+            } else {
+                return bValue.localeCompare(aValue);
+            }
+        });
+        
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    });
+});
+
+// Select all checkbox
+document.getElementById('selectAll').addEventListener('change', function(e) {
+    const checkboxes = document.querySelectorAll('.customer-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = e.target.checked;
+    });
+});
+
+// View modal functions
+function openViewModal(userId, firstName, lastName, email, phone, role) {
+    console.log('Opening view modal for user:', userId, role);
+    
+    document.getElementById('viewUserId').textContent = '#' + userId;
+    document.getElementById('viewUserId2').textContent = userId;
+    document.getElementById('viewFirstName').textContent = firstName;
+    document.getElementById('viewLastName').textContent = lastName;
+    document.getElementById('viewFullName').textContent = firstName + ' ' + lastName;
+    document.getElementById('viewEmail').textContent = email;
+    document.getElementById('viewPhone').textContent = phone;
+    document.getElementById('viewRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    
+    // Update avatar and role badge
+    const avatar = document.getElementById('viewAvatar');
+    const badge = document.getElementById('viewRoleBadge');
+    badge.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+    
+    // Hide all role-specific sections first
+    document.getElementById('viewMerchantInfo').style.display = 'none';
+    document.getElementById('viewCourierInfo').style.display = 'none';
+    
+    if (role === 'client') {
+        avatar.className = 'avatar avatar-lg avatar-rounded bg-success bg-opacity-10 mb-3';
+        avatar.innerHTML = '<i class="feather-user text-success display-4"></i>';
+        badge.className = 'badge bg-success';
+    } else if (role === 'merchant') {
+        avatar.className = 'avatar avatar-lg avatar-rounded bg-warning bg-opacity-10 mb-3';
+        avatar.innerHTML = '<i class="feather-shopping-bag text-warning display-4"></i>';
+        badge.className = 'badge bg-warning';
+        document.getElementById('viewMerchantInfo').style.display = 'block';
+        
+        // Load merchant data via AJAX
+        loadMerchantData(userId);
+    } else if (role === 'courier') {
+        avatar.className = 'avatar avatar-lg avatar-rounded bg-info bg-opacity-10 mb-3';
+        avatar.innerHTML = '<i class="feather-truck text-info display-4"></i>';
+        badge.className = 'badge bg-info';
+        document.getElementById('viewCourierInfo').style.display = 'block';
+        
+        // Load courier data via AJAX
+        loadCourierData(userId);
+    }
+    
+    // Store current user data for edit switch
+    window.currentViewUser = { userId, firstName, lastName, email, phone, role };
+}
+
+// Load merchant data via AJAX
+function loadMerchantData(userId) {
+    fetch(`/customers/merchant-data/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Merchant data received:', data);
+            if (data.success && data.merchant) {
+                document.getElementById('viewCin').textContent = data.merchant.cin || 'N/A';
+                document.getElementById('viewBusinessName').textContent = data.merchant.businessName || 'N/A';
+                document.getElementById('viewBusinessType').textContent = data.merchant.businessType || 'N/A';
+                document.getElementById('viewLocation').textContent = data.merchant.location || 'N/A';
+            } else {
+                document.getElementById('viewCin').textContent = 'No merchant data';
+                document.getElementById('viewBusinessName').textContent = 'No merchant data';
+                document.getElementById('viewBusinessType').textContent = 'No merchant data';
+                document.getElementById('viewLocation').textContent = 'No merchant data';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading merchant data:', error);
+            document.getElementById('viewCin').textContent = 'Error loading data';
+            document.getElementById('viewBusinessName').textContent = 'Error loading data';
+            document.getElementById('viewBusinessType').textContent = 'Error loading data';
+            document.getElementById('viewLocation').textContent = 'Error loading data';
+        });
+}
+
+// Load courier data via AJAX
+function loadCourierData(userId) {
+    fetch(`/customers/courier-data/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Courier data received:', data);
+            if (data.success && data.courier) {
+                document.getElementById('viewCinCourier').textContent = data.courier.cin || 'N/A';
+                document.getElementById('viewLicenseNumber').textContent = data.courier.licenseNumber || 'N/A';
+                document.getElementById('viewVehicleType').textContent = data.courier.vehicleType || 'N/A';
+            } else {
+                document.getElementById('viewCinCourier').textContent = 'No courier data';
+                document.getElementById('viewLicenseNumber').textContent = 'No courier data';
+                document.getElementById('viewVehicleType').textContent = 'No courier data';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading courier data:', error);
+            document.getElementById('viewCinCourier').textContent = 'Error loading data';
+            document.getElementById('viewLicenseNumber').textContent = 'Error loading data';
+            document.getElementById('viewVehicleType').textContent = 'Error loading data';
+        });
+}
+
+// Toggle role-specific fields in edit modal
+function toggleRoleSpecificFields() {
+    const role = document.getElementById('editRole').value;
+    const merchantFields = document.getElementById('editMerchantFields');
+    const courierFields = document.getElementById('editCourierFields');
+    
+    // Hide all role-specific fields
+    merchantFields.style.display = 'none';
+    courierFields.style.display = 'none';
+    
+    // Show relevant fields based on role
+    if (role === 'merchant') {
+        merchantFields.style.display = 'block';
+    } else if (role === 'courier') {
+        courierFields.style.display = 'block';
+    }
+}
+
+// Switch from view to edit modal
+function switchToEdit() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('viewModal'));
+    modal.hide();
+    
+    // Open edit modal with current user data
+    if (window.currentViewUser) {
+        const user = window.currentViewUser;
+        setTimeout(() => {
+            openEditModal(user.userId, user.firstName, user.lastName, user.email, user.phone, user.role);
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            editModal.show();
+        }, 300);
+    }
+}
+
+// Edit modal functions
+function openEditModal(userId, firstName, lastName, email, phone, role) {
+    console.log('Opening edit modal for user:', userId, role);
+    
+    document.getElementById('editUserId').value = userId;
+    document.getElementById('editFirstName').value = firstName;
+    document.getElementById('editLastName').value = lastName;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editPhone').value = phone;
+    document.getElementById('editRole').value = role;
+    document.getElementById('editToken').value = '{{ csrf_token('edit_user_' ~ '__ID__') }}'.replace('__ID__', userId);
+    document.getElementById('editForm').action = '/customers/update/' + userId;
+    
+    // Toggle role-specific fields
+    toggleRoleSpecificFields();
+    
+    // Clear role-specific fields initially
+    document.getElementById('editCin').value = '';
+    document.getElementById('editBusinessName').value = '';
+    document.getElementById('editBusinessType').value = '';
+    document.getElementById('editLocation').value = '';
+    document.getElementById('editCinCourier').value = '';
+    document.getElementById('editLicenseNumber').value = '';
+    document.getElementById('editVehicleType').value = 'motorcycle';
+    
+    // Load role-specific data via AJAX
+    if (role === 'merchant') {
+        loadMerchantDataForEdit(userId);
+    } else if (role === 'courier') {
+        loadCourierDataForEdit(userId);
+    }
+}
+
+// Load merchant data for edit via AJAX
+function loadMerchantDataForEdit(userId) {
+    fetch(`/customers/merchant-data/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Merchant data for edit received:', data);
+            if (data.success && data.merchant) {
+                document.getElementById('editCin').value = data.merchant.cin || '';
+                document.getElementById('editBusinessName').value = data.merchant.businessName || '';
+                document.getElementById('editBusinessType').value = data.merchant.businessType || '';
+                document.getElementById('editLocation').value = data.merchant.location || '';
+            } else {
+                console.log('No merchant data found for edit');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading merchant data for edit:', error);
+        });
+}
+
+// Load courier data for edit via AJAX
+function loadCourierDataForEdit(userId) {
+    fetch(`/customers/courier-data/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Courier data for edit received:', data);
+            if (data.success && data.courier) {
+                document.getElementById('editCinCourier').value = data.courier.cin || '';
+                document.getElementById('editLicenseNumber').value = data.courier.licenseNumber || '';
+                document.getElementById('editVehicleType').value = data.courier.vehicleType || 'motorcycle';
+            } else {
+                console.log('No courier data found for edit');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading courier data for edit:', error);
+        });
+}
+
+// Delete modal functions
+function openDeleteModal(userId, userName) {
+    document.getElementById('deleteCustomerName').textContent = userName;
+    document.getElementById('deleteUserId').value = userId;
+    document.getElementById('deleteToken').value = '{{ csrf_token('delete_user_' ~ '__ID__') }}'.replace('__ID__', userId);
+    document.getElementById('deleteForm').action = '/customers/delete/' + userId;
+}
+</script>
+{% endblock %}

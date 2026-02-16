@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Duralux || Edit User</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/theme.min.css') }}" />
+</head>
+
+<body>
+
+{% include 'partials/duralux_navbar.html.twig' %}
+{% include 'partials/duralux_header.html.twig' %}
+
+<main class="nxl-container">
+    <div class="nxl-content">
+
+        <!-- ===== Page Header ===== -->
+        <div class="page-header mb-4">
+            <div class="page-header-left d-flex align-items-center">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">Edit User</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== Flash Messages ===== -->
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <!-- ===== Edit Form Card ===== -->
+        <div class="card">
+            <div class="card-body">
+
+                <h6 class="mb-3">User Information</h6>
+
+                {{ form_start(form) }}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form_row(form.firstName) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.lastName) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.email) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.phone) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.role) }}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a href="{{ path('app_dashboard') }}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+
+            </div>
+        </div>
+
+    </div>
+
+    {% include 'partials/duralux_footer.html.twig' %}
+</main>
+
+<!-- ===== JS ===== -->
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/dashboard-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
+
+</body>
+</html>
