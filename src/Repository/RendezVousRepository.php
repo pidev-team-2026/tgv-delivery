@@ -43,6 +43,23 @@ class RendezVousRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * Front Office : trouver les rendez-vous d'un utilisateur par son email.
+     *
+     * @return RendezVous[]
+     */
+    public function findByEmailDemandeur(string $email): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.commercant', 'c')
+            ->addSelect('c')
+            ->where('r.emailDemandeur = :email')
+            ->setParameter('email', $email)
+            ->orderBy('r.dateRdv', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return RendezVous[] Returns an array of RendezVous objects
     //     */

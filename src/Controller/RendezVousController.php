@@ -24,8 +24,8 @@ final class RendezVousController extends AbstractController
         $sort = $request->query->get('sort', 'dateRdv');
         $order = $request->query->get('order', 'desc');
 
-        return $this->render('rendez_vous/index.html.twig', [
-            'rendez_vouses' => $rendezVousRepository->findWithSearchAndSort($search, $sort, $order),
+        return $this->render('admin/rendez_vous/index.html.twig', [
+            'rendez_vous' => $rendezVousRepository->findWithSearchAndSort($search, $sort, $order),
             'search' => $search,
             'sort' => $sort,
             'order' => $order,
@@ -46,7 +46,7 @@ final class RendezVousController extends AbstractController
             return $this->redirectToRoute('app_rendez_vous_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('rendez_vous/new.html.twig', [
+        return $this->render('admin/rendez_vous/new.html.twig', [
             'rendez_vou' => $rendezVou,
             'form' => $form,
         ]);
@@ -55,7 +55,7 @@ final class RendezVousController extends AbstractController
     #[Route('/{id}', name: 'app_rendez_vous_show', methods: ['GET'])]
     public function show(RendezVous $rendezVou): Response
     {
-        return $this->render('rendez_vous/show.html.twig', [
+        return $this->render('admin/rendez_vous/show.html.twig', [
             'rendez_vou' => $rendezVou,
         ]);
     }
@@ -72,7 +72,7 @@ final class RendezVousController extends AbstractController
             return $this->redirectToRoute('app_rendez_vous_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('rendez_vous/edit.html.twig', [
+        return $this->render('admin/rendez_vous/edit.html.twig', [
             'rendez_vou' => $rendezVou,
             'form' => $form,
         ]);
@@ -84,8 +84,8 @@ final class RendezVousController extends AbstractController
         if ($this->isCsrfTokenValid('accepter' . $rendezVou->getId(), $request->request->get('_token'))) {
             $rendezVou->setEtat(RendezVous::ETAT_CONFIRME);
             $entityManager->flush();
+            $this->addFlash('success', 'Rendez-vous accepté.');
             $this->envoyerNotificationRdv($rendezVou, 'validation', $mailer, $twig);
-            $this->addFlash('success', 'Rendez-vous accepté. Un email a été envoyé au demandeur.');
         }
 
         return $this->redirectToRoute('app_rendez_vous_index', [], Response::HTTP_SEE_OTHER);
@@ -97,8 +97,8 @@ final class RendezVousController extends AbstractController
         if ($this->isCsrfTokenValid('refuser' . $rendezVou->getId(), $request->request->get('_token'))) {
             $rendezVou->setEtat(RendezVous::ETAT_ANNULE);
             $entityManager->flush();
+            $this->addFlash('success', 'Rendez-vous refusé.');
             $this->envoyerNotificationRdv($rendezVou, 'refus', $mailer, $twig);
-            $this->addFlash('success', 'Rendez-vous refusé. Un email a été envoyé au demandeur.');
         }
 
         return $this->redirectToRoute('app_rendez_vous_index', [], Response::HTTP_SEE_OTHER);

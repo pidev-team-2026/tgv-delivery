@@ -41,7 +41,7 @@ final class CommercantController extends AbstractController
         $sort = $request->query->get('sort', 'nom');
         $order = $request->query->get('order', 'asc');
 
-        return $this->render('commercant/index.html.twig', [
+        return $this->render('admin/commercant/index.html.twig', [
             'commercants' => $commercantRepository->findWithSearchAndSort($search, $sort, $order),
             'search' => $search,
             'sort' => $sort,
@@ -63,7 +63,7 @@ final class CommercantController extends AbstractController
             return $this->redirectToRoute('app_commercant_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('commercant/new.html.twig', [
+        return $this->render('admin/commercant/new.html.twig', [
             'commercant' => $commercant,
             'form' => $form,
         ]);
@@ -72,7 +72,7 @@ final class CommercantController extends AbstractController
     #[Route('/{id}', name: 'app_commercant_show', methods: ['GET'])]
     public function show(Commercant $commercant): Response
     {
-        return $this->render('commercant/show.html.twig', [
+        return $this->render('admin/commercant/show.html.twig', [
             'commercant' => $commercant,
         ]);
     }
@@ -89,7 +89,7 @@ final class CommercantController extends AbstractController
             return $this->redirectToRoute('app_commercant_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('commercant/edit.html.twig', [
+        return $this->render('admin/commercant/edit.html.twig', [
             'commercant' => $commercant,
             'form' => $form,
         ]);

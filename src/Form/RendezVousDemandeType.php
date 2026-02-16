@@ -20,14 +20,20 @@ class RendezVousDemandeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('commercant', EntityType::class, [
+        ;
+
+        if (!$options['commercant_fixed']) {
+            $builder->add('commercant', EntityType::class, [
                 'class' => Commercant::class,
                 'choice_label' => function (Commercant $c) {
                     return $c->getNom() . ' (' . ($c->getMetier() ?? '—') . ')';
                 },
                 'label' => 'Commerçant',
                 'placeholder' => 'Choisir un commerçant',
-            ])
+            ]);
+        }
+
+        $builder
             ->add('emailDemandeur', EmailType::class, [
                 'label' => 'Votre email (pour recevoir la réponse)',
                 'required' => true,
@@ -44,6 +50,9 @@ class RendezVousDemandeType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => RendezVous::class,
+            'commercant_fixed' => false,
         ]);
+
+        $resolver->setAllowedTypes('commercant_fixed', 'bool');
     }
 }

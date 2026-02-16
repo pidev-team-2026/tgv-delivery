@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\RendezVous;
 use App\Form\RendezVousDemandeType;
 use App\Repository\CommercantRepository;
+use App\Repository\RendezVousRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,12 +47,24 @@ final class FrontController extends AbstractController
     /**
      * Demander un rendez-vous (utilisateur) — créé avec état En attente ; le commerçant accepte ou refuse ensuite.
      */
-    #[Route('/rendez-vous/demander', name: 'rendez_vous_demander', methods: ['GET', 'POST'])]
-    public function demanderRendezVous(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/rendez-vous/demander/{commercantId}', name: 'rendez_vous_demander', requirements: ['commercantId' => '\\d+'], defaults: ['commercantId' => null], methods: ['GET', 'POST'])]
+    public function demanderRendezVous(Request $request, EntityManagerInterface $entityManager, CommercantRepository $commercantRepository, ?int $commercantId = null): Response
     {
         $rendezVous = new RendezVous();
         $rendezVous->setEtat(RendezVous::ETAT_EN_ATTENTE);
-        $form = $this->createForm(RendezVousDemandeType::class, $rendezVous);
+
+        $commercantFixed = false;
+        if ($commercantId !== null) {
+            $commercant = $commercantRepository->find($commercantId);
+            if ($commercant !== null) {
+                $rendezVous->setCommercant($commercant);
+                $commercantFixed = true;
+            }
+        }
+
+        $form = $this->createForm(RendezVousDemandeType::class, $rendezVous, [
+            'commercant_fixed' => $commercantFixed,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -65,6 +78,24 @@ final class FrontController extends AbstractController
         return $this->render('front/rendez_vous_demander.html.twig', [
             'rendez_vous' => $rendezVous,
             'form' => $form,
+        ]);
+    }
+
+    /**
+     * Mes rendez-vous (utilisateur connecté).
+     */
+    #[Route('/mes-rendez-vous', name: 'mes_rendez_vous', methods: ['GET'])]
+    public function mesRendezVous(RendezVousRepository $rendezVousRepository): Response
+    {
+        // Pour l'instant, nous utilisons une session ou un email en dur
+        // Dans un vrai projet, vous utiliseriez l'utilisateur connecté
+        $emailDemandeur = $_SESSION['user_email'] ?? 'user@example.com';
+        
+        $rendezVous = $rendezVousRepository->findByEmailDemandeur($emailDemandeur);
+
+        return $this->render('front/mes_rendez_vous.html.twig', [
+            'rendez_vous' => $rendezVous,
+            'email_demandeur' => $emailDemandeur,
         ]);
     }
 }

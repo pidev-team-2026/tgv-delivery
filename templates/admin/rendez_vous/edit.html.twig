@@ -1,0 +1,93 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier Rendez-vous — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Modifier Rendez-vous</h1>
+        <p class="tgv-page-subtitle">Mettre à jour les informations du rendez-vous</p>
+    </div>
+    <div class="tgv-page-actions">
+        <a href="{{ path('app_rendez_vous_show', {'id': rendez_vou.id}) }}" class="tgv-btn tgv-btn-secondary">
+            <i class="fas fa-eye"></i>
+            Voir
+        </a>
+    </div>
+</div>
+
+<!-- Edit Form -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            {{ form_start(form, { attr: { class: 'tgv-form' } }) }}
+                
+                <div class="tgv-form-grid">
+                    <div class="tgv-form-group">
+                        {{ form_label(form.commercant, 'Commerçant', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.commercant, { 'attr': { 'class': 'tgv-form-select' } }) }}
+                        {% if form.commercant.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.commercant.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.emailDemandeur, 'Email du demandeur', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.emailDemandeur, { 'attr': { 'class': 'tgv-form-input', 'placeholder': 'email@exemple.com' } }) }}
+                        {% if form.emailDemandeur.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.emailDemandeur.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.dateRdv, 'Date du rendez-vous', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.dateRdv, { 'attr': { 'class': 'tgv-form-input' } }) }}
+                        {% if form.dateRdv.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.dateRdv.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.etat, 'État', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.etat, { 'attr': { 'class': 'tgv-form-select' } }) }}
+                        {% if form.etat.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.etat.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group tgv-form-full">
+                        {{ form_label(form.message, 'Message', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.message, { 'attr': { 'class': 'tgv-form-textarea', 'rows': 4, 'placeholder': 'Décrivez les besoins...' } }) }}
+                        {% if form.message.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.message.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="tgv-form-actions">
+                    <button type="submit" class="tgv-btn tgv-btn-primary">
+                        <i class="fas fa-save"></i>
+                        Enregistrer les modifications
+                    </button>
+                    <a href="{{ path('app_rendez_vous_index') }}" class="tgv-btn tgv-btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Annuler
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

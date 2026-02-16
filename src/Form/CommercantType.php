@@ -18,7 +18,10 @@ class CommercantType extends AbstractType
         $builder
             ->add('nom', TextType::class, ['label' => 'Nom'])
             ->add('email', EmailType::class, ['label' => 'Email'])
-            ->add('Numero_telephone', TelType::class, ['label' => 'Téléphone'])
+            ->add('numeroTelephone', TelType::class, [
+                'label' => 'Téléphone',
+                'property_path' => 'Numero_telephone',
+            ])
             ->add('ville', ChoiceType::class, [
                 'label' => 'Ville',
                 'placeholder' => 'Sélectionnez une ville',
