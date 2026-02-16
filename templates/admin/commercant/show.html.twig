@@ -1,0 +1,165 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commerçant — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Détails du Commerçant</h1>
+        <p class="tgv-page-subtitle">Informations complètes du commerçant</p>
+    </div>
+    <div class="tgv-page-actions">
+        <a href="{{ path('app_commercant_edit', {'id': commercant.id}) }}" class="tgv-btn tgv-btn-secondary">
+            <i class="fas fa-edit"></i>
+            Modifier
+        </a>
+        <form method="post" action="{{ path('app_commercant_delete', {'id': commercant.id}) }}" style="display: inline;">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commercant.id) }}">
+            <button type="submit" class="tgv-btn tgv-btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commerçant ?')">
+                <i class="fas fa-trash"></i>
+                Supprimer
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Commerçant Details -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-commercant-profile">
+                <div class="tgv-profile-header">
+                    <div class="tgv-profile-avatar">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="tgv-profile-info">
+                        <h2 class="tgv-profile-name">{{ commercant.nom }}</h2>
+                        <div class="tgv-profile-metier">{{ commercant.metier ?? 'Non spécifié' }}</div>
+                        <div class="tgv-profile-status">
+                            <span class="tgv-status tgv-status-success">Actif</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tgv-profile-details">
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </div>
+                        <div class="tgv-detail-value">{{ commercant.email }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-phone"></i>
+                            Téléphone
+                        </div>
+                        <div class="tgv-detail-value">{{ commercant.numeroTelephone }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Ville
+                        </div>
+                        <div class="tgv-detail-value">{{ commercant.ville ?? 'Non spécifié' }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-id-card"></i>
+                            ID
+                        </div>
+                        <div class="tgv-detail-value">#{{ commercant.id }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rendez-vous associés -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Rendez-vous associés</h3>
+        <a href="{{ path('app_rendez_vous_index') }}" class="tgv-section-link">VOIR TOUS LES RENDEZ-VOUS</a>
+    </div>
+    
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-table-container">
+                <table class="tgv-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Email demandeur</th>
+                            <th>Message</th>
+                            <th>État</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set rdvs = commercant.rendezVou|default([]) %}
+                        {% for rdv in rdvs %}
+                        <tr>
+                            <td>{{ rdv.id }}</td>
+                            <td>{{ rdv.dateRdv|date('d/m/Y H:i') }}</td>
+                            <td>{{ rdv.emailDemandeur }}</td>
+                            <td>{{ rdv.message|slice(0, 50) }}{% if rdv.message|length > 50 %}...{% endif %}</td>
+                            <td>
+                                <span class="tgv-status 
+                                    {% if rdv.etat == 'EN_ATTENTE' %}tgv-status-warning
+                                    {% elseif rdv.etat == 'CONFIRME' %}tgv-status-success
+                                    {% else %}tgv-status-danger{% endif %}">
+                                    {{ rdv.etat == 'EN_ATTENTE' ? 'En attente' : 
+                                       (rdv.etat == 'CONFIRME' ? 'Confirmé' : 'Annulé') }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="tgv-actions">
+                                    <a href="{{ path('app_rendez_vous_show', {id: rdv.id}) }}" class="tgv-btn tgv-btn-sm tgv-btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if rdv.etat == 'EN_ATTENTE' %}
+                                        <form method="post" action="{{ path('app_rendez_vous_accepter', {id: rdv.id}) }}" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('accepter' ~ rdv.id) }}">
+                                            <button type="submit" class="tgv-btn tgv-btn-sm tgv-btn-success">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{{ path('app_rendez_vous_refuser', {id: rdv.id}) }}" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('refuser' ~ rdv.id) }}">
+                                            <button type="submit" class="tgv-btn tgv-btn-sm tgv-btn-danger">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="tgv-empty">
+                                <i class="fas fa-calendar-times"></i>
+                                Aucun rendez-vous associé
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="tgv-section">
+    <a href="{{ path('app_commercant_index') }}" class="tgv-btn tgv-btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la liste
+    </a>
+</div>
+{% endblock %}

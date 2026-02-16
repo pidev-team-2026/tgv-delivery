@@ -1,0 +1,117 @@
+<nav class="navbar-delivery">
+    <div class="navbar-container">
+        <a href="{{ path('app_front_accueil') }}" class="navbar-brand">
+            <img class="navbar-logo" src="{{ asset('admin/images/logo-tgv-delivery.png') }}" alt="TGV Delivery">
+        </a>
+
+        <ul class="navbar-links" id="navbarLinks">
+            <li>
+                <a href="{{ path('app_front_accueil') }}">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-store"></i>
+                    Shop
+                    <i class="fas fa-chevron-down nav-caret"></i>
+                </a>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">
+                    <i class="fas fa-wrench"></i>
+                    Services
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu">
+                    <a href="{{ path('app_front_commercants_list') }}">
+                        <i class="fas fa-list"></i>
+                        Liste des commerçants
+                    </a>
+                    <a href="{{ path('app_front_rendez_vous_demander') }}">
+                        <i class="fas fa-calendar-plus"></i>
+                        Demander un rendez-vous
+                    </a>
+                    <a href="{{ path('app_front_mes_rendez_vous') }}">
+                        <i class="fas fa-calendar-check"></i>
+                        Mes rendez-vous
+                    </a>
+                </div>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-headset"></i>
+                    Support
+                    <i class="fas fa-chevron-down nav-caret"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-users"></i>
+                    Partenaires
+                </a>
+            </li>
+            <li class="navbar-cart">
+                <a href="#">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge">0</span>
+                </a>
+            </li>
+            <li class="navbar-auth">
+                <a href="#" class="btn-nav btn-nav-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Connexion
+                </a>
+                <a href="#" class="btn-nav btn-nav-pill">
+                    S'inscrire
+                </a>
+            </li>
+        </ul>
+
+        <button class="navbar-toggle" id="navbarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<script>
+document.getElementById('navbarToggle')?.addEventListener('click', function() {
+    const navbarLinks = document.getElementById('navbarLinks');
+    navbarLinks.classList.toggle('active');
+
+    const icon = this.querySelector('i');
+    if (navbarLinks.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+    } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const navbar = document.querySelector('.navbar-delivery');
+    const navbarLinks = document.getElementById('navbarLinks');
+    const navbarToggle = document.getElementById('navbarToggle');
+    if (!navbar || !navbarLinks || !navbarToggle) {
+        return;
+    }
+
+    if (!navbar.contains(e.target) && navbarLinks.classList.contains('active')) {
+        navbarLinks.classList.remove('active');
+        const icon = navbarToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+});
+
+window.addEventListener('scroll', () => {
+    const navbar = document.querySelector('.navbar-delivery');
+    if (!navbar) {
+        return;
+    }
+
+    // Intentionally no-op: keep navbar visuals constant to match design.
+});
+</script>
