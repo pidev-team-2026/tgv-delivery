@@ -2,24 +2,9 @@
 
 namespace App\Form\Model;
 
-use Symfony\Component\Validator\Constraints as Assert;
-
 class UserRegistrationData
 {
-    #[Assert\NotBlank(message: 'First name is required')]
-    #[Assert\Length(min: 2, max: 50)]
-    #[Assert\Regex(
-        pattern: '/^[A-Za-z\s\-]+$/',
-        message: 'First name must contain only letters'
-    )]
     public ?string $firstName = null;
-
-    #[Assert\NotBlank(message: 'Last name is required')]
-    #[Assert\Length(min: 2, max: 50)]
-    #[Assert\Regex(
-        pattern: '/^[A-Za-z\s\-]+$/',
-        message: 'Last name must contain only letters'
-    )]
     public ?string $lastName = null;
 
     // already existing fields 👇

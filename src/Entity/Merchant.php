@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\MerchantRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: MerchantRepository::class)]
+#[UniqueEntity(fields: ['cin'], message: 'Ce CIN est déjà utilisé pour un marchand')]
 class Merchant
 {
     #[ORM\Id]

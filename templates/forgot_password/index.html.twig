@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forgot Password - Delivery App{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    <!--! ================================================================ !-->
+    <!--! [Start] Main Content !-->
+    <!--! ================================================================ !-->
+    <main class="auth-creative-wrapper">
+        <div class="auth-creative-inner">
+            <div class="creative-card-wrapper">
+                <div class="card my-4 overflow-hidden" style="z-index: 1">
+                    <div class="row flex-1 g-0">
+                        <div class="col-lg-6 h-100 my-auto order-1 order-lg-0">
+                            <div class="wd-50 bg-white p-2 rounded-circle shadow-lg position-absolute translate-middle top-50 start-50 d-none d-lg-block">
+                                <img src="{{ asset('assets/images/tgv.png') }}" alt="" class="img-fluid">
+                            </div>
+                            <div class="creative-card-body card-body p-sm-5">
+                                <h2 class="fs-20 fw-bolder mb-4">Forgot Password</h2>
+                                <h4 class="fs-13 fw-bold mb-2">Réinitialisez votre mot de passe</h4>
+                                <p class="fs-12 fw-medium text-muted">Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.</p>
+
+                                <!-- ===== Flash Messages ===== -->
+                                {% for label, messages in app.flashes %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ label }} alert-dismissible fade show mb-3">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+
+                                <form action="{{ path('app_forgot_password') }}" method="post" class="w-100 mt-4 pt-2">
+                                    <div class="mb-4">
+                                        <input type="email" class="form-control" name="email" placeholder="Adresse Email" required>
+                                    </div>
+                                    <div class="mt-5">
+                                        <button type="submit" class="btn btn-lg btn-primary w-100">
+                                            <i class="feather-mail me-2"></i>Envoyer le lien de réinitialisation
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <div class="mt-4 text-center">
+                                    <span class="text-muted">Vous vous souvenez de votre mot de passe?</span>
+                                    <a href="{{ path('app_login') }}" class="fw-bold text-primary">Retour au login</a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 bg-success order-0 order-lg-1">
+                            <div class="h-100 d-flex align-items-center justify-content-center p-4">
+                                <div class="text-center text-white">
+                                    <i class="feather-lock display-1 mb-4"></i>
+                                    <h3 class="mb-3">Mot de Passe Oublié?</h3>
+                                    <p class="mb-4">Ne vous inquiétez pas! Nous vous aiderons à récupérer l'accès à votre compte.</p>
+                                    <div class="row text-start">
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Sécurité garantie</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Lien temporaire</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Support rapide</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center">
+                                                <i class="feather-check-circle me-3"></i>
+                                                <span>Processus simple</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--! ================================================================ !-->
+    <!--! [End] Main Content !-->
+    <!--! ================================================================ !-->
+{% endblock %}
+
+{% block javascripts %}
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+<script src="{{ asset('assets/js/theme-customizer-init.min.js') }}"></script>
+{% endblock %}

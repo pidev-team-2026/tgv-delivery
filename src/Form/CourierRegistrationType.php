@@ -2,6 +2,7 @@
 
 namespace App\Form\Registration;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\{TextType, ChoiceType};
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,21 +15,34 @@ class CourierRegistrationType extends BaseRegistrationType
 
         $builder
             ->add('cin', TextType::class, [
+                'label' => 'CIN',
+                'attr' => [
+                    'placeholder' => 'CIN'
+                ],
                 'constraints' => [
-                    new Assert\NotBlank(),
-                    new Assert\Regex('/^[0-9]{8}$/'),
+                    new Assert\NotBlank(['message' => 'Le CIN est obligatoire']),
+                    new Assert\Regex([
+                        'pattern' => '/^[0-9]{8}$/',
+                        'message' => 'Le CIN doit contenir 8 chiffres'
+                    ]),
                 ],
             ])
             ->add('licenseNumber', TextType::class, [
-                'constraints' => [new Assert\NotBlank()],
+                'label' => 'Numéro de permis',
+                'attr' => [
+                    'placeholder' => 'Numéro de permis'
+                ],
+                'constraints' => [new Assert\NotBlank(['message' => 'Le numéro de permis est obligatoire'])],
             ])
             ->add('vehicleType', ChoiceType::class, [
+                'label' => 'Type de véhicule',
                 'choices' => [
-                    'Motorcycle' => 'motorcycle',
-                    'Car' => 'car',
-                    'Truck' => 'truck',
+                    'Moto' => 'motorcycle',
+                    'Voiture' => 'car',
+                    'Camion' => 'truck',
                 ],
-                'constraints' => [new Assert\NotBlank()],
+                'placeholder' => 'Sélectionner un type de véhicule',
+                'constraints' => [new Assert\NotBlank(['message' => 'Le type de véhicule est obligatoire'])],
             ]);
     }
 }

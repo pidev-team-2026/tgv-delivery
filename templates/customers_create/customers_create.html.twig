@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="x-ua-compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <title>Duralux || Create Account</title>
+    <title>Créer Compte - Delivery App</title>
 
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}"/>
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}"/>
@@ -25,13 +25,13 @@
         <div class="page-header mb-4">
             <div class="page-header-left d-flex align-items-center">
                 <div class="page-header-title">
-                    <h5>Create Account</h5>
+                    <h5>Créer Compte</h5>
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="{{ path('app_home') }}">Home</a>
+                        <a href="{{ path('app_home') }}">Accueil</a>
                     </li>
-                    <li class="breadcrumb-item active">Create</li>
+                    <li class="breadcrumb-item active">Créer</li>
                 </ul>
             </div>
         </div>
@@ -41,6 +41,7 @@
             {% for message in messages %}
                 <div class="alert alert-{{ label }} alert-dismissible fade show">
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
         {% endfor %}
@@ -50,24 +51,20 @@
 
                 <!-- ===== Role Switcher ===== -->
                 <div class="mb-4">
-                    <label class="form-label fw-bold">Create account as:</label>
-                    <div class="btn-group" role="group">
-
-                        <a href="{{ path('app_register', { role: 'client' }) }}"
-                           class="btn btn-outline-primary {{ role == 'client' ? 'active' : '' }}">
-                            Client
+                    <label class="form-label fw-bold">Créer un compte en tant que:</label>
+                    <div class="btn-group w-100" role="group">
+                        <a href="{{ path('app_customers_create', { role: 'client' }) }}"
+                           class="btn btn-outline-primary flex-fill {{ role == 'client' ? 'active' : '' }}">
+                            <i class="feather-user me-1"></i> Client
                         </a>
-
-                        <a href="{{ path('app_register', { role: 'merchant' }) }}"
-                           class="btn btn-outline-primary {{ role == 'merchant' ? 'active' : '' }}">
-                            Merchant
+                        <a href="{{ path('app_customers_create', { role: 'merchant' }) }}"
+                           class="btn btn-outline-primary flex-fill {{ role == 'merchant' ? 'active' : '' }}">
+                            <i class="feather-shopping-bag me-1"></i> Marchand
                         </a>
-
-                        <a href="{{ path('app_register', { role: 'courier' }) }}"
-                           class="btn btn-outline-primary {{ role == 'courier' ? 'active' : '' }}">
-                            Courier
+                        <a href="{{ path('app_customers_create', { role: 'courier' }) }}"
+                           class="btn btn-outline-primary flex-fill {{ role == 'courier' ? 'active' : '' }}">
+                            <i class="feather-truck me-1"></i> Livreur
                         </a>
-
                     </div>
                 </div>
 
@@ -76,70 +73,120 @@
                     <div class="card-body">
 
                         <h6 class="mb-4 text-capitalize">
-                            {{ role }} information
+                            <i class="feather-user-plus me-2"></i>Informations {{ role == 'merchant' ? 'Marchand' : role == 'courier' ? 'Livreur' : 'Client' }}
                         </h6>
 
                         {{ form_start(form, {
-                            action: path('app_register', { role: role }),
-                            method: 'POST'
+                            action: path('app_customers_create', { role: role }),
+                            method: 'POST',
+                            attr: { novalidate: 'novalidate' }
                         }) }}
 
                         <div class="row g-3">
 
                             <!-- Common fields -->
                             <div class="col-md-6">
-                                {{ form_row(form.firstName) }}
+                                {{ form_row(form.firstName, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_row(form.lastName) }}
+                                {{ form_row(form.lastName, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_row(form.email) }}
+                                {{ form_row(form.email, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_row(form.phone) }}
+                                {{ form_row(form.phone, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_row(form.password) }}
+                                {{ form_row(form.password, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_row(form.confirmPassword) }}
+                                {{ form_row(form.confirmPassword, {
+                                    attr: { class: 'form-control' },
+                                    label_attr: { class: 'form-label fw-semibold' }
+                                }) }}
                             </div>
 
                             <!-- Merchant fields -->
                             {% if role == 'merchant' %}
-                                <div class="col-md-6">
-                                    {{ form_row(form.cin) }}
+                                <div class="col-12 mt-3">
+                                    <h6 class="text-primary fw-semibold mb-3">
+                                        <i class="feather-shopping-bag me-2"></i>Informations Entreprise
+                                    </h6>
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.businessName) }}
+                                    {{ form_row(form.cin, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.businessType) }}
+                                    {{ form_row(form.businessName, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.location) }}
+                                    {{ form_row(form.businessType, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.location, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
                                 </div>
                             {% endif %}
 
                             <!-- Courier fields -->
                             {% if role == 'courier' %}
-                                <div class="col-md-6">
-                                    {{ form_row(form.cin) }}
+                                <div class="col-12 mt-3">
+                                    <h6 class="text-primary fw-semibold mb-3">
+                                        <i class="feather-truck me-2"></i>Informations Livraison
+                                    </h6>
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.licenseNumber) }}
+                                    {{ form_row(form.cin, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.vehicleType) }}
+                                    {{ form_row(form.licenseNumber, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.vehicleType, {
+                                        attr: { class: 'form-control' },
+                                        label_attr: { class: 'form-label fw-semibold' }
+                                    }) }}
                                 </div>
                             {% endif %}
 
                         </div>
 
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                Create Account
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="feather-user-plus me-2"></i>Créer Compte {{ role == 'merchant' ? 'Marchand' : role == 'courier' ? 'Livreur' : 'Client' }}
                             </button>
                         </div>
 
