@@ -1,0 +1,53 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}{{ user.name }} - Admin{% endblock %}
+{% block page_title %}Utilisateur{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{{ path('app_back_user_index') }}">Utilisateurs</a></li>
+    <li class="breadcrumb-item">{{ user.name }}</li>
+{% endblock %}
+
+{% block body %}
+<div class="card mb-4">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Nom</dt>
+            <dd class="col-sm-9">{{ user.name }}</dd>
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">{{ user.email }}</dd>
+            <dt class="col-sm-3">Réclamations</dt>
+            <dd class="col-sm-9">{{ user.reclamations|length }}</dd>
+        </dl>
+        <a href="{{ path('app_back_user_edit', {id: user.id}) }}" class="btn btn-primary">Modifier</a>
+    </div>
+</div>
+
+{% if user.reclamations|length > 0 %}
+<h5>Réclamations de cet utilisateur</h5>
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Sujet</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reclamation in user.reclamations %}
+                <tr>
+                    <td>{{ reclamation.subject }}</td>
+                    <td><span class="badge bg-secondary">{{ reclamation.statusLabel }}</span></td>
+                    <td>{{ reclamation.createdAt|date('d/m/Y') }}</td>
+                    <td class="text-end">
+                        <a href="{{ path('app_back_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

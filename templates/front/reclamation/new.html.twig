@@ -1,0 +1,187 @@
+{% extends 'basefront.html.twig' %}
+
+{% block title %}Nouvelle Réclamation{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="mb-4">Nouvelle Réclamation</h2>
+
+                        <div class="mb-4">
+                            <h5 class="mb-2">Choisissez le mode de saisie</h5>
+                            <p class="text-muted mb-3">
+                                Vous pouvez créer votre réclamation en <strong>tapant un texte</strong> ou en <strong>enregistrant un message vocal</strong> qui sera ensuite transcrit et analysé automatiquement par notre système d’IA.
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-outline-primary active" id="mode-text-btn">
+                                    <span class="d-flex align-items-center">
+                                        <i class="feather-type me-2"></i>
+                                        <span>Mode texte</span>
+                                    </span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="mode-voice-btn">
+                                    <span class="d-flex align-items-center">
+                                        <i class="feather-mic me-2"></i>
+                                        <span>Mode vocal (avec IA)</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{ form_start(form) }}
+                            <input type="hidden" name="reclamation_mode" id="reclamation-mode-field" value="text">
+                            {{ form_row(form.subject) }}
+
+                            {# Zone texte classique #}
+                            <div id="text-mode-wrapper">
+                                {{ form_row(form.message) }}
+                            </div>
+
+                            {# Zone vocale (UI métier avancée) #}
+                            <div id="voice-mode-wrapper" class="border rounded p-3 bg-light d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h6 class="mb-1">Enregistrement vocal</h6>
+                                        <p class="small text-muted mb-0">
+                                            Expliquez votre situation à l’oral. Votre message sera ensuite traité par l’IA (transcription, catégorisation, urgence, sentiment).
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <button type="button" class="btn btn-danger" id="voice-record-btn">
+                                        <span id="voice-record-label">Démarrer l’enregistrement</span>
+                                    </button>
+                                    <span class="text-muted small" id="voice-status-label">
+                                        Aucun enregistrement en cours.
+                                    </span>
+                                </div>
+
+                                <div class="mb-2">
+                                    <audio id="voice-preview" class="w-100 d-none" controls></audio>
+                                </div>
+
+                                <input type="hidden" name="voice_payload" id="voice-payload-field">
+
+                                <p class="small text-muted mb-0">
+                                    Une fois la réclamation envoyée, le message vocal est associé à votre dossier pour un traitement ultérieur par l’IA.
+                                </p>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">Envoyer</button>
+                                <a href="{{ path('app_front_reclamation_index') }}" class="btn btn-outline-secondary">Annuler</a>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    (function() {
+        const modeTextBtn = document.getElementById('mode-text-btn');
+        const modeVoiceBtn = document.getElementById('mode-voice-btn');
+        const textWrapper = document.getElementById('text-mode-wrapper');
+        const voiceWrapper = document.getElementById('voice-mode-wrapper');
+
+        const modeField = document.getElementById('reclamation-mode-field');
+
+        const recordBtn = document.getElementById('voice-record-btn');
+        const recordLabel = document.getElementById('voice-record-label');
+        const statusLabel = document.getElementById('voice-status-label');
+        const audioPreview = document.getElementById('voice-preview');
+        const payloadField = document.getElementById('voice-payload-field');
+
+        let mediaRecorder = null;
+        let chunks = [];
+        let isRecording = false;
+
+        function setMode(mode) {
+            const isText = mode === 'text';
+            modeTextBtn.classList.toggle('active', isText);
+            modeTextBtn.classList.toggle('btn-primary', isText);
+            modeTextBtn.classList.toggle('btn-outline-primary', !isText);
+
+            modeVoiceBtn.classList.toggle('active', !isText);
+            modeVoiceBtn.classList.toggle('btn-primary', !isText);
+            modeVoiceBtn.classList.toggle('btn-outline-primary', isText);
+
+            textWrapper.classList.toggle('d-none', !isText);
+            voiceWrapper.classList.toggle('d-none', isText);
+
+            if (modeField) {
+                modeField.value = mode;
+            }
+        }
+
+        if (modeTextBtn && modeVoiceBtn && textWrapper && voiceWrapper) {
+            modeTextBtn.addEventListener('click', function () {
+                setMode('text');
+            });
+            modeVoiceBtn.addEventListener('click', function () {
+                setMode('voice');
+            });
+        }
+
+        if (recordBtn && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            recordBtn.addEventListener('click', function () {
+                if (!isRecording) {
+                    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+                        mediaRecorder = new MediaRecorder(stream);
+                        chunks = [];
+
+                        mediaRecorder.ondataavailable = function (e) {
+                            if (e.data.size > 0) {
+                                chunks.push(e.data);
+                            }
+                        };
+
+                        mediaRecorder.onstop = function () {
+                            const blob = new Blob(chunks, { type: 'audio/webm' });
+                            const reader = new FileReader();
+                            reader.onloadend = function () {
+                                payloadField.value = reader.result;
+                            };
+                            reader.readAsDataURL(blob);
+
+                            const audioURL = URL.createObjectURL(blob);
+                            audioPreview.src = audioURL;
+                            audioPreview.classList.remove('d-none');
+
+                            statusLabel.textContent = 'Enregistrement terminé. Vous pouvez réécouter votre message.';
+                            recordLabel.textContent = 'Recommencer l’enregistrement';
+                            isRecording = false;
+                        };
+
+                        mediaRecorder.start();
+                        isRecording = true;
+                        recordLabel.textContent = 'Arrêter l’enregistrement';
+                        statusLabel.textContent = 'Enregistrement en cours...';
+                        audioPreview.classList.add('d-none');
+                        payloadField.value = '';
+                    }).catch(function () {
+                        statusLabel.textContent = 'Impossible d’accéder au microphone. Vérifiez les autorisations.';
+                    });
+                } else {
+                    mediaRecorder.stop();
+                }
+            });
+        } else if (statusLabel) {
+            statusLabel.textContent = 'L’enregistrement vocal n’est pas supporté par ce navigateur.';
+        }
+
+        setMode('text');
+    })();
+</script>
+{% endblock %}

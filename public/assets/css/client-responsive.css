@@ -1,0 +1,186 @@
+/* ===================================
+   CLIENT RESPONSIVE DESIGN
+   =================================== */
+
+/* ===================================
+   TABLETS (768px - 1024px)
+   =================================== */
+@media (max-width: 1024px) {
+    .hero {
+        padding: 3rem 1.5rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .container-fluid {
+        padding: 0 1rem;
+    }
+    
+    .product-card,
+    .order-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .product-image {
+        height: 180px;
+    }
+    
+    .product-title {
+        font-size: 1.1rem;
+    }
+    
+    .product-description {
+        font-size: 0.85rem;
+    }
+    
+    .order-header {
+        padding: 0.8rem;
+    }
+    
+    .order-number {
+        font-size: 0.8rem;
+    }
+}
+
+/* ===================================
+   MOBILE PHONES (max-width: 767px)
+   =================================== */
+@media (max-width: 767px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+    }
+    
+    .container-fluid {
+        padding: 0 0.5rem;
+    }
+    
+    .row {
+        margin: 0;
+    }
+    
+    .col-md-6,
+    .col-md-3,
+    .col-md-4,
+    .col-md-8,
+    .col-md-12 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .product-card,
+    .order-card,
+    .stat-card,
+    .action-card {
+        margin-bottom: 1rem;
+    }
+    
+    .product-image {
+        height: 150px;
+    }
+    
+    .product-title {
+        font-size: 1rem;
+    }
+    
+    .product-description {
+        font-size: 0.8rem;
+        line-height: 1.3;
+    }
+    
+    .product-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .product-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .product-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .order-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .order-number {
+        font-size: 0.7rem;
+    }
+    
+    .order-body {
+        padding: 1rem;
+    }
+    
+    .order-price {
+        font-size: 1.2rem;
+    }
+    
+    .order-footer {
+        padding: 1rem 0;
+        text-align: center;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ===================================
+   SMALL MOBILE (max-width: 480px)
+   =================================== */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .action-card {
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .product-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-image {
+        height: 120px;
+    }
+    
+    .product-title {
+        font-size: 0.9rem;
+    }
+    
+    .product-description {
+        font-size: 0.75rem;
+    }
+    
+    .badge {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.4rem;
+    }
+}

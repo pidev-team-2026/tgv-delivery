@@ -1,0 +1,74 @@
+{% extends 'baseback.html.twig' %}
+
+{% block title %}Statistiques - Réclamations{% endblock %}
+{% block page_title %}Statistiques & Prédictions{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item">Tendances & IA</li>
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    <i class="feather-info me-1"></i>
+                    Analyse de l'évolution des réclamations sur la période récente et synthèse hebdomadaire par jour.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">Synthèse hebdomadaire des réclamations</h5>
+                <span class="badge bg-light text-muted small">
+                    Semaine en cours (lundi &rarr; dimanche)
+                </span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Jour</th>
+                                <th class="text-center">Nombre de réclamations</th>
+                                <th class="text-center">% du volume hebdomadaire</th>
+                                <th class="text-center">Niveau d'activité</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if weekly_overview is not empty %}
+                                {% for day in weekly_overview %}
+                                    <tr>
+                                        <td>{{ day.label }}</td>
+                                        <td class="text-center"><strong>{{ day.count }}</strong></td>
+                                        <td class="text-center">{{ day.percentage|number_format(1, ',', ' ') }}&nbsp;%</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{{ day.badge_color }} text-uppercase">
+                                                {{ day.level }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">
+                                        Aucune réclamation enregistrée pour la semaine en cours.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}{% endblock %}
