@@ -23,7 +23,12 @@ class ReclamationType extends AbstractType
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Message',
-                'attr' => ['class' => 'form-control', 'rows' => 5, 'placeholder' => 'Décrivez votre réclamation en détail...'],
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 5,
+                    'placeholder' => 'Décrivez votre réclamation en détail...',
+                ],
             ]);
 
         if ($options['include_user']) {

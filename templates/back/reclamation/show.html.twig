@@ -3,6 +3,10 @@
 {% block title %}{{ reclamation.subject }} - Admin{% endblock %}
 {% block page_title %}Détail réclamation{% endblock %}
 
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{{ path('app_back_reclamation_index') }}">Réclamations</a></li>
     <li class="breadcrumb-item">#{{ reclamation.id }}</li>
@@ -21,10 +25,57 @@
                 <p class="text-muted mb-2">
                     <strong>{{ reclamation.user.name }}</strong> ({{ reclamation.user.email }}) · {{ reclamation.createdAt|date('d/m/Y à H:i') }}
                 </p>
-                <p class="mb-0">{{ reclamation.message|nl2br }}</p>
+                <p class="mb-3">{{ reclamation.message|nl2br }}</p>
+
+                {# Lecture du message vocal associé (si présent sur le disque) #}
+                {% if reclamation.message starts with 'Message vocal enregistré' %}
+                    {% set possible_extensions = ['webm', 'ogg', 'mp3'] %}
+                    {% set voice_found = false %}
+                    {% for ext in possible_extensions %}
+                        {% set voice_path = 'uploads/reclamations/reclamation_' ~ reclamation.id ~ '.' ~ ext %}
+                        {% if not voice_found %}
+                            <div class="mt-4">
+                                <h6 class="text-muted mb-3">📢 Message vocal</h6>
+                                <div class="custom-audio-player bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 shadow-sm border border-blue-100">
+                                    <div class="flex items-center space-x-4">
+                                        <button class="play-button w-12 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105" onclick="toggleAudio(this)">
+                                            <i class="fas fa-play text-sm ml-0.5"></i>
+                                        </button>
+                                        <div class="flex-1">
+                                            <div class="waveform-container bg-white rounded-lg p-3 shadow-inner">
+                                                <div class="waveform flex items-center space-x-1">
+                                                    {% for i in range(1, 50) %}
+                                                        <div class="wave-bar bg-blue-300 rounded-full transition-all duration-200" style="height: {{ random(20, 60) }}px; width: 2px;"></div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
+                                                <span class="audio-time">0:00</span>
+                                                <div class="audio-progress bg-gray-200 rounded-full h-1 flex-1 mx-3">
+                                                    <div class="audio-progress-bar bg-blue-500 h-1 rounded-full transition-all duration-200" style="width: 0%"></div>
+                                                </div>
+                                                <span class="audio-duration">0:00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <audio class="d-none" controls onloadedmetadata="updateDuration(this)">
+                                        <source src="{{ asset(voice_path) }}" type="audio/{{ ext == 'ogg' ? 'ogg' : (ext == 'mp3' ? 'mpeg' : 'webm') }}">
+                                        Votre navigateur ne supporte pas la lecture audio.
+                                    </audio>
+                                </div>
+                                <div class="alert alert-warning d-none mt-3" role="alert">
+                                    ⚠️ Le fichier audio n'est pas disponible. Vous pouvez tout de même lire la transcription ci-dessus.
+                                </div>
+                            </div>
+                            {% set voice_found = true %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
             <div class="card-footer">
-                <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier statut</a>
+                {% if reclamation.reponses|length == 0 %}
+                    <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-outline-primary btn-sm">Modifier statut</a>
+                {% endif %}
             </div>
         </div>
 
@@ -72,4 +123,136 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Custom styles for modern design */
+.custom-audio-player {
+    backdrop-filter: blur(10px);
+}
+
+.waveform .wave-bar {
+    animation: wave 1.5s ease-in-out infinite;
+}
+
+.waveform .wave-bar:nth-child(odd) {
+    animation-delay: 0.2s;
+}
+
+@keyframes wave {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.5); }
+}
+
+.playing .wave-bar {
+    animation: wavePlaying 0.5s ease-in-out infinite;
+    background: linear-gradient(to top, #3b82f6, #60a5fa) !important;
+}
+
+@keyframes wavePlaying {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1.2); }
+}
+
+/* Enhanced card design */
+.card {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* Modern button styles */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Status badge improvements */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+/* Alert improvements */
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 500;
+}
+</style>
+
+<script>
+function toggleAudio(button) {
+    const player = button.closest('.custom-audio-player');
+    const audio = player.querySelector('audio');
+    const icon = button.querySelector('i');
+    const waveform = player.querySelector('.waveform');
+    const progressBar = player.querySelector('.audio-progress-bar');
+    const timeDisplay = player.querySelector('.audio-time');
+    
+    if (audio.paused) {
+        audio.play();
+        icon.classList.remove('fa-play');
+        icon.classList.add('fa-pause');
+        waveform.classList.add('playing');
+        
+        // Update progress bar
+        audio.addEventListener('timeupdate', function() {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = progress + '%';
+            timeDisplay.textContent = formatTime(audio.currentTime);
+        });
+        
+        audio.addEventListener('ended', function() {
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
+            waveform.classList.remove('playing');
+            progressBar.style.width = '0%';
+            timeDisplay.textContent = '0:00';
+        });
+        
+    } else {
+        audio.pause();
+        icon.classList.remove('fa-pause');
+        icon.classList.add('fa-play');
+        waveform.classList.remove('playing');
+    }
+}
+
+function updateDuration(audio) {
+    const durationDisplay = audio.closest('.custom-audio-player').querySelector('.audio-duration');
+    durationDisplay.textContent = formatTime(audio.duration);
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return minutes + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
+// Initialize all audio players
+document.addEventListener('DOMContentLoaded', function() {
+    const audioElements = document.querySelectorAll('.custom-audio-player audio');
+    audioElements.forEach(audio => {
+        audio.addEventListener('error', function() {
+            const player = this.closest('.custom-audio-player');
+            const alert = player.nextElementSibling;
+            if (alert && alert.classList.contains('alert')) {
+                alert.classList.remove('d-none');
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

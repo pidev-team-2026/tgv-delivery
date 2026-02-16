@@ -8,36 +8,72 @@
 {% endblock %}
 
 {% block body %}
-<div class="card stretch stretch-full">
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <h5 class="card-title mb-0">Liste des réclamations</h5>
-        <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
-            <div class="input-group" style="max-width: 280px;">
-                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Rechercher (sujet, message, client)...">
-                <button type="submit" class="btn btn-primary"><i class="feather-search"></i></button>
+<div class="card mb-4">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+            <h2 class="mb-1" style="font-weight: 800;">Réclamations</h2>
+            <p class="text-muted mb-0">Gérer toutes les réclamations des clients</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ path('app_front_home') }}" class="btn btn-primary btn-sm" target="_blank">
+                <i class="feather-external-link me-1"></i>
+                Voir le site
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" id="form-search-back" class="row g-3 align-items-center">
+            <div class="col-12 col-lg-6">
+                <input type="text" name="search" value="{{ search }}" id="input-search-back" class="form-control" placeholder="Rechercher (sujet, message, client)...">
             </div>
-            <select name="sort_by" class="form-select" style="width: auto;" onchange="this.form.submit()">
-                <option value="createdAt" {{ sort_by == 'createdAt' ? 'selected' : '' }}>Date création</option>
-                <option value="updatedAt" {{ sort_by == 'updatedAt' ? 'selected' : '' }}>Date modification</option>
-                <option value="subject" {{ sort_by == 'subject' ? 'selected' : '' }}>Sujet</option>
-                <option value="status" {{ sort_by == 'status' ? 'selected' : '' }}>Statut</option>
-            </select>
-            <select name="sort_order" class="form-select" style="width: auto;" onchange="this.form.submit()">
-                <option value="DESC" {{ sort_order == 'DESC' ? 'selected' : '' }}>Descendant</option>
-                <option value="ASC" {{ sort_order == 'ASC' ? 'selected' : '' }}>Ascendant</option>
-            </select>
+            <div class="col-6 col-lg-2">
+                <select name="sort_by" class="form-select" onchange="this.form.submit()">
+                    <option value="createdAt" {{ sort_by == 'createdAt' ? 'selected' : '' }}>Date création</option>
+                    <option value="updatedAt" {{ sort_by == 'updatedAt' ? 'selected' : '' }}>Date modification</option>
+                    <option value="subject" {{ sort_by == 'subject' ? 'selected' : '' }}>Sujet</option>
+                    <option value="status" {{ sort_by == 'status' ? 'selected' : '' }}>Statut</option>
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <select name="sort_order" class="form-select" onchange="this.form.submit()">
+                    <option value="DESC" {{ sort_order == 'DESC' ? 'selected' : '' }}>DESC</option>
+                    <option value="ASC" {{ sort_order == 'ASC' ? 'selected' : '' }}>ASC</option>
+                </select>
+            </div>
+            <div class="col-12 col-lg-2 d-flex gap-2 justify-content-lg-end">
+                <button type="submit" class="btn btn-outline-primary w-100 w-lg-auto">
+                    <i class="feather-search me-1"></i>
+                    Chercher
+                </button>
+                <a href="{{ path('app_back_reclamation_index') }}" class="btn btn-light w-100 w-lg-auto">
+                    <i class="feather-rotate-ccw me-1"></i>
+                    Réinitialiser
+                </a>
+            </div>
         </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <i class="feather-list text-muted"></i>
+            <h5 class="card-title mb-0">Liste des réclamations ({{ reclamations|length }})</h5>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead>
-                    <tr class="border-b">
+                    <tr>
                         <th>Client</th>
                         <th>Sujet</th>
                         <th>Statut</th>
-                        <th>Date</th>
-                        <th>Réponses</th>
+                        <th>Date création</th>
+                        <th class="text-center">Réponses</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -50,7 +86,7 @@
                                     <span class="fs-12 text-muted">{{ reclamation.user.email }}</span>
                                 </div>
                             </td>
-                            <td>{{ reclamation.subject }}</td>
+                            <td class="fw-semibold">{{ reclamation.subject }}</td>
                             <td>
                                 {% set status_class = {
                                     'open': 'warning',
@@ -60,10 +96,14 @@
                                 <span class="badge bg-{{ status_class[reclamation.status] ?? 'secondary' }}">{{ reclamation.statusLabel }}</span>
                             </td>
                             <td>{{ reclamation.createdAt|date('d/m/Y H:i') }}</td>
-                            <td>{{ reclamation.reponses|length }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark">{{ reclamation.reponses|length }}</span>
+                            </td>
                             <td class="text-end">
                                 <a href="{{ path('app_back_reclamation_show', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
-                                <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                {% if reclamation.reponses|length == 0 %}
+                                    <a href="{{ path('app_back_reclamation_edit', {id: reclamation.id}) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% else %}
@@ -76,4 +116,19 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+(function() {
+    var form = document.getElementById('form-search-back');
+    var input = document.getElementById('input-search-back');
+    if (!form || !input) return;
+    var debounce = null;
+    input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(function() { form.submit(); }, 400);
+    });
+})();
+</script>
 {% endblock %}

@@ -38,8 +38,6 @@ class Reclamation
     private ?string $subject = null;
 //cc
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: "Le message est requis.")]
-    #[Assert\Length(min: 10, minMessage: "Le message doit contenir au moins {{ limit }} caractères.")]
     private ?string $message = null;
 
     #[ORM\Column(length: 20)]
