@@ -2,15 +2,18 @@
 
 namespace App\Form;
 
+use App\Entity\Contrat;
 use App\Entity\Partenaire;
 use App\Entity\Zone;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PartenaireType extends AbstractType
@@ -61,16 +64,6 @@ class PartenaireType extends AbstractType
                     'placeholder' => 'https://www.exemple.com'
                 ]
             ])
-            ->add('datedebutcontrat', DateTimeType::class, [
-                'label' => 'Date de début de contrat',
-                'widget' => 'single_text',
-                'html5' => true,
-                'input' => 'datetime_immutable',
-                'attr' => [
-                    'class' => 'form-control',
-                    'type' => 'datetime-local'
-                ]
-            ])
             ->add('zone', EntityType::class, [
                 'class' => Zone::class,
                 'choice_label' => 'nom',
@@ -80,7 +73,25 @@ class PartenaireType extends AbstractType
                     'class' => 'form-control'
                 ]
             ])
+            ->add('contrats', CollectionType::class, [
+                'entry_type' => ContratType::class,
+                'entry_options' => ['with_partenaire' => false],
+                'label' => 'Contrat(s)',
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+            ])
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            $partenaire = $event->getData();
+            if ($partenaire && $partenaire->getContrats()->isEmpty()) {
+                $contrat = new Contrat();
+                $contrat->setDateDebut(new \DateTime());
+                $contrat->setDateFin((new \DateTime())->modify('+1 year'));
+                $partenaire->addContrat($contrat);
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -1,0 +1,19 @@
+{{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+    <div class="row g-3">
+        {% if form.partenaire is defined %}
+            <div class="col-12">
+                {{ form_row(form.partenaire) }}
+            </div>
+        {% endif %}
+        <div class="col-md-6">
+            {{ form_row(form.dateDebut) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.dateFin) }}
+        </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+        <a class="btn btn-outline-secondary" href="{{ path('app_contrat_index') }}">Annuler</a>
+    </div>
+{{ form_end(form) }}

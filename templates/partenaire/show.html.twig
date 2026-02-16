@@ -50,9 +50,26 @@
                             {% endif %}
                         </dd>
 
-                        <dt class="col-sm-4 text-muted">Date de début de contrat</dt>
+                        <dt class="col-sm-4 text-muted">Contrats</dt>
                         <dd class="col-sm-8">
-                            {{ partenaire.datedebutcontrat ? partenaire.datedebutcontrat|date('d/m/Y H:i') : '-' }}
+                            {% if partenaire.contrats|length > 0 %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for contrat in partenaire.contrats %}
+                                        <li class="mb-1">
+                                            {{ contrat.dateDebut|date('d/m/Y') }} → {{ contrat.dateFin|date('d/m/Y') }}
+                                            {% if contrat.isExpire %}
+                                                <span class="badge bg-danger">Expiré</span>
+                                            {% elseif contrat.isExpirantBientot %}
+                                                <span class="badge bg-warning">Expire bientôt</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span class="text-muted">Aucun contrat</span>
+                            {% endif %}
                         </dd>
                     </dl>
                 </div>
