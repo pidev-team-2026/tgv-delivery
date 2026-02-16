@@ -2,32 +2,49 @@
 
 {% block title %}Back Office - Partenaires{% endblock %}
 
-{% block page_title %}Gestion des partenaires{% endblock %}
+{% block breadcrumb %}Partenaires{% endblock %}
 
 {% block body %}
+    <div class="page-title-section d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <h1 class="mb-1">Gestion des partenaires</h1>
+            <p class="subtitle mb-0">Vue d'ensemble des partenaires et zones de livraison</p>
+        </div>
+        <a href="{{ path('app_partenaire_new') }}" class="btn btn-success mt-3 mt-md-0">
+            <i class="bi bi-plus-lg me-1"></i> NOUVEAU PARTENAIRE
+        </a>
+    </div>
+
     <div class="row g-4">
         <div class="col-12 col-xl-8">
             <div class="row g-3 mb-4">
                 <div class="col-12 col-md-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="text-muted small">Total partenaires</div>
-                            <div class="h3 mb-0">{{ kpi_total }}</div>
+                    <div class="card border-0 text-white stat-card-blue rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Total partenaires</div>
+                                <div class="h3 mb-0 fw-bold">{{ kpi_total }}</div>
+                            </div>
+                            <i class="bi bi-people-fill fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="text-muted small">Avec zone affectée</div>
-                            <div class="h3 mb-0">{{ kpi_with_zone }}</div>
+                    <div class="card border-0 text-white stat-card-green rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Avec zone affectée</div>
+                                <div class="h3 mb-0 fw-bold">{{ kpi_with_zone }}</div>
+                            </div>
+                            <i class="bi bi-geo-alt-fill fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="text-muted small">Top types</div>
+                    <div class="card border-0 text-white stat-card-orange rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Top types</div>
                             {% if kpi_top_types is not empty %}
                                 <div class="small">
                                     {% for type, count in kpi_top_types %}
@@ -38,27 +55,20 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                <div class="text-muted small">—</div>
+                                <div class="small opacity-75">—</div>
                             {% endif %}
+                            </div>
+                            <i class="bi bi-tags-fill fs-1 opacity-75"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card mb-4">
+                <div class="card-header">Liste des partenaires</div>
                 <div class="card-body">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
-                        <div>
-                            <h2 class="h5 mb-1">Liste des partenaires</h2>
-                            <p class="mb-0 text-muted small">
-                                Recherche, tri et visualisation des partenaires par zone de livraison.
-                            </p>
-                        </div>
-                        <a href="{{ path('app_partenaire_new') }}" class="btn btn-primary">
-                            + Nouveau partenaire
-                        </a>
-                    </div>
 
+                    <p class="text-muted small mb-3">Recherche, tri et visualisation des partenaires par zone de livraison.</p>
                     {# Formulaire de recherche #}
                     <form method="GET"
                           action="{{ path('app_partenaire_index') }}"

@@ -3,7 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\PartenaireRepository;
-use App\Entity\Zone;  // ✅ AJOUTÉ : Import de Zone
+use App\Entity\Zone;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -42,14 +44,21 @@ class Partenaire
     #[Assert\Url(message: "L'URL du site web n'est pas valide")]
     private ?string $siteweb = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "La date de début de contrat est obligatoire")]
-    private ?\DateTimeImmutable $datedebutcontrat = null;
+    /**
+     * @var Collection<int, Contrat>
+     */
+    #[ORM\OneToMany(targetEntity: Contrat::class, mappedBy: 'partenaire', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $contrats;
 
     #[ORM\ManyToOne(inversedBy: 'partenaires')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Veuillez sélectionner une zone")]
-    private ?Zone $zone = null;  // ✅ CORRIGÉ : Zone avec majuscule
+    private ?Zone $zone = null;
+
+    public function __construct()
+    {
+        $this->contrats = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,23 +131,39 @@ class Partenaire
         return $this;
     }
 
-    public function getDatedebutcontrat(): ?\DateTimeImmutable
+    /**
+     * @return Collection<int, Contrat>
+     */
+    public function getContrats(): Collection
     {
-        return $this->datedebutcontrat;
+        return $this->contrats;
     }
 
-    public function setDatedebutcontrat(?\DateTimeImmutable $datedebutcontrat): static
+    public function addContrat(Contrat $contrat): static
     {
-        $this->datedebutcontrat = $datedebutcontrat;
+        if (!$this->contrats->contains($contrat)) {
+            $this->contrats->add($contrat);
+            $contrat->setPartenaire($this);
+        }
         return $this;
     }
 
-    public function getZone(): ?Zone  // ✅ CORRIGÉ : Zone avec majuscule
+    public function removeContrat(Contrat $contrat): static
+    {
+        if ($this->contrats->removeElement($contrat)) {
+            if ($contrat->getPartenaire() === $this) {
+                $contrat->setPartenaire(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getZone(): ?Zone
     {
         return $this->zone;
     }
 
-    public function setZone(?Zone $zone): static  // ✅ CORRIGÉ : Zone avec majuscule
+    public function setZone(?Zone $zone): static
     {
         $this->zone = $zone;
         return $this;

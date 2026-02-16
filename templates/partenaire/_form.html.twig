@@ -18,14 +18,21 @@
         <div class="col-md-6">
             {{ form_row(form.siteweb) }}
         </div>
-        <div class="col-md-6">
-            {{ form_row(form.datedebutcontrat) }}
-        </div>
         <div class="col-12">
             {# Champ zone important + affichage des erreurs #}
             {{ form_row(form.zone) }}
             <div class="form-text text-muted">
                 Choisis une zone existante. Si la liste est vide, crée d’abord une zone dans “Gestion des zones”.
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card border">
+                <div class="card-header bg-light">
+                    <strong>Contrat(s)</strong> — Date de début et date de fin du contrat (un contrat est créé par défaut)
+                </div>
+                <div class="card-body">
+                    {{ form_row(form.contrats) }}
+                </div>
             </div>
         </div>
     </div>

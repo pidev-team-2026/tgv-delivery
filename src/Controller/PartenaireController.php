@@ -116,7 +116,10 @@ final class PartenaireController extends AbstractController
                 'telephone' => $partenaire->getTelephone(),
                 'adresse' => $partenaire->getAddresse(),
                 'siteWeb' => $partenaire->getSiteweb(),
-                'dateDebutContrat' => $partenaire->getDatedebutcontrat()?->format('Y-m-d'),
+                'contrats' => array_map(fn ($c) => [
+                    'dateDebut' => $c->getDateDebut()?->format('Y-m-d'),
+                    'dateFin' => $c->getDateFin()?->format('Y-m-d'),
+                ], $partenaire->getContrats()->toArray()),
                 'zone' => $partenaire->getZone() ? [
                     'id' => $partenaire->getZone()->getId(),
                     'nom' => $partenaire->getZone()->getNom(),
