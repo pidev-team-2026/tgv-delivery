@@ -1,0 +1,25 @@
+{% extends 'layout/base_back.html.twig' %}
+
+{% block title %}Nouvelle zone{% endblock %}
+
+{% block page_title %}Créer une zone de livraison{% endblock %}
+
+{% block body %}
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <h2 class="h5 mb-1">Nouvelle zone</h2>
+                    <p class="mb-0 text-muted small">
+                        Ajoute une zone pour pouvoir affecter les partenaires à une couverture géographique.
+                    </p>
+                </div>
+                <a class="btn btn-outline-secondary btn-sm" href="{{ path('app_zone_index') }}">
+                    Retour à la liste
+                </a>
+            </div>
+
+            {{ include('zone/_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

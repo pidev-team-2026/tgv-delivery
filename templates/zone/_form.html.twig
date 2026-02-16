@@ -1,0 +1,28 @@
+{{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+    <div class="row g-3">
+        <div class="col-md-6">
+            {{ form_row(form.nom) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.ville) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.codepostal) }}
+        </div>
+        <div class="col-12">
+            {{ form_row(form.description) }}
+        </div>
+        <div class="col-12">
+            <div class="form-check">
+                {{ form_widget(form.actif) }}
+                {{ form_label(form.actif) }}
+                {{ form_errors(form.actif) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+        <a class="btn btn-outline-secondary" href="{{ path('app_zone_index') }}">Annuler</a>
+    </div>
+{{ form_end(form) }}

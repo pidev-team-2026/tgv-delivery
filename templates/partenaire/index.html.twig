@@ -1,0 +1,219 @@
+{% extends 'layout/base_back.html.twig' %}
+
+{% block title %}Back Office - Partenaires{% endblock %}
+
+{% block breadcrumb %}Partenaires{% endblock %}
+
+{% block body %}
+    <div class="page-title-section d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div>
+            <h1 class="mb-1">Gestion des partenaires</h1>
+            <p class="subtitle mb-0">Vue d'ensemble des partenaires et zones de livraison</p>
+        </div>
+        <a href="{{ path('app_partenaire_new') }}" class="btn btn-success mt-3 mt-md-0">
+            <i class="bi bi-plus-lg me-1"></i> NOUVEAU PARTENAIRE
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 text-white stat-card-blue rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Total partenaires</div>
+                                <div class="h3 mb-0 fw-bold">{{ kpi_total }}</div>
+                            </div>
+                            <i class="bi bi-people-fill fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 text-white stat-card-green rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Avec zone affectée</div>
+                                <div class="h3 mb-0 fw-bold">{{ kpi_with_zone }}</div>
+                            </div>
+                            <i class="bi bi-geo-alt-fill fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 text-white stat-card-orange rounded-3">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="small opacity-90">Top types</div>
+                            {% if kpi_top_types is not empty %}
+                                <div class="small">
+                                    {% for type, count in kpi_top_types %}
+                                        <div class="d-flex justify-content-between">
+                                            <span>{{ type }}</span>
+                                            <strong>{{ count }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="small opacity-75">—</div>
+                            {% endif %}
+                            </div>
+                            <i class="bi bi-tags-fill fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">Liste des partenaires</div>
+                <div class="card-body">
+
+                    <p class="text-muted small mb-3">Recherche, tri et visualisation des partenaires par zone de livraison.</p>
+                    {# Formulaire de recherche #}
+                    <form method="GET"
+                          action="{{ path('app_partenaire_index') }}"
+                          class="row g-2 align-items-center mb-3">
+                        <div class="col-md-6">
+                            <input
+                                type="text"
+                                name="q"
+                                value="{{ search }}"
+                                placeholder="Rechercher par nom, email, type, téléphone ou zone..."
+                                class="form-control"
+                            >
+                        </div>
+                        <div class="col-md-auto d-flex gap-2">
+                            <button type="submit" class="btn btn-outline-primary">
+                                Rechercher
+                            </button>
+                            {% if search %}
+                                <a href="{{ path('app_partenaire_index') }}" class="btn btn-outline-secondary">
+                                    Effacer
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <a class="text-decoration-none"
+                                       href="{{ path('app_partenaire_index', {sort: 'id', direction: sort == 'id' and direction == 'ASC' ? 'DESC' : 'ASC', q: search}) }}">
+                                        ID
+                                        {% if sort == 'id' %}
+                                            <span class="small text-muted">
+                                            {% if direction == 'ASC' %}↑{% else %}↓{% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a class="text-decoration-none"
+                                       href="{{ path('app_partenaire_index', {sort: 'nom', direction: sort == 'nom' and direction == 'ASC' ? 'DESC' : 'ASC', q: search}) }}">
+                                        Nom
+                                        {% if sort == 'nom' %}
+                                            <span class="small text-muted">
+                                            {% if direction == 'ASC' %}↑{% else %}↓{% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>
+                                    <a class="text-decoration-none"
+                                       href="{{ path('app_partenaire_index', {sort: 'type', direction: sort == 'type' and direction == 'ASC' ? 'DESC' : 'ASC', q: search}) }}">
+                                        Type
+                                        {% if sort == 'type' %}
+                                            <span class="small text-muted">
+                                            {% if direction == 'ASC' %}↑{% else %}↓{% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>
+                                    <a class="text-decoration-none"
+                                       href="{{ path('app_partenaire_index', {sort: 'zone', direction: sort == 'zone' and direction == 'ASC' ? 'DESC' : 'ASC', q: search}) }}">
+                                        Zone
+                                        {% if sort == 'zone' %}
+                                            <span class="small text-muted">
+                                            {% if direction == 'ASC' %}↑{% else %}↓{% endif %}
+                                        </span>
+                                        {% endif %}
+                                    </a>
+                                </th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for partenaire in partenaires %}
+                                <tr>
+                                    <td class="text-muted">#{{ partenaire.id }}</td>
+                                    <td>{{ partenaire.nom }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ partenaire.type }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a class="text-decoration-none" href="mailto:{{ partenaire.email }}">
+                                            {{ partenaire.email }}
+                                        </a>
+                                    </td>
+                                    <td>{{ partenaire.telephone }}</td>
+                                    <td>
+                                        {% if partenaire.zone %}
+                                            <span class="badge bg-primary-subtle text-primary">
+                                                {{ partenaire.zone.nom }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Non affecté</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('app_partenaire_show', {'id': partenaire.id}) }}"
+                                               class="btn btn-outline-secondary">
+                                                Voir
+                                            </a>
+                                            <a href="{{ path('app_partenaire_edit', {'id': partenaire.id}) }}"
+                                               class="btn btn-outline-primary">
+                                                Modifier
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        Aucun partenaire trouvé pour votre recherche.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h3 class="h6 mb-3">Statistiques rapides</h3>
+                    <p class="small text-muted mb-1">
+                        Ces indicateurs peuvent être enrichis plus tard avec des requêtes métier.
+                    </p>
+                    <ul class="list-unstyled mb-0 small">
+                        <li class="d-flex justify-content-between">
+                            <span>Total partenaires listés</span>
+                            <strong>{{ partenaires|length }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

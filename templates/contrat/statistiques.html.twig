@@ -1,0 +1,93 @@
+{% extends 'layout/base_back.html.twig' %}
+
+{% block title %}Statistiques des contrats{% endblock %}
+
+{% block page_title %}Statistiques des contrats{% endblock %}
+
+{% block body %}
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="text-muted small">Total contrats</div>
+                            <div class="h3 mb-0">{{ stats.total }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 border-start border-success border-3">
+                        <div class="card-body">
+                            <div class="text-muted small">Contrats actifs</div>
+                            <div class="h3 mb-0 text-success">{{ stats.actifs }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 border-start border-warning border-3">
+                        <div class="card-body">
+                            <div class="text-muted small">Expirent sous 30 jours</div>
+                            <div class="h3 mb-0 text-warning">{{ stats.expirant_bientot }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card shadow-sm border-0 border-start border-danger border-3">
+                        <div class="card-body">
+                            <div class="text-muted small">Contrats expirés</div>
+                            <div class="h3 mb-0 text-danger">{{ stats.expires }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <strong>Contrats expirés</strong>
+                </div>
+                <div class="card-body">
+                    {% if contrats_expires|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for contrat in contrats_expires %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ contrat.partenaire.nom }} — {{ contrat.dateFin|date('d/m/Y') }}</span>
+                                    <a href="{{ path('app_contrat_show', {id: contrat.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun contrat expiré.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <strong>Contrats expirant bientôt (30 jours)</strong>
+                </div>
+                <div class="card-body">
+                    {% if contrats_expirant_bientot|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for contrat in contrats_expirant_bientot %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ contrat.partenaire.nom }} — {{ contrat.dateFin|date('d/m/Y') }}</span>
+                                    <a href="{{ path('app_contrat_show', {id: contrat.id}) }}" class="btn btn-sm btn-outline-secondary">Voir</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Aucun contrat n'expire dans les 30 prochains jours.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <a href="{{ path('app_contrat_index') }}" class="btn btn-outline-secondary">Retour à la liste des contrats</a>
+        </div>
+    </div>
+{% endblock %}

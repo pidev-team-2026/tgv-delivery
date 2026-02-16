@@ -1,0 +1,98 @@
+{% extends 'layout/base_back.html.twig' %}
+
+{% block title %}Fiche partenaire{% endblock %}
+
+{% block page_title %}Détail d’un partenaire{% endblock %}
+
+{% block body %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h2 class="h5 mb-1">{{ partenaire.nom }}</h2>
+                            <p class="mb-0 text-muted small">
+                                Type : <strong>{{ partenaire.type }}</strong>
+                            </p>
+                        </div>
+                        <span class="badge bg-primary-subtle text-primary">
+                            {{ partenaire.zone ? partenaire.zone.nom : 'Zone non définie' }}
+                        </span>
+                    </div>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Identifiant</dt>
+                        <dd class="col-sm-8">#{{ partenaire.id }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8">
+                            <a href="mailto:{{ partenaire.email }}" class="text-decoration-none">
+                                {{ partenaire.email }}
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Téléphone</dt>
+                        <dd class="col-sm-8">{{ partenaire.telephone }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Adresse</dt>
+                        <dd class="col-sm-8">{{ partenaire.addresse }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Site web</dt>
+                        <dd class="col-sm-8">
+                            {% if partenaire.siteweb %}
+                                <a href="{{ partenaire.siteweb }}" target="_blank" rel="noopener"
+                                   class="text-decoration-none">
+                                    {{ partenaire.siteweb }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Contrats</dt>
+                        <dd class="col-sm-8">
+                            {% if partenaire.contrats|length > 0 %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for contrat in partenaire.contrats %}
+                                        <li class="mb-1">
+                                            {{ contrat.dateDebut|date('d/m/Y') }} → {{ contrat.dateFin|date('d/m/Y') }}
+                                            {% if contrat.isExpire %}
+                                                <span class="badge bg-danger">Expiré</span>
+                                            {% elseif contrat.isExpirantBientot %}
+                                                <span class="badge bg-warning">Expire bientôt</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Actif</span>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span class="text-muted">Aucun contrat</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <h3 class="h6 mb-3">Actions</h3>
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_partenaire_edit', {'id': partenaire.id}) }}"
+                           class="btn btn-primary">
+                            Modifier le partenaire
+                        </a>
+                        <a href="{{ path('app_partenaire_index') }}" class="btn btn-outline-secondary">
+                            Retour à la liste
+                        </a>
+                        {{ include('partenaire/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

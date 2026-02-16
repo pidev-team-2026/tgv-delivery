@@ -1,0 +1,43 @@
+{
+	"folders": [
+		{
+			"path": "../mon_projet_livraison/.git"
+		},
+		{
+			"path": "../mon_projet_livraison/assets"
+		},
+		{
+			"path": "../mon_projet_livraison/bin"
+		},
+		{
+			"path": "../mon_projet_livraison/config"
+		},
+		{
+			"path": "../mon_projet_livraison/migrations"
+		},
+		{
+			"path": "../mon_projet_livraison/php_test.php"
+		},
+		{
+			"path": "../mon_projet_livraison/public"
+		},
+		{
+			"path": "../mon_projet_livraison/src"
+		},
+		{
+			"path": "../mon_projet_livraison/templates"
+		},
+		{
+			"path": "../mon_projet_livraison/tests"
+		},
+		{
+			"path": "../mon_projet_livraison/translations"
+		},
+		{
+			"path": "../mon_projet_livraison/var"
+		},
+		{
+			"path": "../mon_projet_livraison/vendor"
+		}
+	]
+}

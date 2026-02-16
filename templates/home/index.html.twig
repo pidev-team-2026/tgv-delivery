@@ -1,0 +1,87 @@
+{% extends 'layout/base_front.html.twig' %}
+
+{% block title %}TGV Delivery - Plateforme de gestion{% endblock %}
+
+{% block body %}
+    <section class="hero">
+        <div class="container">
+            <div class="hero-card mx-auto">
+                <div class="hero-badge mb-3">
+                    <span class="hero-badge-dot"></span>
+                    <span>Projet PIDEV & Symfony</span>
+                </div>
+
+                <h1 class="hero-title">
+                    Pilotez vos partenaires et zones de livraison comme un professionnel.
+                </h1>
+
+                <p class="hero-subtitle">
+                    TGV Delivery connecte vos commerçants, livreurs et clients autour d’un suivi
+                    simple, fiable et en temps réel. Gérez vos partenaires, organisez vos zones de
+                    livraison et garantissez des colis livrés à l’heure, partout en Tunisie.
+                </p>
+
+                <div class="hero-actions d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <a href="{{ path('app_partenaire_index') }}" class="btn btn-primary btn-lg">
+                        Voir les partenaires
+                    </a>
+                    <a href="{{ path('app_zone_index') }}" class="btn btn-outline-light btn-lg">
+                        Voir les zones de livraison
+                    </a>
+                </div>
+
+                <div class="hero-metrics">
+                    <div>
+                        <strong>Experts de la livraison</strong>
+                        Gestion centralisée des partenaires et tournées pour une organisation fluide au quotidien.
+                    </div>
+                    <div>
+                        <strong>Couverture nationale</strong>
+                        Visualisez et pilotez facilement vos zones de livraison dans toutes les régions.
+                    </div>
+                    <div>
+                        <strong>Expérience client soignée</strong>
+                        Communications claires, délais maîtrisés et qualité de service au cœur de chaque envoi.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-4">
+                    <div class="card-glass p-4 h-100">
+                        <h2 class="section-title mb-2">Plateforme pour les pros</h2>
+                        <p class="text-secondary mb-0">
+                            Un espace de gestion pensé pour les équipes opérationnelles: visibilité
+                            sur les partenaires, historique des collaborations et qualité de service.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card-glass p-4 h-100">
+                        <h2 class="section-title mb-2">Pilotage des livraisons</h2>
+                        <p class="text-secondary mb-0">
+                            Organisez vos zones, affectez vos partenaires et adaptez vos tournées en
+                            fonction des pics d’activité et des besoins locaux.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xl-4">
+                    <div class="card-glass p-4 h-100">
+                        <h2 class="section-title mb-2">Fiabilité & transparence</h2>
+                        <p class="text-secondary mb-0">
+                            Des informations centralisées pour mieux communiquer avec vos clients et
+                            garantir une expérience de livraison claire et prévisible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
