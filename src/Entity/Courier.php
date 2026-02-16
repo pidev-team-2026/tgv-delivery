@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\CourierRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CourierRepository::class)]
+#[UniqueEntity(fields: ['cin'], message: 'Ce CIN est déjà utilisé pour un livreur')]
 class Courier
 {
     #[ORM\Id]

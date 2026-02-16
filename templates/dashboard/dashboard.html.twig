@@ -1,82 +1,350 @@
-<!DOCTYPE html>
-<html lang="zxx">
+{% extends 'base.html.twig' %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
-    <meta name="keyword" content="" />
-    <meta name="author" content="flexilecode" />
-    <!--! The above 6 meta tags *must* come first in the head; any other head content must come *after* these tags !-->
-    <!--! BEGIN: Apps Title-->
-    <title>Duralux || Dashboard</title>
-    <!--! END:  Apps Title-->
-    <!--! BEGIN: Favicon-->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/images/favicon.ico" />
-    <!--! END: Favicon-->
-    <!--! BEGIN: Bootstrap CSS-->
-    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css" />
-    <!--! END: Bootstrap CSS-->
-    <!--! BEGIN: Vendors CSS-->
-    <link rel="stylesheet" type="text/css" href="assets/vendors/css/vendors.min.css" />
-    <link rel="stylesheet" type="text/css" href="assets/vendors/css/daterangepicker.min.css" />
-    <!--! END: Vendors CSS-->
-    <!--! BEGIN: Custom CSS-->
-    <link rel="stylesheet" type="text/css" href="assets/css/theme.min.css" />
-    <!--! END: Custom CSS-->
-    <!--! HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries !-->
-    <!--! WARNING: Respond.js doesn"t work if you view the page via file: !-->
-    <!--[if lt IE 9]>
-			<script src="https:oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-			<script src="https:oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-		<![endif]-->
-</head>
+{% block title %}Tableau de bord - Delivery App{% endblock %}
 
-<body>
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}">
+{% endblock %}
+
+{% block body %}
     {% include 'partials/duralux_navbar.html.twig' %}
     {% include 'partials/duralux_header.html.twig' %}
 
     <main class="nxl-container">
         <div class="nxl-content">
-            {% block content %}
+            <!-- ===== Page Header ===== -->
             <div class="page-header">
-                <div class="page-header-left d-flex align-items-center">
+                <div class="page-header-left">
                     <div class="page-header-title">
-                        <h5 class="m-b-10">Dashboard</h5>
+                        <h5 class="m-b-10">Tableau de bord</h5>
                     </div>
+                </div>
+                <div class="page-header-right">
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Home</a></li>
-                        <li class="breadcrumb-item">Dashboard</li>
+                        <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                        <li class="breadcrumb-item active">Tableau de bord</li>
                     </ul>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <p class="text-muted">Your dashboard content goes here.</p>
+
+            <!-- ===== Flash Messages ===== -->
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show mb-3">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <!-- ===== Statistics Cards ===== -->
+            <div class="main-content">
+                <div class="row">
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2 text-muted">Total des utilisateurs</h6>
+                                    <h3 class="mb-0">{{ totalUsers }}</h3>
+                                </div>
+                                <div class="avatar avatar-lg avatar-rounded bg-primary bg-opacity-10">
+                                    <i class="feather-users text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-success">
+                                    <i class="feather-trending-up"></i> 
+                                    +{{ totalUsers > 0 ? (totalUsers / 10)|round : 0 }}% ce mois
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2 text-muted">Clients</h6>
+                                    <h3 class="mb-0">{{ totalClients }}</h3>
+                                </div>
+                                <div class="avatar avatar-lg avatar-rounded bg-success bg-opacity-10">
+                                    <i class="feather-user text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="feather-users"></i> 
+                                    {{ totalUsers > 0 ? ((totalClients / totalUsers) * 100)|round : 0 }}% des utilisateurs
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2 text-muted">Commerçants</h6>
+                                    <h3 class="mb-0">{{ totalMerchants }}</h3>
+                                </div>
+                                <div class="avatar avatar-lg avatar-rounded bg-warning bg-opacity-10">
+                                    <i class="feather-shopping-bag text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="feather-check-circle"></i> 
+                                    {{ activeMerchants }} actifs
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-2 text-muted">Livreurs</h6>
+                                    <h3 class="mb-0">{{ totalCouriers }}</h3>
+                                </div>
+                                <div class="avatar avatar-lg avatar-rounded bg-info bg-opacity-10">
+                                    <i class="feather-truck text-info"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="feather-check-circle"></i> 
+                                    {{ activeCouriers }} actifs
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% endblock %}
+
+            <!-- ===== Charts Section ===== -->
+            <div class="row mt-4">
+                <div class="col-xl-8 col-lg-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h6 class="mb-0">Distribution des utilisateurs par rôle</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="roleChart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h6 class="mb-0">Aperçu de l'activité</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="activityChart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Recent Users Table ===== -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Utilisateurs récents</h6>
+                            <a href="{{ path('app_customers') }}" class="btn btn-sm btn-primary">
+                                <i class="feather-eye me-1"></i>Voir tout
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Utilisateur</th>
+                                            <th>Email</th>
+                                            <th>Rôle</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in recentUsers|reverse %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar avatar-sm avatar-rounded me-3">
+                                                        {% if user.role == 'client' %}
+                                                            <i class="feather-user"></i>
+                                                        {% elseif user.role == 'merchant' %}
+                                                            <i class="feather-shopping-bag"></i>
+                                                        {% else %}
+                                                            <i class="feather-truck"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">{{ user.firstName }} {{ user.lastName }}</h6>
+                                                        <small class="text-muted">ID: #{{ user.id }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ user.email }}</td>
+                                            <td>
+                                                <span class="badge 
+                                                    {% if user.role == 'client' %}bg-success
+                                                    {% elseif user.role == 'merchant' %}bg-warning
+                                                    {% else %}bg-info{% endif %}">
+                                                    {{ user.role|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">Actif</span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Quick Actions ===== -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h6 class="mb-0">Actions rapides</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="{{ path('app_customers_create') }}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                        <i class="feather-user-plus mb-2" style="font-size: 2rem;"></i>
+                                        <span>Ajouter un utilisateur</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="{{ path('app_customers') }}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                        <i class="feather-users mb-2" style="font-size: 2rem;"></i>
+                                        <span>Gérer les utilisateurs</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="#" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                        <i class="feather-bar-chart mb-2" style="font-size: 2rem;"></i>
+                                        <span>Voir les rapports</span>
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <a href="#" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                        <i class="feather-settings mb-2" style="font-size: 2rem;"></i>
+                                        <span>Paramètres</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
         </div>
         {% include 'partials/duralux_footer.html.twig' %}
     </main>
+{% endblock %}
 
-    <!--! Footer Script !-->
-    <!--! ================================================================ !-->
-    <!--! BEGIN: Vendors JS !-->
-    <script src="assets/vendors/js/vendors.min.js"></script>
-    <!-- vendors.min.js {always must need to be top} -->
-    <script src="assets/vendors/js/daterangepicker.min.js"></script>
-    <script src="assets/vendors/js/apexcharts.min.js"></script>
-    <script src="assets/vendors/js/circle-progress.min.js"></script>
-    <!--! END: Vendors JS !-->
-    <!--! BEGIN: Apps Init  !-->
-    <script src="assets/js/common-init.min.js"></script>
-    <script src="assets/js/dashboard-init.min.js"></script>
-    <!--! END: Apps Init !-->
-    <!--! BEGIN: Theme Customizer  !-->
-    <script src="assets/js/theme-customizer-init.min.js"></script>
-    <!--! END: Theme Customizer !-->
-</body>
+{% block javascripts %}
+<script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+<script src="{{ asset('assets/vendors/js/apexcharts.min.js') }}"></script>
+<script>
+// Role Distribution Chart
+var roleOptions = {
+    series: [{
+        name: 'Users',
+        data: [{{ roleDistribution.clients }}, {{ roleDistribution.merchants }}, {{ roleDistribution.couriers }}]
+    }],
+    chart: {
+        type: 'bar',
+        height: 300,
+        toolbar: {
+            show: false
+        }
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            endingShape: 'rounded'
+        },
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+    },
+    xaxis: {
+        categories: ['Clients', 'Merchants', 'Couriers'],
+    },
+    yaxis: {
+        title: {
+            text: 'Number of Users'
+        }
+    },
+    fill: {
+        opacity: 1
+    },
+    colors: ['#10b981', '#f59e0b', '#3b82f6'],
+    tooltip: {
+        y: {
+            formatter: function (val) {
+                return val + " users"
+            }
+        }
+    }
+};
 
-</html>
+var roleChart = new ApexCharts(document.querySelector("#roleChart"), roleOptions);
+roleChart.render();
+
+// Activity Overview Chart
+var activityOptions = {
+    series: [{{ totalClients }}, {{ totalMerchants }}, {{ totalCouriers }}],
+    chart: {
+        type: 'donut',
+        height: 300,
+    },
+    labels: ['Clients', 'Merchants', 'Couriers'],
+    colors: ['#10b981', '#f59e0b', '#3b82f6'],
+    legend: {
+        position: 'bottom'
+    },
+    responsive: [{
+        breakpoint: 480,
+        options: {
+            chart: {
+                width: 200
+            },
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }]
+};
+
+var activityChart = new ApexCharts(document.querySelector("#activityChart"), activityOptions);
+activityChart.render();
+</script>
+{% endblock %}
