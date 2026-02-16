@@ -1,0 +1,163 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Détails Rendez-vous — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Détails du Rendez-vous</h1>
+        <p class="tgv-page-subtitle">Informations complètes du rendez-vous</p>
+    </div>
+    <div class="tgv-page-actions">
+        {% if rendez_vou.etat == 'EN_ATTENTE' %}
+            <form method="post" action="{{ path('app_rendez_vous_accepter', {'id': rendez_vou.id}) }}" style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('accepter' ~ rendez_vou.id) }}">
+                <button type="submit" class="tgv-btn tgv-btn-success">
+                    <i class="fas fa-check"></i>
+                    Accepter
+                </button>
+            </form>
+            <form method="post" action="{{ path('app_rendez_vous_refuser', {'id': rendez_vou.id}) }}" style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('refuser' ~ rendez_vou.id) }}">
+                <button type="submit" class="tgv-btn tgv-btn-danger">
+                    <i class="fas fa-times"></i>
+                    Refuser
+                </button>
+            </form>
+        {% endif %}
+        <a href="{{ path('app_rendez_vous_edit', {'id': rendez_vou.id}) }}" class="tgv-btn tgv-btn-secondary">
+            <i class="fas fa-edit"></i>
+            Modifier
+        </a>
+    </div>
+</div>
+
+<!-- Rendez-vous Details -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-rdv-profile">
+                <div class="tgv-profile-header">
+                    <div class="tgv-profile-avatar">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="tgv-profile-info">
+                        <h2 class="tgv-profile-name">RDV #{{ rendez_vou.id }}</h2>
+                        <div class="tgv-profile-metier">{{ rendez_vou.commercant.nom }}</div>
+                        <div class="tgv-profile-status">
+                            <span class="tgv-status 
+                                {% if rendez_vou.etat == 'EN_ATTENTE' %}tgv-status-warning
+                                {% elseif rendez_vou.etat == 'CONFIRME' %}tgv-status-success
+                                {% else %}tgv-status-danger{% endif %}">
+                                {{ rendez_vou.etat == 'EN_ATTENTE' ? 'En attente' : 
+                                   (rendez_vou.etat == 'CONFIRME' ? 'Confirmé' : 'Annulé') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tgv-profile-details">
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-calendar"></i>
+                            Date du rendez-vous
+                        </div>
+                        <div class="tgv-detail-value">{{ rendez_vou.dateRdv|date('d/m/Y H:i') }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-store"></i>
+                            Commerçant
+                        </div>
+                        <div class="tgv-detail-value">
+                            <a href="{{ path('app_commercant_show', {'id': rendez_vou.commercant.id}) }}" class="tgv-link">
+                                {{ rendez_vou.commercant.nom }} ({{ rendez_vou.commercant.metier ?? 'Non spécifié' }})
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-envelope"></i>
+                            Email du demandeur
+                        </div>
+                        <div class="tgv-detail-value">{{ rendez_vou.emailDemandeur }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Ville
+                        </div>
+                        <div class="tgv-detail-value">{{ rendez_vou.commercant.ville ?? 'Non spécifié' }}</div>
+                    </div>
+                    
+                    <div class="tgv-detail-row">
+                        <div class="tgv-detail-label">
+                            <i class="fas fa-phone"></i>
+                            Téléphone commerçant
+                        </div>
+                        <div class="tgv-detail-value">{{ rendez_vou.commercant.numeroTelephone }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Section -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Message du demandeur</h3>
+    </div>
+    
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-message-box">
+                <div class="tgv-message-header">
+                    <i class="fas fa-comment"></i>
+                    Message
+                </div>
+                <div class="tgv-message-content">
+                    {{ rendez_vou.message|nl2br }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actions Section -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-actions-grid">
+                <a href="{{ path('app_rendez_vous_index') }}" class="tgv-btn tgv-btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour à la liste
+                </a>
+                
+                {% if rendez_vou.etat == 'EN_ATTENTE' %}
+                    <div class="tgv-actions-group">
+                        <form method="post" action="{{ path('app_rendez_vous_accepter', {'id': rendez_vou.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accepter' ~ rendez_vou.id) }}">
+                            <button type="submit" class="tgv-btn tgv-btn-success">
+                                <i class="fas fa-check"></i>
+                                Accepter le RDV
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_rendez_vous_refuser', {'id': rendez_vou.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('refuser' ~ rendez_vou.id) }}">
+                            <button type="submit" class="tgv-btn tgv-btn-danger">
+                                <i class="fas fa-times"></i>
+                                Refuser le RDV
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Tableau de bord — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Tableau de bord</h1>
+        <p class="tgv-page-subtitle">Vue d'ensemble de votre activité commerciale</p>
+    </div>
+    <div class="tgv-page-actions">
+        <a href="{{ path('app_commercant_new') }}" class="tgv-btn tgv-btn-primary">
+            <i class="fas fa-plus"></i>
+            NOUVEAU COMMERCANT
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="tgv-stats-grid">
+    <div class="tgv-stat-card blue">
+        <i class="fas fa-store tgv-stat-icon"></i>
+        <div class="tgv-stat-number">{{ nb_commercants ?? 0 }}</div>
+        <div class="tgv-stat-label">Commerçants</div>
+    </div>
+    
+    <div class="tgv-stat-card green">
+        <i class="fas fa-calendar-check tgv-stat-icon"></i>
+        <div class="tgv-stat-number">{{ nb_rdv ?? 0 }}</div>
+        <div class="tgv-stat-label">Rendez-vous</div>
+    </div>
+    
+    <div class="tgv-stat-card teal">
+        <i class="fas fa-clock tgv-stat-icon"></i>
+        <div class="tgv-stat-number">{{ nb_en_attente ?? 0 }}</div>
+        <div class="tgv-stat-label">En attente</div>
+    </div>
+    
+    <div class="tgv-stat-card orange">
+        <i class="fas fa-map-marker-alt tgv-stat-icon"></i>
+        <div class="tgv-stat-number">24</div>
+        <div class="tgv-stat-label">Zones couvertes</div>
+    </div>
+</div>
+
+<!-- Recent Orders Section -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Rendez-vous récents</h3>
+        <a href="{{ path('app_rendez_vous_index') }}" class="tgv-section-link">VOIR TOUS LES RENDEZ-VOUS</a>
+    </div>
+    
+    <div class="tgv-recent-item">
+        <div class="tgv-recent-info">
+            <h4>RDV-20260210-001</h4>
+            <div class="tgv-recent-meta">10/02/2026 21:43</div>
+        </div>
+        <div class="tgv-recent-status en-attente">
+            En attente
+        </div>
+    </div>
+</div>
+
+<!-- Recent Products Section -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Commerçants récents</h3>
+        <a href="{{ path('app_commercant_index') }}" class="tgv-section-link">VOIR TOUS LES COMMERCANTS</a>
+    </div>
+    
+    <div class="tgv-recent-item">
+        <div class="tgv-recent-info">
+            <h4>Mohamed Ali - Mécanicien</h4>
+            <div class="tgv-recent-meta">Tunis - 14/02/2026</div>
+        </div>
+        <div class="tgv-recent-status actif">
+            Actif
+        </div>
+    </div>
+    
+    <div class="tgv-recent-item">
+        <div class="tgv-recent-info">
+            <h4>Sonia Ben - Restaurant</h4>
+            <div class="tgv-recent-meta">Sfax - 13/02/2026</div>
+        </div>
+        <div class="tgv-recent-status nouveau">
+            Nouveau
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Sidebar toggle for mobile
+document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+    const sidebar = document.querySelector('.tgv-sidebar');
+    sidebar.classList.toggle('open');
+    
+    // Change icon
+    const icon = this.querySelector('i');
+    if (sidebar.classList.contains('open')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+    } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+});
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click', function(e) {
+    const sidebar = document.querySelector('.tgv-sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    
+    if (window.innerWidth <= 1024 && 
+        !sidebar.contains(e.target) && 
+        !sidebarToggle.contains(e.target) && 
+        sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        const icon = sidebarToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    const sidebar = document.querySelector('.tgv-sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    
+    if (window.innerWidth > 1024) {
+        sidebar.classList.remove('open');
+        const icon = sidebarToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+});
+</script>
+{% endblock %}

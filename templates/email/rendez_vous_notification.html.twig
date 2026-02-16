@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rendez-vous — {{ statut == 'validation' ? 'Confirmé' : 'Refusé' }}</title>
+</head>
+<body style="font-family: sans-serif; line-height: 1.5; color: #333;">
+    <h2>Gestion des services — Rendez-vous {{ statut == 'validation' ? 'confirmé' : 'refusé' }}</h2>
+    <p>Bonjour,</p>
+    {% if statut == 'validation' %}
+        <p>Votre demande de rendez-vous a été <strong>acceptée</strong>.</p>
+    {% else %}
+        <p>Votre demande de rendez-vous a été <strong>refusée</strong>.</p>
+    {% endif %}
+    <p><strong>Commerçant :</strong> {{ rendezVous.commercant.nom }} ({{ rendezVous.commercant.metier ?? '—' }})</p>
+    <p><strong>Date prévue :</strong> {{ rendezVous.dateRdv ? rendezVous.dateRdv|date('d/m/Y à H:i') : '—' }}</p>
+    <p><strong>Votre message :</strong> {{ rendezVous.message }}</p>
+    <p>Cordialement,<br>L'équipe Gestion des services</p>
+</body>
+</html>

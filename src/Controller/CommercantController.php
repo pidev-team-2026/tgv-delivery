@@ -2,14 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\Produit;
-use App\Entity\Commande;
-use App\Form\ProduitType;
-use App\Repository\ProduitRepository;
-use App\Repository\CommandeRepository;
+use App\Entity\Commercant;
+use App\Form\CommercantType;
+use App\Repository\CommercantRepository;
+use App\Repository\RendezVousRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,241 +15,94 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/commercant')]
 final class CommercantController extends AbstractController
 {
-    #[Route('/', name: 'app_commercant_dashboard', methods: ['GET'])]
-    public function dashboard(ProduitRepository $produitRepository, CommandeRepository $commandeRepository): Response
+    /**
+     * Tableau de bord Back Office (accueil admin).
+     */
+    #[Route('/dashboard', name: 'app_back_dashboard', methods: ['GET'])]
+    public function dashboard(CommercantRepository $commercantRepository, RendezVousRepository $rendezVousRepository): Response
     {
-        $totalProduits = $produitRepository->count([]);
-        $totalCommandes = $commandeRepository->count([]);
-        $commandesRecents = $commandeRepository->findBy([], ['dateCreation' => 'DESC'], 5);
-        $produitsRecents = $produitRepository->findBy([], ['dateCreation' => 'DESC'], 5);
-        
-        // Calculer les statistiques de ventes
-        $commandesLivrees = $commandeRepository->findBy(['statut' => 'livree']);
-        $totalRevenus = array_sum(array_map(fn($c) => $c->getTotalPrix(), $commandesLivrees));
-        $totalVendus = $commandeRepository->createQueryBuilder('c')
-            ->select('COUNT(cp.id)')
-            ->leftJoin('c.produits', 'cp')
-            ->where('c.statut = :statut')
-            ->setParameter('statut', 'livree')
-            ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+        $nbCommercants = $commercantRepository->count([]);
+        $nbRdv = $rendezVousRepository->count([]);
+        $nbEnAttente = $rendezVousRepository->count(['etat' => 'EN_ATTENTE']);
+        $statsParVille = $commercantRepository->countByVille();
 
-        return $this->render('commercant/dashboard/index.html.twig', [
-            'totalProduits' => $totalProduits,
-            'totalCommandes' => $totalCommandes,
-            'totalRevenus' => $totalRevenus,
-            'totalVendus' => $totalVendus,
-            'commandesRecents' => $commandesRecents,
-            'produitsRecents' => $produitsRecents,
+        return $this->render('admin/dashboard.html.twig', [
+            'nb_commercants' => $nbCommercants,
+            'nb_rdv' => $nbRdv,
+            'nb_en_attente' => $nbEnAttente,
+            'stats_par_ville' => $statsParVille,
         ]);
     }
 
-    #[Route('/produits', name: 'app_commercant_produits', methods: ['GET'])]
-    public function produits(Request $request, ProduitRepository $produitRepository): Response
+    #[Route(name: 'app_commercant_index', methods: ['GET'])]
+    public function index(CommercantRepository $commercantRepository, Request $request): Response
     {
-        $search = $request->query->get('search', '');
-        $sortBy = $request->query->get('sort', 'id');
-        $order = $request->query->get('order', 'ASC');
-        
-        $produits = $produitRepository->findBySearchAndSort($search, $sortBy, $order);
-        
-        return $this->render('commercant/produits/index.html.twig', [
-            'produits' => $produits,
+        $search = $request->query->get('q', '');
+        $sort = $request->query->get('sort', 'nom');
+        $order = $request->query->get('order', 'asc');
+
+        return $this->render('admin/commercant/index.html.twig', [
+            'commercants' => $commercantRepository->findWithSearchAndSort($search, $sort, $order),
             'search' => $search,
-            'sortBy' => $sortBy,
+            'sort' => $sort,
             'order' => $order,
         ]);
     }
 
-    #[Route('/produits/new', name: 'app_commercant_produit_new', methods: ['GET', 'POST'])]
-    public function newProduit(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'app_commercant_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $produit = new Produit();
-        $form = $this->createForm(ProduitType::class, $produit);
+        $commercant = new Commercant();
+        $form = $this->createForm(CommercantType::class, $commercant);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile|null $imageFile */
-            $imageFile = $form->get('image')->getData();
-            if ($imageFile instanceof UploadedFile) {
-                $targetDir = $this->getParameter('kernel.project_dir') . '/public/uploads/produits';
-                $safeName = bin2hex(random_bytes(16));
-                $extension = $imageFile->guessExtension() ?: 'bin';
-                $fileName = $safeName . '.' . $extension;
-
-                $imageFile->move($targetDir, $fileName);
-                $produit->setImage('uploads/produits/' . $fileName);
-            }
-
-            $entityManager->persist($produit);
+            $entityManager->persist($commercant);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produit ajouté avec succès!');
-            return $this->redirectToRoute('app_commercant_produits');
+            return $this->redirectToRoute('app_commercant_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('commercant/produits/new.html.twig', [
-            'produit' => $produit,
+        return $this->render('admin/commercant/new.html.twig', [
+            'commercant' => $commercant,
             'form' => $form,
         ]);
     }
 
-    #[Route('/produits/{id}', name: 'app_commercant_produit_show', methods: ['GET'])]
-    public function showProduit(Produit $produit): Response
+    #[Route('/{id}', name: 'app_commercant_show', methods: ['GET'])]
+    public function show(Commercant $commercant): Response
     {
-        return $this->render('commercant/produits/show.html.twig', [
-            'produit' => $produit,
+        return $this->render('admin/commercant/show.html.twig', [
+            'commercant' => $commercant,
         ]);
     }
 
-    #[Route('/produits/{id}/edit', name: 'app_commercant_produit_edit', methods: ['GET', 'POST'])]
-    public function editProduit(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_commercant_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Commercant $commercant, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ProduitType::class, $produit);
+        $form = $this->createForm(CommercantType::class, $commercant);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile|null $imageFile */
-            $imageFile = $form->get('image')->getData();
-            if ($imageFile instanceof UploadedFile) {
-                $targetDir = $this->getParameter('kernel.project_dir') . '/public/uploads/produits';
-                $safeName = bin2hex(random_bytes(16));
-                $extension = $imageFile->guessExtension() ?: 'bin';
-                $fileName = $safeName . '.' . $extension;
-
-                $imageFile->move($targetDir, $fileName);
-                $produit->setImage('uploads/produits/' . $fileName);
-            }
-
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produit modifié avec succès!');
-            return $this->redirectToRoute('app_commercant_produits');
+            return $this->redirectToRoute('app_commercant_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('commercant/produits/edit.html.twig', [
-            'produit' => $produit,
+        return $this->render('admin/commercant/edit.html.twig', [
+            'commercant' => $commercant,
             'form' => $form,
         ]);
     }
 
-    #[Route('/produits/{id}/toggle', name: 'app_commercant_produit_toggle', methods: ['POST'])]
-    public function toggleProduit(Produit $produit, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_commercant_delete', methods: ['POST'])]
+    public function delete(Request $request, Commercant $commercant, EntityManagerInterface $entityManager): Response
     {
-        if ($produit->getStatut() === 'disponible') {
-            $produit->setStatut('archive');
-            $this->addFlash('success', 'Produit désactivé avec succès!');
-        } else {
-            $produit->setStatut('disponible');
-            $this->addFlash('success', 'Produit activé avec succès!');
-        }
-
-        $entityManager->flush();
-        return $this->redirectToRoute('app_commercant_produits');
-    }
-
-    #[Route('/produits/{id}/delete', name: 'app_commercant_produit_delete', methods: ['POST'])]
-    public function deleteProduit(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($produit);
+        if ($this->isCsrfTokenValid('delete'.$commercant->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($commercant);
             $entityManager->flush();
-            $this->addFlash('success', 'Produit supprimé avec succès!');
         }
 
-        return $this->redirectToRoute('app_commercant_produits');
-    }
-
-    #[Route('/commandes', name: 'app_commercant_commandes', methods: ['GET'])]
-    public function commandes(Request $request, CommandeRepository $commandeRepository): Response
-    {
-        $search = $request->query->get('search', '');
-        $sortBy = $request->query->get('sort', 'id');
-        $order = $request->query->get('order', 'DESC');
-        
-        $commandes = $commandeRepository->findBySearchAndSort($search, $sortBy, $order);
-        
-        return $this->render('commercant/commandes/index.html.twig', [
-            'commandes' => $commandes,
-            'search' => $search,
-            'sortBy' => $sortBy,
-            'order' => $order,
-        ]);
-    }
-
-    #[Route('/commandes/{id}', name: 'app_commercant_commande_show', methods: ['GET'])]
-    public function showCommande(Commande $commande): Response
-    {
-        return $this->render('commercant/commandes/show.html.twig', [
-            'commande' => $commande,
-        ]);
-    }
-
-    #[Route('/commandes/{id}/confirm', name: 'app_commercant_commande_confirm', methods: ['POST'])]
-    public function confirmCommande(Commande $commande, EntityManagerInterface $entityManager): Response
-    {
-        $commande->setStatut('confirmee');
-        $entityManager->flush();
-        
-        $this->addFlash('success', 'Commande confirmée avec succès!');
-        return $this->redirectToRoute('app_commercant_commandes');
-    }
-
-    #[Route('/commandes/{id}/status', name: 'app_commercant_commande_status', methods: ['POST'])]
-    public function updateStatus(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
-    {
-        $newStatus = $request->request->get('status');
-        $validStatuses = ['en_attente', 'confirmee', 'en_preparation', 'prete', 'en_livraison', 'livree', 'annulee'];
-        
-        if (in_array($newStatus, $validStatuses)) {
-            $commande->setStatut($newStatus);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Statut de la commande mis à jour avec succès!');
-        }
-
-        return $this->redirectToRoute('app_commercant_commandes');
-    }
-
-    #[Route('/commandes/{id}/assign-livreur', name: 'app_commercant_commande_assign_livreur', methods: ['POST'])]
-    public function assignLivreur(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
-    {
-        $livreur = $request->request->get('livreur');
-        
-        if ($livreur) {
-            $commande->setLivreur($livreur);
-            $commande->setStatut('en_livraison');
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Livreur affecté avec succès!');
-        }
-
-        return $this->redirectToRoute('app_commercant_commandes');
-    }
-
-    #[Route('/commandes/{id}/cancel', name: 'app_commercant_commande_cancel', methods: ['POST'])]
-    public function cancelCommande(Commande $commande, EntityManagerInterface $entityManager): Response
-    {
-        $commande->setStatut('annulee');
-        $entityManager->flush();
-        
-        $this->addFlash('success', 'Commande annulée avec succès!');
-        return $this->redirectToRoute('app_commercant_commandes');
-    }
-
-    #[Route('/commandes/{id}/contact', name: 'app_commercant_commande_contact', methods: ['GET', 'POST'])]
-    public function contactClient(Request $request, Commande $commande): Response
-    {
-        $message = $request->request->get('message');
-        
-        if ($message) {
-            // Ici vous pourriez intégrer un service d'envoi d'email
-            $this->addFlash('success', 'Message envoyé au client avec succès!');
-            return $this->redirectToRoute('app_commercant_commandes');
-        }
-
-        return $this->render('commercant/commandes/contact.html.twig', [
-            'commande' => $commande,
-        ]);
+        return $this->redirectToRoute('app_commercant_index', [], Response::HTTP_SEE_OTHER);
     }
 }

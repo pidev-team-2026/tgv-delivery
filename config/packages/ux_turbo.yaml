@@ -1,0 +1,3 @@
+# UX Turbo (Symfony 6.4)
+framework:
+    csrf_protection: true

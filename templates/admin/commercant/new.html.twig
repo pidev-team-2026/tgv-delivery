@@ -1,0 +1,87 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouveau Commerçant — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Nouveau Commerçant</h1>
+        <p class="tgv-page-subtitle">Ajouter un nouveau commerçant partenaire</p>
+    </div>
+</div>
+
+<!-- New Form -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            {{ form_start(form, { attr: { class: 'tgv-form' } }) }}
+                
+                <div class="tgv-form-grid">
+                    <div class="tgv-form-group">
+                        {{ form_label(form.nom, 'Nom du commerçant', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.nom, { 'attr': { 'class': 'tgv-form-input', 'placeholder': 'Nom du commerçant' } }) }}
+                        {% if form.nom.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.nom.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.email, 'Email', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.email, { 'attr': { 'class': 'tgv-form-input', 'placeholder': 'email@exemple.com' } }) }}
+                        {% if form.email.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.email.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.numeroTelephone, 'Téléphone', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.numeroTelephone, { 'attr': { 'class': 'tgv-form-input', 'placeholder': '+216 XX XXX XXX' } }) }}
+                        {% if form.numeroTelephone.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.numeroTelephone.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.ville, 'Ville', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.ville, { 'attr': { 'class': 'tgv-form-select' } }) }}
+                        {% if form.ville.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.ville.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="tgv-form-group">
+                        {{ form_label(form.metier, 'Métier', { 'label_attr': { 'class': 'tgv-form-label' } }) }}
+                        {{ form_widget(form.metier, { 'attr': { 'class': 'tgv-form-select' } }) }}
+                        {% if form.metier.vars.errors|length > 0 %}
+                            <div class="tgv-form-error">
+                                {{ form.metier.vars.errors[0].message }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="tgv-form-actions">
+                    <button type="submit" class="tgv-btn tgv-btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Créer le commerçant
+                    </button>
+                    <a href="{{ path('app_commercant_index') }}" class="tgv-btn tgv-btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Annuler
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Rendez-vous — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Rendez-vous</h1>
+        <p class="tgv-page-subtitle">Gérez toutes les demandes de rendez-vous</p>
+    </div>
+</div>
+
+<!-- Search and Filters -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Liste des rendez-vous</h3>
+    </div>
+    
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <form method="get" action="{{ path('app_rendez_vous_index') }}" class="tgv-search-form">
+                <div class="tgv-search-row">
+                    <input type="text" name="q" class="tgv-search-input" value="{{ search }}" placeholder="Rechercher par message, état ou commerçant...">
+                    <select name="sort" class="tgv-search-select">
+                        <option value="dateRdv" {{ sort == 'dateRdv' ? 'selected' }}>Date</option>
+                        <option value="etat" {{ sort == 'etat' ? 'selected' }}>État</option>
+                        <option value="commercant" {{ sort == 'commercant' ? 'selected' }}>Commerçant</option>
+                    </select>
+                    <select name="order" class="tgv-search-select">
+                        <option value="desc" {{ order == 'desc' ? 'selected' }}>Décroissant</option>
+                        <option value="asc" {{ order == 'asc' ? 'selected' }}>Croissant</option>
+                    </select>
+                    <button type="submit" class="tgv-btn tgv-btn-primary">
+                        <i class="fas fa-search"></i>
+                        Rechercher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Rendez-vous List -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-table-container">
+                <table class="tgv-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Commerçant</th>
+                            <th>Email demandeur</th>
+                            <th>Message</th>
+                            <th>État</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rdv in rendez_vous %}
+                        <tr>
+                            <td>{{ rdv.id }}</td>
+                            <td>{{ rdv.dateRdv|date('d/m/Y H:i') }}</td>
+                            <td>{{ rdv.commercant.nom }}</td>
+                            <td>{{ rdv.emailDemandeur }}</td>
+                            <td>{{ rdv.message|slice(0, 50) }}{% if rdv.message|length > 50 %}...{% endif %}</td>
+                            <td>
+                                <span class="tgv-status 
+                                    {% if rdv.etat == 'EN_ATTENTE' %}tgv-status-warning
+                                    {% elseif rdv.etat == 'CONFIRME' %}tgv-status-success
+                                    {% else %}tgv-status-danger{% endif %}">
+                                    {{ rdv.etat == 'EN_ATTENTE' ? 'En attente' : 
+                                       (rdv.etat == 'CONFIRME' ? 'Confirmé' : 'Annulé') }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="tgv-actions">
+                                    <a href="{{ path('app_rendez_vous_show', {id: rdv.id}) }}" class="tgv-btn tgv-btn-sm tgv-btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if rdv.etat == 'EN_ATTENTE' %}
+                                        <form method="post" action="{{ path('app_rendez_vous_accepter', {'id': rdv.id}) }}" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('accepter' ~ rdv.id) }}">
+                                            <button type="submit" class="tgv-btn tgv-btn-sm tgv-btn-success" title="Accepter">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{{ path('app_rendez_vous_refuser', {'id': rdv.id}) }}" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('refuser' ~ rdv.id) }}">
+                                            <button type="submit" class="tgv-btn tgv-btn-sm tgv-btn-danger" title="Refuser">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="tgv-empty">
+                                <i class="fas fa-calendar-times"></i>
+                                Aucun rendez-vous trouvé
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

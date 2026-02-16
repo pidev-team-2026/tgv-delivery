@@ -1,0 +1,398 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Commerçants — TGV Delivery{% endblock %}
+
+{% block stylesheets %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+    color: #1e293b;
+    min-height: 100vh;
+}
+
+/* Navbar styles from accueil */
+.navbar-delivery {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    padding: 0.75rem 0;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.navbar-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    align-items: center;
+}
+
+.navbar-links a {
+    color: #475569;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.navbar-links a:hover {
+    color: #2563eb;
+}
+
+/* Main content */
+.main-content {
+    margin-top: 100px;
+    padding: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.125rem;
+    color: #64748b;
+}
+
+/* Search Section */
+.search-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.search-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    background: white;
+}
+
+.btn-search {
+    padding: 0.75rem 1.5rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-search:hover {
+    background: #1d4ed8;
+}
+
+/* Commerçants Grid */
+.commercants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.commercant-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.commercant-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.commercant-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.commercant-icon {
+    width: 50px;
+    height: 50px;
+    background: #2563eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.commercant-info h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.commercant-metier {
+    color: #2563eb;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.commercant-details {
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.detail-item i {
+    width: 20px;
+    color: #94a3b8;
+}
+
+.commercant-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+    transform: translateY(-1px);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-text {
+    color: #94a3b8;
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content {
+        margin-top: 120px;
+        padding: 1rem;
+    }
+    
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-input,
+    .search-select {
+        width: 100%;
+    }
+    
+    .commercants-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .commercant-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Nos Commerçants Partenaires</h1>
+        <p class="page-subtitle">Trouvez le professionnel idéal pour vos besoins</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <form method="get" action="{{ path('app_front_commercants_list') }}" class="search-form">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="order" value="{{ order }}">
+            <input type="text" name="q" class="search-input" value="{{ search }}" placeholder="Rechercher par nom, email ou métier...">
+            <select name="sort" class="search-select">
+                <option value="nom" {{ sort == 'nom' ? 'selected' }}>Nom</option>
+                <option value="metier" {{ sort == 'metier' ? 'selected' }}>Métier</option>
+                <option value="ville" {{ sort == 'ville' ? 'selected' }}>Ville</option>
+            </select>
+            <select name="order" class="search-select">
+                <option value="asc" {{ order == 'asc' ? 'selected' }}>Croissant</option>
+                <option value="desc" {{ order == 'desc' ? 'selected' }}>Décroissant</option>
+            </select>
+            <button type="submit" class="btn-search">
+                <i class="fas fa-search"></i>
+                Rechercher
+            </button>
+        </form>
+    </div>
+
+    {% if commercants|length > 0 %}
+        <!-- Commerçants Grid -->
+        <div class="commercants-grid">
+            {% for c in commercants %}
+                <div class="commercant-card">
+                    <div class="commercant-header">
+                        <div class="commercant-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="commercant-info">
+                            <h3>{{ c.nom }}</h3>
+                            <div class="commercant-metier">{{ c.metier ?? 'Non spécifié' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="commercant-details">
+                        <div class="detail-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>{{ c.email }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-phone"></i>
+                            <span>{{ c.numeroTelephone }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ c.ville ?? 'Non spécifié' }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="commercant-actions">
+                        <a href="{{ path('app_front_rendez_vous_demander', { commercantId: c.id }) }}" class="btn-action btn-primary">
+                            <i class="fas fa-calendar-check"></i>
+                            Demander RDV
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-store-slash"></i>
+            </div>
+            <h2 class="empty-state-title">Aucun commerçant trouvé</h2>
+            <p class="empty-state-text">
+                Essayez de modifier votre recherche ou revenez plus tard.
+            </p>
+            <a href="{{ path('app_front_accueil') }}" class="btn-action btn-secondary">
+                <i class="fas fa-home"></i>
+                Retour à l'accueil
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

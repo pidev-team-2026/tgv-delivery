@@ -1,7 +1,5 @@
 twig:
     file_name_pattern: '*.twig'
-    paths:
-        '%kernel.project_dir%/ui-template': ui_template
 
 when@test:
     twig:

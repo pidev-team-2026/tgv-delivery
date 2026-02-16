@@ -1,0 +1,31 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier le Commerçant — Back Office{% endblock %}
+
+{% block breadcrumb %}
+{% set breadcrumb = [
+    { label: 'Tableau de bord', url: path('app_back_dashboard') },
+    { label: 'Commerçants', url: path('app_commercant_index') },
+    { label: 'Modifier', url: '' }
+] %}
+{{ include('admin/Partials/breadcrumb.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<h1 class="admin-page-title">Modifier le Commerçant</h1>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card admin-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Informations du commerçant</h5>
+                {{ include('commercant/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+                <div class="form-actions">
+                    <a href="{{ path('app_commercant_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+                    {{ include('commercant/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

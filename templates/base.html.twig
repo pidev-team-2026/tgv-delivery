@@ -1,102 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Delivery App{% endblock %}</title>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+        {% endblock %}
 
-    {# ===== CSS ===== #}
-    <link rel="stylesheet" href="{{ asset('assets/vendors/bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-
-    {% block stylesheets %}{% endblock %}
-</head>
-
-<body>
-
-    {# ===== MAIN CONTENT ===== #}
-    {% block body %}{% endblock %}
-
-    {# ===== OPTIONAL UI COMPONENTS ===== #}
-    {% include 'partials/theme_customizer.html.twig' %}
-
-    {# ===== JS ===== #}
-    <script src="{{ asset('assets/vendors/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/app.js') }}"></script>
-    
-    {# ===== FIX FOR DROPDOWS ===== #}
-    <script>
-        // Force Bootstrap dropdowns to work properly
-        document.addEventListener('DOMContentLoaded', function() {
-            // Remove any existing dropdown listeners to avoid conflicts
-            document.removeEventListener('click', closeDropdowns);
-            document.removeEventListener('keydown', closeDropdownsOnEscape);
-            
-            // Add new event listeners
-            document.addEventListener('click', closeDropdowns);
-            document.addEventListener('keydown', closeDropdownsOnEscape);
-            
-            function closeDropdowns(event) {
-                const dropdowns = document.querySelectorAll('.dropdown-menu.show');
-                dropdowns.forEach(function(dropdown) {
-                    const dropdownElement = dropdown.closest('.dropdown');
-                    if (dropdownElement && !dropdownElement.contains(event.target)) {
-                        const dropdownToggle = dropdownElement.querySelector('[data-bs-toggle="dropdown"]');
-                        if (dropdownToggle) {
-                            const bootstrapDropdown = bootstrap.Dropdown.getInstance(dropdownToggle);
-                            if (bootstrapDropdown) {
-                                bootstrapDropdown.hide();
-                            } else {
-                                // Fallback if Bootstrap instance doesn't exist
-                                dropdownToggle.classList.remove('show');
-                                dropdown.classList.remove('show');
-                            }
-                        }
-                    }
-                });
-            }
-            
-            function closeDropdownsOnEscape(event) {
-                if (event.key === 'Escape') {
-                    const dropdowns = document.querySelectorAll('.dropdown-menu.show');
-                    dropdowns.forEach(function(dropdown) {
-                        const dropdownElement = dropdown.closest('.dropdown');
-                        if (dropdownElement) {
-                            const dropdownToggle = dropdownElement.querySelector('[data-bs-toggle="dropdown"]');
-                            if (dropdownToggle) {
-                                const bootstrapDropdown = bootstrap.Dropdown.getInstance(dropdownToggle);
-                                if (bootstrapDropdown) {
-                                    bootstrapDropdown.hide();
-                                } else {
-                                    // Fallback if Bootstrap instance doesn't exist
-                                    dropdownToggle.classList.remove('show');
-                                    dropdown.classList.remove('show');
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-            
-            // Initialize Bootstrap dropdowns
-            const dropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-            dropdownToggles.forEach(function(toggle) {
-                new bootstrap.Dropdown(toggle);
-            });
-            
-            // Fix dropdown toggles that are already open
-            const openDropdowns = document.querySelectorAll('.dropdown-menu.show');
-            openDropdowns.forEach(function(dropdown) {
-                const dropdownElement = dropdown.closest('.dropdown');
-                if (dropdownElement) {
-                    const dropdownToggle = dropdownElement.querySelector('[data-bs-toggle="dropdown"]');
-                    if (dropdownToggle) {
-                        dropdownToggle.classList.add('show');
-                    }
-                }
-            });
-        });
-    </script>
-
-    {% block javascripts %}{% endblock %}
-</body>
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
 </html>

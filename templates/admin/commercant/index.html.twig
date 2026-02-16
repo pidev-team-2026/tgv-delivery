@@ -1,0 +1,114 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Commerçants — TGV Delivery{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<div class="tgv-page-header">
+    <div>
+        <h1 class="tgv-page-title">Commerçants</h1>
+        <p class="tgv-page-subtitle">Gérez tous les commerçants partenaires</p>
+    </div>
+    <div class="tgv-page-actions">
+        <a href="{{ path('app_commercant_new') }}" class="tgv-btn tgv-btn-primary">
+            <i class="fas fa-plus"></i>
+            NOUVEAU COMMERCANT
+        </a>
+    </div>
+</div>
+
+<!-- Search and Filters -->
+<div class="tgv-section">
+    <div class="tgv-section-header">
+        <h3 class="tgv-section-title">Liste des commerçants</h3>
+    </div>
+    
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <form method="get" action="{{ path('app_commercant_index') }}" class="tgv-search-form">
+                <div class="tgv-search-row">
+                    <input type="text" name="q" class="tgv-search-input" value="{{ search }}" placeholder="Rechercher par nom, email ou métier...">
+                    <select name="sort" class="tgv-search-select">
+                        <option value="nom" {{ sort == 'nom' ? 'selected' }}>Nom</option>
+                        <option value="metier" {{ sort == 'metier' ? 'selected' }}>Métier</option>
+                        <option value="ville" {{ sort == 'ville' ? 'selected' }}>Ville</option>
+                    </select>
+                    <select name="order" class="tgv-search-select">
+                        <option value="asc" {{ order == 'asc' ? 'selected' }}>Croissant</option>
+                        <option value="desc" {{ order == 'desc' ? 'selected' }}>Décroissant</option>
+                    </select>
+                    <button type="submit" class="tgv-btn tgv-btn-primary">
+                        <i class="fas fa-search"></i>
+                        Rechercher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Commerçants List -->
+<div class="tgv-section">
+    <div class="tgv-card">
+        <div class="tgv-card-body">
+            <div class="tgv-table-container">
+                <table class="tgv-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Ville</th>
+                            <th>Métier</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commercant in commercants %}
+                        <tr>
+                            <td>{{ commercant.id }}</td>
+                            <td>
+                                <div class="tgv-user-info">
+                                    <i class="fas fa-store tgv-user-icon"></i>
+                                    <span>{{ commercant.nom }}</span>
+                                </div>
+                            </td>
+                            <td>{{ commercant.email }}</td>
+                            <td>{{ commercant.numeroTelephone }}</td>
+                            <td>{{ commercant.ville }}</td>
+                            <td>
+                                <span class="tgv-metier">{{ commercant.metier }}</span>
+                            </td>
+                            <td>
+                                <div class="tgv-actions">
+                                    <a href="{{ path('app_commercant_show', {id: commercant.id}) }}" class="tgv-btn tgv-btn-sm tgv-btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_commercant_edit', {id: commercant.id}) }}" class="tgv-btn tgv-btn-sm tgv-btn-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_commercant_delete', {id: commercant.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commerçant ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commercant.id) }}">
+                                        <button type="submit" class="tgv-btn tgv-btn-sm tgv-btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="tgv-empty">
+                                <i class="fas fa-store-slash"></i>
+                                Aucun commerçant trouvé
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

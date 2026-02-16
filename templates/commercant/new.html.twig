@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Nouveau Commerçant — Back Office{% endblock %}
+
+{% block breadcrumb %}
+{% set breadcrumb = [
+    { label: 'Tableau de bord', url: path('app_back_dashboard') },
+    { label: 'Commerçants', url: path('app_commercant_index') },
+    { label: 'Nouveau', url: '' }
+] %}
+{{ include('admin/Partials/breadcrumb.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<h1 class="admin-page-title">Créer un Commerçant</h1>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card admin-card">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Informations du commerçant</h5>
+                {{ include('commercant/_form.html.twig') }}
+                <div class="form-actions">
+                    <a href="{{ path('app_commercant_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

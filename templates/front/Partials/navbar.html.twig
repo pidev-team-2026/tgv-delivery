@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ path('app_front_accueil') }}">
+            <img src="{{ asset('admin/images/logo-tgv-delivery.png') }}" alt="TGV DELIVERY" height="30" class="me-2">
+            TGV <span style="color: #0066ff;">DELIVERY</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarFront" aria-controls="navbarFront" aria-expanded="false" aria-label="Menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarFront">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_front_accueil') }}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_front_commercants_list') }}">Commerçants</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_front_rendez_vous_demander') }}">Demander un RDV</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_commercant_index') }}">Espace admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

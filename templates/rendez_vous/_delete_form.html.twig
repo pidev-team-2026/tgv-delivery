@@ -1,0 +1,19 @@
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDeleteRdv{{ rendez_vou.id }}">Supprimer</button>
+<div class="modal fade" id="modalDeleteRdv{{ rendez_vou.id }}" tabindex="-1" aria-labelledby="modalDeleteRdvLabel{{ rendez_vou.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDeleteRdvLabel{{ rendez_vou.id }}">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">Êtes-vous sûr de vouloir supprimer ce rendez-vous ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('app_rendez_vous_delete', {'id': rendez_vou.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ rendez_vou.id) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
