@@ -10,29 +10,85 @@
     <title>{% block title %}Dashboard{% endblock %} - TGV Delivery Admin</title>
     
     {# Favicon #}
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/images/favicon.ico') }}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}" />
     
     {# Bootstrap CSS #}
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}" />
     
     {# Vendors CSS #}
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/vendors.min.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/vendors/css/daterangepicker.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendors/css/vendors.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendors/css/daterangepicker.min.css') }}" />
     
     {# Custom Theme CSS #}
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/theme.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/theme.min.css') }}" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <style>
+        :root {
+            --nxl-sidebar-width: 280px;
+            --nxl-header-height: 70px;
+        }
+
+        .btn i[class^="bi"],
+        .btn i[class^="feather"],
+        .btn-group i[class^="bi"],
+        .btn-group i[class^="feather"] {
+            display: inline-block !important;
+            font-size: 14px !important;
+            line-height: 1 !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .btn-group .btn {
+            min-width: 34px;
+        }
+
+        .nxl-navigation {
+            width: var(--nxl-sidebar-width);
+        }
+
+        .nxl-header {
+            position: fixed;
+            top: 0;
+            left: var(--nxl-sidebar-width);
+            width: calc(100% - var(--nxl-sidebar-width));
+            z-index: 1030;
+            transition: none !important;
+        }
+
+        .nxl-container {
+            margin-left: var(--nxl-sidebar-width);
+        }
+
+        .nxl-content {
+            padding-top: var(--nxl-header-height);
+        }
+
+        @media (max-width: 991.98px) {
+            .nxl-container {
+                margin-left: 0;
+            }
+
+            .nxl-header {
+                left: 0;
+                width: 100%;
+            }
+        }
+    </style>
     
     {% block stylesheets %}{% endblock %}
 </head>
 
 <body>
     {# Navigation Sidebar #}
-    {% include 'admin/partials/sidebar.html.twig' %}
+    {% include 'admin/partials/admin_sidebar.html.twig' %}
     
     {# Main Container #}
     <main class="nxl-container">
         {# Header #}
-        {% include 'admin/partials/navbar.html.twig' %}
+        {% include 'admin/partials/admin_navbar.html.twig' %}
         
         {# Main Content #}
         <div class="nxl-content">
@@ -52,7 +108,7 @@
                     <div class="page-header-right-items">
                         <div class="d-flex d-md-none">
                             <a href="javascript:void(0)" class="page-header-right-close-toggle">
-                                <i class="feather-arrow-left me-2"></i>
+                                <i class="bi bi-arrow-left me-2"></i>
                                 <span>Back</span>
                             </a>
                         </div>
@@ -62,7 +118,7 @@
                     </div>
                     <div class="d-md-none d-flex align-items-center">
                         <a href="javascript:void(0)" class="page-header-right-open-toggle">
-                            <i class="feather-align-right fs-20"></i>
+                            <i class="bi bi-list fs-20"></i>
                         </a>
                     </div>
                 </div>
@@ -85,17 +141,17 @@
         </div>
         
         {# Footer #}
-        {% include 'admin/partials/footer.html.twig' %}
+        {% include 'admin/partials/admin_footer.html.twig' %}
     </main>
     
     {# Customizer (optional - can be removed) #}
     {# {% include 'admin/partials/customizer.html.twig' %} #}
     
     {# Bootstrap & Vendors JS #}
-    <script src="{{ asset('assets/vendors/js/vendors.min.js') }}"></script>
+    <script src="{{ asset('vendors/js/vendors.min.js') }}"></script>
     
     {# Common Init JS #}
-    <script src="{{ asset('assets/js/common-init.min.js') }}"></script>
+    <script src="{{ asset('js/common-init.min.js') }}"></script>
     
     {# Dashboard Charts (only for dashboard page) #}
     {% block javascripts %}{% endblock %}

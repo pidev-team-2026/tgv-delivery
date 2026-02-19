@@ -36,7 +36,7 @@ final class CommercantController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
 
-        return $this->render('commercant/dashboard/index.html.twig', [
+        return $this->render('commercant/dashboard/commercant_dashboard.html.twig', [
             'totalProduits' => $totalProduits,
             'totalCommandes' => $totalCommandes,
             'totalRevenus' => $totalRevenus,

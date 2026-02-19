@@ -1,0 +1,264 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Dashboard - TGV Delivery{% endblock %}
+{% block page_title %}Tableau de Bord{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <li class="breadcrumb-item active">Dashboard</li>
+{% endblock %}
+
+{% block page_actions %}{% endblock %}
+
+{% block body %}
+<div class="row">
+    {# Commandes en attente #}
+    <div class="col-xxl-3 col-md-6">
+        <div class="card stretch stretch-full">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                    <div class="d-flex gap-4 align-items-center">
+                        <div class="avatar-text avatar-lg bg-soft-primary text-primary">
+                            <i class="bi bi-cart"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-dark">
+                                <span class="counter">{{ totalCommandes|default(0) }}</span>
+                            </div>
+                            <h3 class="fs-13 fw-semibold text-truncate-1-line">Commandes Totales</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a href="{{ path('app_commande_index') }}" class="fs-12 fw-medium text-muted">Voir toutes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# Produits #}
+    <div class="col-xxl-3 col-md-6">
+        <div class="card stretch stretch-full">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                    <div class="d-flex gap-4 align-items-center">
+                        <div class="avatar-text avatar-lg bg-soft-success text-success">
+                            <i class="bi bi-box"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-dark">
+                                <span class="counter">{{ totalProduits|default(0) }}</span>
+                            </div>
+                            <h3 class="fs-13 fw-semibold text-truncate-1-line">Produits</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a href="{{ path('app_produit_index') }}" class="fs-12 fw-medium text-muted">Voir tous</a>
+                        <div>
+                            <span class="fs-12 text-dark">En stock</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# Livraisons #}
+    <div class="col-xxl-3 col-md-6">
+        <div class="card stretch stretch-full">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                    <div class="d-flex gap-4 align-items-center">
+                        <div class="avatar-text avatar-lg bg-soft-warning text-warning">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-dark">
+                                <span class="counter">{{ totalLivraisons|default(0) }}</span>
+                            </div>
+                            <h3 class="fs-13 fw-semibold text-truncate-1-line">Livraisons</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <a href="{{ path('app_commande_index') }}" class="fs-12 fw-medium text-muted">Voir les commandes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# Revenus #}
+    <div class="col-xxl-3 col-md-6">
+        <div class="card stretch stretch-full">
+            <div class="card-body">
+                <div class="d-flex align-items-start justify-content-between mb-4">
+                    <div class="d-flex gap-4 align-items-center">
+                        <div class="avatar-text avatar-lg bg-soft-danger text-danger">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-dark">
+                                <span>{{ totalRevenus|default(0)|number_format(0) }}€</span>
+                            </div>
+                            <h3 class="fs-13 fw-semibold text-truncate-1-line">Revenus</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <span class="fs-12 fw-medium text-muted">Ce mois</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Commandes récentes #}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Commandes Récentes</h5>
+            </div>
+            <div class="card-body custom-card-action p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="border-b">
+                                <th>#</th>
+                                <th>Client</th>
+                                <th>Date</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recentCommandes is defined and recentCommandes|length > 0 %}
+                                {% for commande in recentCommandes %}
+                                <tr>
+                                    <td><a href="{{ path('app_commande_show', {id: commande.id}) }}" class="fw-bold">#{{ commande.reference ?? commande.id }}</a></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="avatar-image avatar-sm">
+                                                <div class="avatar-text bg-soft-primary text-primary">
+                                                    {{ commande.nomClient ? commande.nomClient|slice(0, 1)|upper : 'C' }}
+                                                </div>
+                                            </div>
+                                            <span>{{ commande.nomClient ?? 'Client inconnu' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : 'N/A' }}</td>
+                                    <td>
+                                        <span class="fw-bold">{{ commande.totalPrix|default(0)|number_format(2) }}€</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-soft-success text-success">{{ commande.statutLibelle|default('En attente') }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ path('app_commande_show', {id: commande.id}) }}" class="avatar-text avatar-sm" data-bs-toggle="tooltip" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="bi bi-inbox fs-3 mb-2"></i>
+                                            <p>Aucune commande récente</p>
+                                            <a href="{{ path('app_commande_index') }}" class="btn btn-sm btn-outline-primary mt-2">
+                                                <i class="bi bi-list"></i> Voir toutes les commandes
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Accès rapide #}
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-lightning text-warning me-2"></i>
+                    Consulter
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ path('app_commande_index') }}" class="btn btn-light-brand">
+                        <i class="bi bi-cart me-2"></i> Liste des commandes
+                    </a>
+                    <a href="{{ path('app_produit_index') }}" class="btn btn-light-brand">
+                        <i class="bi bi-box me-2"></i> Liste des produits
+                    </a>
+                    <a href="#" class="btn btn-light-brand">
+                        <i class="bi bi-people me-2"></i> Liste des clients
+                    </a>
+                    <a href="#" class="btn btn-light-brand">
+                        <i class="bi bi-truck me-2"></i> Livraisons
+                    </a>
+                    <a href="#" class="btn btn-light-brand">
+                        <i class="bi bi-person-plus me-2"></i> Partenaires
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up text-success me-2"></i>
+                    Statistiques du Jour
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <div class="fs-12 text-muted mb-1">Commandes</div>
+                            <div class="fs-4 fw-bold text-dark">{{ commandesAujourdhui|default(0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <div class="fs-12 text-muted mb-1">Revenus</div>
+                            <div class="fs-4 fw-bold text-dark">{{ revenusAujourdhui|default(0)|number_format(0) }}€</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <div class="fs-12 text-muted mb-1">Livraisons</div>
+                            <div class="fs-4 fw-bold text-dark">{{ livraisonsAujourdhui|default(0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded">
+                            <div class="fs-12 text-muted mb-1">Clients</div>
+                            <div class="fs-4 fw-bold text-dark">{{ nouveauxClients|default(0) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

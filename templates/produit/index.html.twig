@@ -64,14 +64,15 @@
                             {% endif %}
                         </a>
                     </th>
+                    <th>Image</th>
                     <th>
                         <a href="{{ path('app_produit_index', {
                             search: search|default(''), 
-                            sort: 'idProd', 
-                            order: (sortBy|default('id') == 'idProd' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
+                            sort: 'id', 
+                            order: (sortBy|default('id') == 'id' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
                         }) }}" class="text-decoration-none text-dark">
                             ID Prod
-                            {% if sortBy|default('id') == 'idProd' %}
+                            {% if sortBy|default('id') == 'id' %}
                                 <i class="bi bi-arrow-{{ order|default('ASC') == 'ASC' ? 'up' : 'down' }}"></i>
                             {% endif %}
                         </a>
@@ -144,7 +145,15 @@
                 {% for produit in produits %}
                 <tr>
                     <td>{{ produit.id }}</td>
-                    <td>{{ produit.idProd }}</td>
+                    <td>
+                        {% if produit.image %}
+                            <img src="{{ asset(produit.image) }}" alt="{{ produit.nom }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                            <div class="bg-secondary rounded" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image text-white"></i>
+                            </div>
+                        {% endif %}
+                    </td>
                     <td><strong>{{ produit.nom }}</strong></td>
                     <td>{{ produit.description }}</td>
                     <td><strong class="text-success">{{ produit.prix }}€</strong></td>
@@ -167,34 +176,34 @@
                     <td class="text-muted small">
                         {{ produit.dateCreation ? produit.dateCreation|date('d/m/Y H:i') : '-' }}
                     </td>
-                    <td class="text-center">
-                        <div class="btn-group" role="group">
-                            <a href="{{ path('app_produit_show', {'id': produit.id}) }}" 
-                               class="btn btn-sm btn-outline-info" 
-                               title="Voir les détails"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{{ path('app_produit_edit', {'id': produit.id}) }}" 
-                               class="btn btn-sm btn-outline-warning" 
-                               title="Modifier ce produit"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form method="POST" 
-                                  action="{{ path('app_produit_delete', {'id': produit.id}) }}" 
-                                  style="display:inline;" 
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
-                                <button type="submit" 
-                                        class="btn btn-sm btn-outline-danger" 
-                                        title="Supprimer ce produit"
-                                        data-bs-toggle="tooltip">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
+                   <td class="text-center">
+    <div class="btn-group" role="group">
+        <a href="{{ path('app_produit_show', {'id': produit.id}) }}" 
+           class="btn btn-sm btn-outline-info" 
+           title="Voir les détails"
+           data-bs-toggle="tooltip">
+            <i class="bi bi-eye"></i>
+        </a>
+        <a href="{{ path('app_produit_edit', {'id': produit.id}) }}" 
+           class="btn btn-sm btn-outline-warning" 
+           title="Modifier ce produit"
+           data-bs-toggle="tooltip">
+            <i class="bi bi-pencil"></i>
+        </a>
+        <form method="POST" 
+              action="{{ path('app_produit_delete', {'id': produit.id}) }}" 
+              style="display:inline;" 
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+            <button type="submit" 
+                    class="btn btn-sm btn-outline-danger" 
+                    title="Supprimer ce produit"
+                    data-bs-toggle="tooltip">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
                 </tr>
                 
             

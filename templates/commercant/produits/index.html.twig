@@ -170,44 +170,44 @@
                         {% endif %}
                     </td>
                     <td class="text-center">
-                        <div class="btn-group" role="group">
-                            <a href="{{ path('app_commercant_produit_show', {'id': produit.id}) }}" 
-                               class="btn btn-sm btn-outline-info" 
-                               title="Voir les détails"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" 
-                               class="btn btn-sm btn-outline-warning" 
-                               title="Modifier ce produit"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <form method="POST" 
-                                  action="{{ path('app_commercant_produit_toggle', {'id': produit.id}) }}" 
-                                  style="display:inline;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ produit.id) }}">
-                                <button type="submit" 
-                                        class="btn btn-sm {% if produit.statut == 'disponible' %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
-                                        title="{% if produit.statut == 'disponible' %}Désactiver{% else %}Activer{% endif %}"
-                                        data-bs-toggle="tooltip">
-                                    <i class="bi bi-{% if produit.statut == 'disponible' %}x-lg{% else %}check-lg{% endif %}"></i>
-                                </button>
-                            </form>
-                            <form method="POST" 
-                                  action="{{ path('app_commercant_produit_delete', {'id': produit.id}) }}" 
-                                  style="display:inline;" 
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
-                                <button type="submit" 
-                                        class="btn btn-sm btn-outline-danger" 
-                                        title="Supprimer ce produit"
-                                        data-bs-toggle="tooltip">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
+    <div class="btn-group" role="group">
+        <a href="{{ path('app_commercant_produit_show', {'id': produit.id}) }}" 
+           class="btn btn-sm btn-outline-info" 
+           title="Voir les détails"
+           data-bs-toggle="tooltip">
+            <i class="bi bi-eye"></i>
+        </a>
+        <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" 
+           class="btn btn-sm btn-outline-warning" 
+           title="Modifier ce produit"
+           data-bs-toggle="tooltip">
+            <i class="bi bi-pencil"></i>
+        </a>
+        <form method="POST" 
+              action="{{ path('app_commercant_produit_toggle', {'id': produit.id}) }}" 
+              style="display:inline;">
+            <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ produit.id) }}">
+            <button type="submit" 
+                    class="btn btn-sm {% if produit.statut == 'disponible' %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
+                    title="{% if produit.statut == 'disponible' %}Désactiver{% else %}Activer{% endif %}"
+                    data-bs-toggle="tooltip">
+                <i class="{% if produit.statut == 'disponible' %}bi bi-x{% else %}bi bi-check{% endif %}"></i>
+            </button>
+        </form>
+        <form method="POST" 
+              action="{{ path('app_commercant_produit_delete', {'id': produit.id}) }}" 
+              style="display:inline;" 
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+            <button type="submit" 
+                    class="btn btn-sm btn-outline-danger" 
+                    title="Supprimer ce produit"
+                    data-bs-toggle="tooltip">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
                 </tr>
                 {% endfor %}
             {% else %}

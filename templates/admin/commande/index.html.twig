@@ -8,9 +8,6 @@
         <h1><i class="bi bi-clipboard-check"></i> Commandes</h1>
         <p class="text-muted">Gérer toutes les commandes client</p>
     </div>
-    <a href="{{ path('app_commande_new') }}" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Nouvelle commande
-    </a>
 </div>
 
 <!-- BARRE DE RECHERCHE -->
@@ -38,7 +35,6 @@
                             </a>
                         </div>
                     </div>
-                    <!-- Garder les paramètres de tri -->
                     <input type="hidden" name="sort" value="{{ sortBy|default('id') }}">
                     <input type="hidden" name="order" value="{{ order|default('DESC') }}">
                 </form>

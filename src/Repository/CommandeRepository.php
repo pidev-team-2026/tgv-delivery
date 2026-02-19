@@ -39,6 +39,82 @@ public function findBySearchAndSort(string $search = '', string $sortBy = 'id', 
     
     return $qb->getQuery()->getResult();
 }
+
+    /** Commandes récentes (pour le dashboard admin) */
+    public function findRecent(int $limit = 10): array
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.dateCreation', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** Revenus du mois en cours */
+    public function getRevenusMois(): float
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select('SUM(c.totalPrix)')
+            ->where('c.dateCreation >= :debut')
+            ->andWhere('c.statut != :annulee')
+            ->setParameter('debut', (new \DateTime())->modify('first day of this month')->setTime(0, 0))
+            ->setParameter('annulee', 'annulee')
+            ->getQuery()
+            ->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
+    /** Commandes créées aujourd'hui */
+    public function countAujourdhui(): int
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.dateCreation >= :minuit')
+            ->setParameter('minuit', (new \DateTime())->setTime(0, 0, 0))
+            ->getQuery()
+            ->getSingleScalarResult();
+        return (int) ($result ?? 0);
+    }
+
+    /** Revenus du jour */
+    public function getRevenusAujourdhui(): float
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select('SUM(c.totalPrix)')
+            ->where('c.dateCreation >= :minuit')
+            ->andWhere('c.statut != :annulee')
+            ->setParameter('minuit', (new \DateTime())->setTime(0, 0, 0))
+            ->setParameter('annulee', 'annulee')
+            ->getQuery()
+            ->getSingleScalarResult();
+        return (float) ($result ?? 0);
+    }
+
+    /** Nombre de commandes en livraison ou livrées (pour "livraisons actives") */
+    public function countEnLivraisonOuLivrees(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.statut IN (:statuts)')
+            ->setParameter('statuts', ['en_livraison', 'livree'])
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /** Livraisons aujourd'hui (statut livree avec date du jour) ou en cours */
+    public function countLivraisonsAujourdhui(): int
+    {
+        $result = $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.statut IN (:statuts)')
+            ->andWhere('c.dateCreation >= :minuit')
+            ->setParameter('statuts', ['en_livraison', 'livree'])
+            ->setParameter('minuit', (new \DateTime())->setTime(0, 0, 0))
+            ->getQuery()
+            ->getSingleScalarResult();
+        return (int) ($result ?? 0);
+    }
+
 //    /**
 //     * @return Commande[] Returns an array of Commande objects
 //     */
