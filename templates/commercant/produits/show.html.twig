@@ -9,10 +9,10 @@
         <p class="text-muted">Informations complètes du produit : {{ produit.nom }}</p>
     </div>
     <div>
-        <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
+        <a href="{{ path('wajih_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
             <i class="bi bi-pencil"></i> Modifier
         </a>
-        <a href="{{ path('app_commercant_produits') }}" class="btn btn-outline-secondary">
+        <a href="{{ path('wajih_commercant_produits') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Retour
         </a>
     </div>
@@ -99,11 +99,11 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="{{ path('app_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
+                    <a href="{{ path('wajih_commercant_produit_edit', {'id': produit.id}) }}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Modifier
                     </a>
                     
-                    <form method="POST" action="{{ path('app_commercant_produit_toggle', {'id': produit.id}) }}">
+                    <form method="POST" action="{{ path('wajih_commercant_produit_toggle', {'id': produit.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ produit.id) }}">
                         <button type="submit" class="btn {% if produit.statut == 'disponible' %}btn-danger{% else %}btn-success{% endif %} w-100">
                             <i class="bi bi-{% if produit.statut == 'disponible' %}x-lg{% else %}check-lg{% endif %}"></i>
@@ -111,7 +111,7 @@
                         </button>
                     </form>
                     
-                    <form method="POST" action="{{ path('app_commercant_produit_delete', {'id': produit.id}) }}" 
+                    <form method="POST" action="{{ path('wajih_commercant_produit_delete', {'id': produit.id}) }}" 
                           onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
                         <button type="submit" class="btn btn-danger w-100">

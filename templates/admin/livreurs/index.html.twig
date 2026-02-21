@@ -1,0 +1,170 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Gestion des livreurs - Espace Admin{% endblock %}
+
+{% block body %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-people"></i> Gestion des livreurs</h1>
+        <p class="text-muted">Gérer les livreurs internes et partenaires</p>
+    </div>
+    <a href="{{ path('admin_livreur_new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Ajouter un livreur
+    </a>
+</div>
+
+<!-- STATISTIQUES -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="fs-2 fw-bold text-success">{{ livreursPropres|length }}</div>
+                <div class="text-muted">Livreurs internes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="fs-2 fw-bold text-primary">{{ livreursPartenaires|length }}</div>
+                <div class="text-muted">Livreurs partenaires</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="fs-2 fw-bold text-warning">{{ livreursOccupes|length }}</div>
+                <div class="text-muted">En livraison</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="fs-2 fw-bold text-danger">{{ livreursInactifs|length }}</div>
+                <div class="text-muted">Inactifs</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TABLEAU DES LIVREURS -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-list"></i> Liste des livreurs</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Type</th>
+                    <th>Nom</th>
+                    <th>Téléphone</th>
+                    <th>Véhicule</th>
+                    <th>Statut</th>
+                    <th>Zone couverte</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livreur in tous %}
+                <tr>
+                    <td>
+                        {% if livreur.type == 'propre' %}
+                            <span class="badge bg-success"><i class="bi bi-person-badge"></i> Interne</span>
+                        {% else %}
+                            <span class="badge bg-primary"><i class="bi bi-building"></i> Partenaire</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ livreur.nomComplet }}</strong>
+                        {% if livreur.societePartenaire %}
+                            <br><small class="text-muted">{{ livreur.societePartenaire }}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ livreur.telephone }}</td>
+                    <td>{{ livreur.vehiculeLibelle }}</td>
+                    <td>
+                        {% if livreur.statut == 'disponible' %}
+                            <span class="badge bg-success">Disponible</span>
+                        {% elseif livreur.statut == 'occupe' %}
+                            <span class="badge bg-warning">En livraison</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ livreur.zonesCouvertes ?: '—' }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <!-- Changer statut -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" 
+                                        data-bs-toggle="dropdown" title="Changer le statut">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if livreur.statut != 'disponible' %}
+                                    <li>
+                                        <form method="POST" action="{{ path('admin_livreur_statut', {'id': livreur.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="statut" value="disponible">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('statut' ~ livreur.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-check-circle"></i> Rendre disponible
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+                                    {% if livreur.statut != 'occupe' %}
+                                    <li>
+                                        <form method="POST" action="{{ path('admin_livreur_statut', {'id': livreur.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="statut" value="occupe">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('statut' ~ livreur.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-truck"></i> En livraison
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+                                    {% if livreur.statut != 'inactif' %}
+                                    <li>
+                                        <form method="POST" action="{{ path('admin_livreur_statut', {'id': livreur.id}) }}" style="display:inline;">
+                                            <input type="hidden" name="statut" value="inactif">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('statut' ~ livreur.id) }}">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-x-circle"></i> Désactiver
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            
+                            <!-- Supprimer -->
+                            <form method="POST" 
+                                  action="{{ path('admin_livreur_delete', {'id': livreur.id}) }}" 
+                                  style="display:inline;" 
+                                  onsubmit="return confirm('Supprimer ce livreur ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_livreur' ~ livreur.id) }}">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        title="Supprimer">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">
+                        <i class="bi bi-people" style="font-size: 2rem;"></i>
+                        <p class="mt-2">Aucun livreur trouvé</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

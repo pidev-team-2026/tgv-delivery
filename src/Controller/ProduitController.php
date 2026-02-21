@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/produit')]
 final class ProduitController extends AbstractController
 {
-    #[Route(name: 'app_produit_index', methods: ['GET'])]
+    #[Route(name: 'wajih_produit_index', methods: ['GET'])]
 public function index(Request $request, ProduitRepository $produitRepository): Response
 {
     $search = $request->query->get('search', '');
@@ -30,7 +30,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
         'order' => $order,
     ]);
 }
-    #[Route('/new', name: 'app_produit_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'wajih_produit_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $produit = new Produit();
@@ -41,7 +41,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
             $entityManager->persist($produit);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('wajih_produit_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('produit/new.html.twig', [
@@ -50,7 +50,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
         ]);
     }
 
-    #[Route('/{id}', name: 'app_produit_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'wajih_produit_show', methods: ['GET'])]
     public function show(Produit $produit): Response
     {
         return $this->render('produit/show.html.twig', [
@@ -58,7 +58,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_produit_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'wajih_produit_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ProduitType::class, $produit);
@@ -67,7 +67,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('wajih_produit_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('produit/edit.html.twig', [
@@ -76,7 +76,7 @@ public function index(Request $request, ProduitRepository $produitRepository): R
         ]);
     }
 
-    #[Route('/{id}', name: 'app_produit_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'wajih_produit_delete', methods: ['POST'])]
     public function delete(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->getPayload()->getString('_token'))) {
@@ -84,6 +84,6 @@ public function index(Request $request, ProduitRepository $produitRepository): R
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_produit_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('wajih_produit_index', [], Response::HTTP_SEE_OTHER);
     }
 }

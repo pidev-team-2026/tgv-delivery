@@ -15,7 +15,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <form method="get" action="{{ path('app_commercant_commandes') }}">
+                <form method="get" action="{{ path('wajih_commercant_commandes') }}">
                     <div class="row">
                         <div class="col-md-8">
                             <input type="text" 
@@ -30,7 +30,7 @@
                             </button>
                         </div>
                         <div class="col-md-2">
-                            <a href="{{ path('app_commercant_commandes') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ path('wajih_commercant_commandes') }}" class="btn btn-outline-secondary w-100">
                                 <i class="bi bi-arrow-clockwise"></i> Réinitialiser
                             </a>
                         </div>
@@ -57,7 +57,7 @@
             <thead class="table-light">
                 <tr>
                     <th>
-                        <a href="{{ path('app_commercant_commandes', {
+                        <a href="{{ path('wajih_commercant_commandes', {
                             search: search|default(''), 
                             sort: 'id', 
                             order: (sortBy|default('id') == 'id' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -69,7 +69,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_commercant_commandes', {
+                        <a href="{{ path('wajih_commercant_commandes', {
                             search: search|default(''), 
                             sort: 'reference', 
                             order: (sortBy|default('id') == 'reference' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -82,7 +82,7 @@
                     </th>
                     <th>Client</th>
                     <th>
-                        <a href="{{ path('app_commercant_commandes', {
+                        <a href="{{ path('wajih_commercant_commandes', {
                             search: search|default(''), 
                             sort: 'totalPrix', 
                             order: (sortBy|default('id') == 'totalPrix' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -94,7 +94,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_commercant_commandes', {
+                        <a href="{{ path('wajih_commercant_commandes', {
                             search: search|default(''), 
                             sort: 'statut', 
                             order: (sortBy|default('id') == 'statut' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -107,7 +107,7 @@
                     </th>
                     <th>Livreur</th>
                     <th>
-                        <a href="{{ path('app_commercant_commandes', {
+                        <a href="{{ path('wajih_commercant_commandes', {
                             search: search|default(''), 
                             sort: 'dateCreation', 
                             order: (sortBy|default('id') == 'dateCreation' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -170,7 +170,7 @@
                     </td>
                     <td class="text-center">
                         <div class="btn-group" role="group">
-                            <a href="{{ path('app_commercant_commande_show', {'id': commande.id}) }}" 
+                            <a href="{{ path('wajih_commercant_commande_show', {'id': commande.id}) }}" 
                                class="btn btn-sm btn-outline-info" 
                                title="Voir les détails"
                                data-bs-toggle="tooltip">
@@ -179,7 +179,7 @@
                             
                             {% if commande.statut == 'en_attente' %}
                                 <form method="POST" 
-                                      action="{{ path('app_commercant_commande_confirm', {'id': commande.id}) }}" 
+                                      action="{{ path('wajih_commercant_commande_confirm', {'id': commande.id}) }}" 
                                       style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ commande.id) }}">
                                     <button type="submit" 
@@ -199,7 +199,7 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                        <form method="POST" action="{{ path('wajih_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
                                             <input type="hidden" name="status" value="en_preparation">
                                             <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
                                             <button type="submit" class="dropdown-item">
@@ -208,7 +208,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                        <form method="POST" action="{{ path('wajih_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
                                             <input type="hidden" name="status" value="prete">
                                             <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
                                             <button type="submit" class="dropdown-item">
@@ -217,7 +217,7 @@
                                         </form>
                                     </li>
                                     <li>
-                                        <form method="POST" action="{{ path('app_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
+                                        <form method="POST" action="{{ path('wajih_commercant_commande_status', {'id': commande.id}) }}" style="display:inline;">
                                             <input type="hidden" name="status" value="livree">
                                             <input type="hidden" name="_token" value="{{ csrf_token('status' ~ commande.id) }}">
                                             <button type="submit" class="dropdown-item">
@@ -230,22 +230,17 @@
                             
                             <!-- Affecter livreur -->
                             {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
-                                <form method="POST" 
-                                      action="{{ path('app_commercant_commande_assign_livreur', {'id': commande.id}) }}" 
-                                      style="display:inline;">
-                                    <input type="hidden" name="livreur" value="Livreur par défaut">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('assign' ~ commande.id) }}">
-                                    <button type="submit" 
-                                            class="btn btn-sm btn-outline-primary" 
-                                            title="Affecter un livreur"
-                                            data-bs-toggle="tooltip">
-                                        <i class="bi bi-truck"></i>
-                                    </button>
-                                </form>
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-primary" 
+                                        title="Affecter un livreur"
+                                        data-bs-toggle="tooltip"
+                                        onclick="openLivreurModal({{ commande.id }}, '{{ commande.reference }}')">
+                                    <i class="bi bi-truck"></i>
+                                </button>
                             {% endif %}
                             
                             <!-- Contacter client -->
-                            <a href="{{ path('app_commercant_commande_contact', {'id': commande.id}) }}" 
+                            <a href="{{ path('wajih_commercant_commande_contact', {'id': commande.id}) }}" 
                                class="btn btn-sm btn-outline-secondary" 
                                title="Contacter le client"
                                data-bs-toggle="tooltip">
@@ -255,7 +250,7 @@
                             <!-- Annuler -->
                             {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
                                 <form method="POST" 
-                                      action="{{ path('app_commercant_commande_cancel', {'id': commande.id}) }}" 
+                                      action="{{ path('wajih_commercant_commande_cancel', {'id': commande.id}) }}" 
                                       style="display:inline;" 
                                       onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ commande.id) }}">
@@ -289,4 +284,215 @@
         </table>
     </div>
 </div>
+
+<!-- ══ MODAL ASSIGNATION LIVREUR ══ -->
+<div class="lv-overlay" id="lvOverlay">
+    <div class="lv-modal">
+        <div class="lv-head">
+            <div class="lv-head-ico"><i class="bi bi-truck"></i></div>
+            <div><h5>Assigner un livreur</h5><p id="modalCommandeRef"></p></div>
+            <button class="lv-close" onclick="closeLivreurModal()"><i class="bi bi-x"></i></button>
+        </div>
+
+        <div class="lv-body">
+            <div class="lv-tabs">
+                <button class="lv-tab active" id="tabP" onclick="switchLivreurTab('propres')">
+                    <i class="bi bi-person-badge"></i> Internes
+                    <span class="lv-tab-badge" id="cntP">0</span>
+                </button>
+                <button class="lv-tab" id="tabA" onclick="switchLivreurTab('partenaires')">
+                    <i class="bi bi-building"></i> Partenaires
+                    <span class="lv-tab-badge" id="cntA">0</span>
+                </button>
+            </div>
+
+            <input type="text" class="lv-search" id="lvSearch"
+                   placeholder="Rechercher par nom, téléphone, zone..."
+                   oninput="filterLivreurCards(this.value)">
+
+            <div id="panelP">
+                <div class="lv-grid" id="gridP"></div>
+                <div class="lv-empty" id="emptyP" style="display:none;"><i class="bi bi-person-x"></i> Aucun livreur interne disponible.</div>
+            </div>
+
+            <div id="panelA" style="display:none;">
+                <div class="lv-grid" id="gridA"></div>
+                <div class="lv-empty" id="emptyA" style="display:none;"><i class="bi bi-building-x"></i> Aucun partenaire disponible.</div>
+            </div>
+        </div>
+
+        <div class="lv-footer">
+            <button class="btn-lv-cancel" onclick="closeLivreurModal()"><i class="bi bi-x"></i> Annuler</button>
+            <button class="btn-lv-ok" id="btnOk" disabled onclick="confirmerLivreur()">
+                <i class="bi bi-check-lg"></i> Assigner ce livreur
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="cm-toast" id="toast"><i class="bi bi-check-circle-fill" style="color:#00B37E;"></i><span id="toastMsg"></span></div>
+
+
+<script>
+let currentCommandeId = null;
+let selectedLivreurId = null;
+let selectedLivreurNom = null;
+let selectedLivreurTel = null;
+let livreursData = { propres: [], partenaires: [] };
+
+// ── Ouvrir / Fermer ──────────────────────
+function openLivreurModal(commandeId, commandeRef) {
+    currentCommandeId = commandeId;
+    document.getElementById('modalCommandeRef').textContent = commandeRef;
+    document.getElementById('lvOverlay').classList.add('open');
+    
+    // Charger les livreurs disponibles
+    fetch(`/commercant/commandes/${commandeId}/livreurs-dispo`)
+        .then(r => r.json())
+        .then(data => {
+            livreursData = data;
+            renderLivreurs();
+        })
+        .catch(err => {
+            console.error('Erreur chargement livreurs:', err);
+            showToast('❌ Erreur lors du chargement des livreurs');
+        });
+}
+
+function closeLivreurModal() {
+    document.getElementById('lvOverlay').classList.remove('open');
+    selectedLivreurId = null;
+    document.querySelectorAll('.lv-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('btnOk').disabled = true;
+}
+
+document.getElementById('lvOverlay').addEventListener('click', e => { 
+    if(e.target === e.currentTarget) closeLivreurModal(); 
+});
+
+// ── Rendu des livreurs ─────────────────────
+function renderLivreurs() {
+    renderLivreurGrid('propres', livreursData.propres);
+    renderLivreurGrid('partenaires', livreursData.partenaires);
+    
+    document.getElementById('cntP').textContent = livreursData.propres.length;
+    document.getElementById('cntA').textContent = livreursData.partenaires.length;
+    
+    // Afficher/masquer les messages vide
+    document.getElementById('emptyP').style.display = livreursData.propres.length === 0 ? 'block' : 'none';
+    document.getElementById('emptyA').style.display = livreursData.partenaires.length === 0 ? 'block' : 'none';
+}
+
+function renderLivreurGrid(type, livreurs) {
+    const grid = document.getElementById(type === 'propres' ? 'gridP' : 'gridA');
+    
+    if (livreurs.length === 0) {
+        grid.innerHTML = '';
+        return;
+    }
+    
+    grid.innerHTML = livreurs.map(l => `
+        <div class="lv-card" 
+             data-id="${l.id}"
+             data-nom="${l.nomComplet}"
+             data-tel="${l.telephone}"
+             data-search="${(l.nomComplet + ' ' + l.telephone + ' ' + (l.zonesCouvertes || '') + ' ' + (l.societePartenaire || '')).toLowerCase()}">
+            <div class="lv-card-top">
+                <div class="lv-avatar ${type === 'partenaires' ? 'p' : ''}">
+                    ${type === 'partenaires' && l.societePartenaire ? l.societePartenaire.slice(0,2).toUpperCase() : l.nomComplet.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}
+                </div>
+                <div>
+                    <div class="lv-card-name">${l.societePartenaire || l.nomComplet}</div>
+                    <div class="lv-card-tel">${l.telephone}</div>
+                </div>
+            </div>
+            <div class="lv-card-tags">
+                <span class="lv-tag">${l.vehiculeLibelle || 'Véhicule'}</span>
+                ${l.zonesCouvertes ? `<span class="lv-tag green"><i class="bi bi-geo-alt"></i> ${l.zonesCouvertes}</span>` : ''}
+                ${l.note ? `<span class="lv-tag">⭐ ${l.note}</span>` : ''}
+                ${l.nombreLivraisons ? `<span class="lv-tag">${l.nombreLivraisons} livr.</span>` : ''}
+            </div>
+        </div>
+    `).join('');
+    
+    // Ajouter les écouteurs d'événements
+    grid.querySelectorAll('.lv-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.lv-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            selectedLivreurId = this.dataset.id;
+            selectedLivreurNom = this.dataset.nom;
+            selectedLivreurTel = this.dataset.tel;
+            
+            document.getElementById('btnOk').disabled = false;
+        });
+    });
+}
+
+// ── Onglets ──────────────────────────────
+function switchLivreurTab(type) {
+    document.getElementById('panelP').style.display = type === 'propres' ? '' : 'none';
+    document.getElementById('panelA').style.display = type === 'partenaires' ? '' : 'none';
+    document.getElementById('tabP').classList.toggle('active', type === 'propres');
+    document.getElementById('tabA').classList.toggle('active', type === 'partenaires');
+    document.getElementById('lvSearch').value = '';
+    filterLivreurCards('');
+}
+
+// ── Filtre recherche ─────────────────────
+function filterLivreurCards(query) {
+    const lowerQuery = query.toLowerCase();
+    document.querySelectorAll('.lv-card').forEach(card => {
+        card.style.display = card.dataset.search.includes(lowerQuery) ? '' : 'none';
+    });
+}
+
+// ── Confirmer assignation ─────────────────
+function confirmerLivreur() {
+    if (!selectedLivreurId) {
+        showToast('❌ Sélectionnez un livreur.');
+        return;
+    }
+    
+    const btn = document.getElementById('btnOk');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Assignation...';
+    
+    const formData = new FormData();
+    formData.append('livreur_id', selectedLivreurId);
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
+    
+    fetch(`/commercant/commandes/${currentCommandeId}/assign-livreur`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            closeLivreurModal();
+            showToast('✅ ' + res.message);
+            setTimeout(() => location.reload(), 1800);
+        } else {
+            showToast('❌ ' + res.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Assigner ce livreur';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('❌ Erseau.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Assigner ce livreur';
+    });
+}
+
+// ── Toast ────────────────────────────────
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+}
+</script>
 {% endblock %}

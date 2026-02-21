@@ -2,7 +2,7 @@
     <div class="navbar-wrapper">
         {# Logo / Brand #}
         <div class="m-header">
-            <a href="{{ path('app_commercant_dashboard') }}" class="b-brand">
+            <a href="{{ path('wajih_commercant_dashboard') }}" class="b-brand">
                 <img src="{{ asset('images/logo.png') }}" alt="TGV Delivery" class="logo logo-lg" style="height: 150px; width: auto; margin: 15px 0;" />
                 <img src="{{ asset('images/logo.png') }}" alt="TGV" class="logo logo-sm" style="height: 100px; width: auto; margin: 12px 0;" />
             </a>
@@ -18,7 +18,7 @@
                 
                 {# Dashboard #}
                 <li class="nxl-item">
-                    <a href="{{ path('app_commercant_dashboard') }}" class="nxl-link">
+                    <a href="{{ path('wajih_commercant_dashboard') }}" class="nxl-link">
                         <span class="nxl-micon"><i class="bi bi-speedometer2"></i></span>
                         <span class="nxl-mtext">Dashboard</span>
                     </a>
@@ -38,7 +38,7 @@
                     </a>
                     <ul class="nxl-submenu">
                         <li class="nxl-item">
-                            <a class="nxl-link" href="{{ path('app_commercant_commandes') }}">Liste des commandes</a>
+                            <a class="nxl-link" href="{{ path('wajih_commercant_commandes') }}">Liste des commandes</a>
                         </li>
                     </ul>
                 </li>
@@ -52,19 +52,27 @@
                     </a>
                     <ul class="nxl-submenu">
                         <li class="nxl-item">
-                            <a class="nxl-link" href="{{ path('app_commercant_produits') }}">Liste des produits</a>
+                            <a class="nxl-link" href="{{ path('wajih_commercant_produits') }}">Liste des produits</a>
                         </li>
                         <li class="nxl-item">
-                            <a class="nxl-link" href="{{ path('app_commercant_produit_new') }}">Ajouter un produit</a>
+                            <a class="nxl-link" href="{{ path('wajih_commercant_produit_new') }}">Ajouter un produit</a>
                         </li>
                     </ul>
                 </li>
-                
-                {# Ventes Section #}
-                <li class="nxl-item nxl-caption">
-                    <label>Ventes</label>
-                </li>
-                
+                <li class="nxl-item nxl-hasmenu">
+                    <a href="javascript:void(0);" class="nxl-link"> 
+                        <span class="nxl-micon"><i class="bi bi-truck"></i></span>
+                        <span class="nxl-mtext">Livreurs</span>
+                        <span class="nxl-arrow"><i class="bi bi-chevron-right"></i></span>
+                    <ul class="nxl-submenu">
+                        <li class="nxl-item">
+                            <a class="nxl-link" href="{{ path('app_commercant_livreurs') }}">Liste des livreurs</a>
+                        </li>
+                    </ul>
+                        {# Badge nombre de livreurs disponibles (optionnel) #}
+                         {#<span class="badge bg-success ms-auto">{{ livreursDispo }}</span>} 
+                    </a>
+                </li>     
                 {# Statistiques #}
                 <li class="nxl-item nxl-hasmenu">
                     <a href="javascript:void(0);" class="nxl-link">

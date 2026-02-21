@@ -8,7 +8,7 @@
         <h1><i class="bi bi-bag"></i> Produits</h1>
         <p class="text-muted">Gérer le catalogue de produits</p>
     </div>
-    <a href="{{ path('app_produit_new') }}" class="btn btn-success">
+    <a href="{{ path('wajih_produit_new') }}" class="btn btn-success">
         <i class="bi bi-plus-circle"></i> Ajouter un produit
     </a>
 </div>
@@ -18,7 +18,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <form method="get" action="{{ path('app_produit_index') }}">
+                <form method="get" action="{{ path('wajih_produit_index') }}">
                     <div class="row">
                         <div class="col-md-8">
                             <input type="text" 
@@ -33,7 +33,7 @@
                             </button>
                         </div>
                         <div class="col-md-2">
-                            <a href="{{ path('app_produit_index') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ path('wajih_produit_index') }}" class="btn btn-outline-secondary w-100">
                                 <i class="bi bi-arrow-clockwise"></i> Réinitialiser
                             </a>
                         </div>
@@ -53,7 +53,7 @@
             <thead>
                 <tr>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'id', 
                             order: (sortBy|default('id') == 'id' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -66,7 +66,7 @@
                     </th>
                     <th>Image</th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'id', 
                             order: (sortBy|default('id') == 'id' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -78,7 +78,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'nom', 
                             order: (sortBy|default('id') == 'nom' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -91,7 +91,7 @@
                     </th>
                     <th>Description</th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'prix', 
                             order: (sortBy|default('id') == 'prix' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -103,7 +103,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'statut', 
                             order: (sortBy|default('id') == 'statut' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -115,7 +115,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'stock', 
                             order: (sortBy|default('id') == 'stock' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -127,7 +127,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_produit_index', {
+                        <a href="{{ path('wajih_produit_index', {
                             search: search|default(''), 
                             sort: 'dateCreation', 
                             order: (sortBy|default('id') == 'dateCreation' and order|default('ASC') == 'ASC') ? 'DESC' : 'ASC'
@@ -178,20 +178,20 @@
                     </td>
                    <td class="text-center">
     <div class="btn-group" role="group">
-        <a href="{{ path('app_produit_show', {'id': produit.id}) }}" 
+        <a href="{{ path('wajih_produit_show', {'id': produit.id}) }}" 
            class="btn btn-sm btn-outline-info" 
            title="Voir les détails"
            data-bs-toggle="tooltip">
             <i class="bi bi-eye"></i>
         </a>
-        <a href="{{ path('app_produit_edit', {'id': produit.id}) }}" 
+        <a href="{{ path('wajih_produit_edit', {'id': produit.id}) }}" 
            class="btn btn-sm btn-outline-warning" 
            title="Modifier ce produit"
            data-bs-toggle="tooltip">
             <i class="bi bi-pencil"></i>
         </a>
         <form method="POST" 
-              action="{{ path('app_produit_delete', {'id': produit.id}) }}" 
+              action="{{ path('wajih_produit_delete', {'id': produit.id}) }}" 
               style="display:inline;" 
               onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">

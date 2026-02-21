@@ -1,0 +1,459 @@
+{% extends 'commercant/base_commercant.html.twig' %}
+
+{% block title %}Commande {{ commande.reference }} — Espace Commerçant{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ asset('css/livraison.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-clipboard-check"></i> Commande {{ commande.reference }}</h1>
+        <p class="text-muted mb-0">Créée le {{ commande.dateCreation|date('d/m/Y à H:i') }}</p>
+    </div>
+    <a href="{{ path('wajih_commercant_commandes') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Retour
+    </a>
+</div>
+
+{% for type, msgs in app.flashes %}{% for m in msgs %}
+<div class="alert alert-{{ type }} alert-dismissible fade show">{{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+{% endfor %}{% endfor %}
+
+<div class="row g-3">
+
+    {# ── COLONNE GAUCHE ── #}
+    <div class="col-md-8">
+
+        {# INFO COMMANDE #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations commande</h5>
+                <span class="badge-statut s-{{ commande.statut }}">
+                    {% if commande.statut=='en_attente' %}<i class="bi bi-hourglass-split"></i> En attente
+                    {% elseif commande.statut=='confirmee' %}<i class="bi bi-check-circle"></i> Confirmée
+                    {% elseif commande.statut=='en_preparation' %}<i class="bi bi-box-seam"></i> En préparation
+                    {% elseif commande.statut=='prete' %}<i class="bi bi-bag-check"></i> Prête
+                    {% elseif commande.statut=='en_livraison' %}<i class="bi bi-truck"></i> En livraison
+                    {% elseif commande.statut=='livree' %}<i class="bi bi-check2-circle"></i> Livrée
+                    {% elseif commande.statut=='annulee' %}<i class="bi bi-x-circle"></i> Annulée
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped mb-0">
+                    <tbody>
+                        <tr><th width="30%">Référence</th><td><strong>{{ commande.reference }}</strong></td></tr>
+                        <tr><th>Total</th><td><span class="text-success fw-bold fs-5">{{ commande.getMontantTotal()|number_format(3,',','') }} TND</span></td></tr>
+                        <tr><th>Frais livraison</th><td>{{ commande.fraisLivraison|number_format(3,',','') }} TND</td></tr>
+                        {% if commande.remise > 0 %}
+                        <tr><th>Remise</th><td class="text-success">−{{ commande.remise|number_format(3,',','') }} TND {% if commande.codePromo %}<span class="badge bg-success">{{ commande.codePromo }}</span>{% endif %}</td></tr>
+                        {% endif %}
+                        <tr>
+                            <th>Paiement</th>
+                            <td>
+                                {% if commande.modePaiement=='especes' %}<span class="badge bg-warning text-dark">💵 Espèces</span>
+                                {% elseif commande.modePaiement=='carte' %}<span class="badge bg-info">💳 Carte</span>
+                                {% elseif commande.modePaiement=='virement' %}<span class="badge bg-primary">🏦 Virement</span>{% endif %}
+                                {% if commande.isPaiementEffectue() %}<span class="badge bg-success ms-1">Payé ✓</span>{% else %}<span class="badge bg-danger ms-1">Non payé</span>{% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# CLIENT #}
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-person"></i> Client</h5></div>
+            <div class="card-body">
+                <table class="table table-striped mb-0">
+                    <tbody>
+                        <tr><th width="30%">Nom</th><td><strong>{{ commande.nomClient }}</strong></td></tr>
+                        <tr><th>Téléphone</th><td>{{ commande.telephone }}</td></tr>
+                        <tr><th>Email</th><td>{{ commande.email ?? '—' }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# ADRESSE #}
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-geo-alt"></i> Adresse de livraison</h5></div>
+            <div class="card-body">
+                <table class="table table-striped mb-0">
+                    <tbody>
+                        {% if commande.gouvernorat %}
+                        <tr><th width="30%">Gouvernorat</th><td>{{ commande.gouvernorat }}</td></tr>
+                        {% endif %}
+                        <tr><th width="30%">Adresse</th><td>{{ commande.adresseLivraison }}</td></tr>
+                        <tr><th>Ville</th><td>{{ commande.ville }}</td></tr>
+                        <tr><th>Code postal</th><td>{{ commande.codePostal }}</td></tr>
+                        {% if commande.estimationLivraison %}
+                        <tr><th>Estimation</th><td class="text-success fw-bold"><i class="bi bi-clock"></i>
+                            {% set m = commande.estimationLivraison %}
+                            {% if m < 60 %}{{ m }} min{% else %}{{ (m/60)|round(0,'floor') }}h{{ m%60 > 0 ? '%02d'|format(m%60) : '' }}{% endif %}
+                        </td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# ARTICLES #}
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-box"></i> Articles commandés</h5></div>
+            <div class="card-body">
+                {% set items = [] %}
+                {% if commande.notes %}{% set p = commande.notes|json_encode %}{% if p is iterable %}{% set items = p %}{% endif %}{% endif %}
+                {% if items|length > 0 %}
+                <table class="table">
+                    <thead><tr><th>Article</th><th>Qté</th><th class="text-end">Prix</th></tr></thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if item.image is defined and item.image %}<img src="{{ item.image }}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">
+                                    {% else %}<div style="width:36px;height:36px;background:#f5f5f5;border-radius:8px;display:flex;align-items:center;justify-content:center;">🛍️</div>{% endif %}
+                                    <strong>{{ item.name ?? item.nom ?? 'Produit' }}</strong>
+                                </div>
+                            </td>
+                            <td>× {{ item.qty ?? item.quantite ?? 1 }}</td>
+                            <td class="text-end fw-bold text-success">{{ ((item.price ?? item.prix ?? 0) * (item.qty ?? item.quantite ?? 1))|number_format(3,',','') }} TND</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><th colspan="2" class="text-end">Total :</th><th class="text-end text-success">{{ commande.getMontantTotal()|number_format(3,',','') }} TND</th></tr>
+                    </tfoot>
+                </table>
+                {% else %}
+                <p class="text-muted text-center py-3">Aucun détail d'article disponible.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── COLONNE DROITE — ACTIONS ── #}
+    <div class="col-md-4">
+
+        {# LIVREUR ASSIGNÉ #}
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0"><i class="bi bi-truck"></i> Livreur assigné</h5>
+                {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                <button class="btn btn-sm btn-success" onclick="openModal()">
+                    <i class="bi bi-plus-lg"></i> Assigner
+                </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if commande.livreur %}
+                <div class="livreur-box" id="livreurBox">
+                    <i class="bi bi-person-fill-check text-success fs-4"></i>
+                    <div>
+                        <div class="fw-bold" id="lvNom">{{ commande.livreur.nomComplet }}</div>
+                        <div class="text-muted small" id="lvTel">{{ commande.livreur.telephone }}</div>
+                        <div class="small">{{ commande.livreur.vehiculeLibelle }} · {{ commande.livreur.typeLibelle }}</div>
+                    </div>
+                    {% if commande.statut != 'livree' %}
+                    <form method="POST" action="{{ path('app_commercant_commande_desassign_livreur',{'id':commande.id}) }}" class="ms-auto">
+                        <input type="hidden" name="_token" value="{{ csrf_token('desassign'~commande.id) }}">
+                        <button type="submit" class="btn-desassign" onclick="return confirm('Désassigner ?')">
+                            <i class="bi bi-x"></i> Libérer
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3" id="livreurVide">
+                    <i class="bi bi-person-x fs-3 d-block mb-2"></i>
+                    Aucun livreur assigné
+                    {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                    <br><button class="btn btn-sm btn-outline-success mt-2" onclick="openModal()">
+                        <i class="bi bi-truck"></i> Assigner un livreur
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# ACTIONS #}
+        <div class="card mb-3">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-gear"></i> Actions</h5></div>
+            <div class="card-body d-grid gap-2">
+                {% if commande.statut == 'en_attente' %}
+                <form method="POST" action="{{ path('wajih_commercant_commande_confirm',{'id':commande.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('confirm'~commande.id) }}">
+                    <button class="btn btn-success w-100"><i class="bi bi-check-lg"></i> Confirmer</button>
+                </form>
+                {% endif %}
+                {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
+                <div class="dropdown">
+                    <button class="btn btn-warning dropdown-toggle w-100" data-bs-toggle="dropdown">
+                        <i class="bi bi-arrow-repeat"></i> Changer le statut
+                    </button>
+                    <ul class="dropdown-menu w-100">
+                        {% for s in [
+                            {v:'en_attente',     i:'bi-hourglass',    l:'En attente'},
+                            {v:'confirmee',      i:'bi-check-circle', l:'Confirmée'},
+                            {v:'en_preparation', i:'bi-box-seam',     l:'En préparation'},
+                            {v:'prete',          i:'bi-bag-check',    l:'Prête'},
+                            {v:'en_livraison',   i:'bi-truck',        l:'En livraison'},
+                            {v:'livree',         i:'bi-check2-all',   l:'Livrée'},
+                        ] %}
+                        {% if s.v != commande.statut %}
+                        <li>
+                            <form method="POST" action="{{ path('wajih_commercant_commande_status',{'id':commande.id}) }}">
+                                <input type="hidden" name="status" value="{{ s.v }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('status'~commande.id) }}">
+                                <button class="dropdown-item"><i class="bi {{ s.i }}"></i> {{ s.l }}</button>
+                            </form>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                <form method="POST" action="{{ path('wajih_commercant_commande_cancel',{'id':commande.id}) }}"
+                      onsubmit="return confirm('Annuler cette commande ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('cancel'~commande.id) }}">
+                    <button class="btn btn-danger w-100"><i class="bi bi-x-circle"></i> Annuler</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {# STATS LIVREURS #}
+        <div class="card">
+            <div class="card-header"><h5 class="mb-0"><i class="bi bi-people"></i> Livreurs disponibles</h5></div>
+            <div class="card-body">
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <div class="fs-3 fw-bold text-success">{{ livreursPropres|length }}</div>
+                        <div class="small text-muted">Internes</div>
+                    </div>
+                    <div class="vr"></div>
+                    <div>
+                        <div class="fs-3 fw-bold text-primary">{{ livreursPartenaires|length }}</div>
+                        <div class="small text-muted">Partenaires</div>
+                    </div>
+                    <div class="vr"></div>
+                    <div>
+                        <div class="fs-3 fw-bold">{{ livreursPropres|length + livreursPartenaires|length }}</div>
+                        <div class="small text-muted">Total</div>
+                    </div>
+                </div>
+                <a href="{{ path('app_commercant_livreurs') }}" class="btn btn-outline-secondary w-100 mt-3 btn-sm">
+                    <i class="bi bi-list-ul"></i> Gérer les livreurs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ══ MODAL ASSIGNATION ══ #}
+<div class="lv-overlay" id="lvOverlay">
+    <div class="lv-modal">
+        <div class="lv-head">
+            <div class="lv-head-ico"><i class="bi bi-truck"></i></div>
+            <div><h5>Assigner un livreur</h5><p>{{ commande.reference }}</p></div>
+            <button class="lv-close" onclick="closeModal()"><i class="bi bi-x"></i></button>
+        </div>
+
+        <div class="lv-body">
+            <div class="lv-tabs">
+                <button class="lv-tab active" id="tabP" onclick="switchTab('propres')">
+                    <i class="bi bi-person-badge"></i> Internes
+                    <span class="lv-tab-badge" id="cntP">{{ livreursPropres|length }}</span>
+                </button>
+                <button class="lv-tab" id="tabA" onclick="switchTab('partenaires')">
+                    <i class="bi bi-building"></i> Partenaires
+                    <span class="lv-tab-badge" id="cntA">{{ livreursPartenaires|length }}</span>
+                </button>
+            </div>
+
+            <input type="text" class="lv-search" id="lvSearch"
+                   placeholder="Rechercher par nom, téléphone, zone..."
+                   oninput="filterCards(this.value)">
+
+            {# PROPRES #}
+            <div id="panelP">
+                {% if livreursPropres|length > 0 %}
+                <div class="lv-grid">
+                    {% for l in livreursPropres %}
+                    <div class="lv-card {{ commande.livreur and commande.livreur.id == l.id ? 'selected' : '' }}"
+                         data-id="{{ l.id }}"
+                         data-nom="{{ l.nomComplet }}"
+                         data-tel="{{ l.telephone }}"
+                         data-search="{{ (l.nomComplet ~ ' ' ~ l.telephone ~ ' ' ~ (l.zonesCouvertes ?? ''))|lower }}">
+                        <div class="lv-card-top">
+                            <div class="lv-avatar">{{ l.prenom|slice(0,1) }}{{ l.nom|slice(0,1) }}</div>
+                            <div>
+                                <div class="lv-card-name">{{ l.nomComplet }}</div>
+                                <div class="lv-card-tel">{{ l.telephone }}</div>
+                            </div>
+                        </div>
+                        <div class="lv-card-tags">
+                            <span class="lv-tag">{{ l.vehiculeLibelle }}</span>
+                            {% if l.zonesCouvertes %}<span class="lv-tag green"><i class="bi bi-geo-alt"></i> {{ l.zonesCouvertes }}</span>{% endif %}
+                            {% if l.note %}<span class="lv-tag">⭐ {{ l.note|number_format(1) }}</span>{% endif %}
+                            <span class="lv-tag">{{ l.nombreLivraisons }} livr.</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="lv-empty"><i class="bi bi-person-x"></i> Aucun livreur interne disponible.</div>
+                {% endif %}
+            </div>
+
+            {# PARTENAIRES #}
+            <div id="panelA" style="display:none;">
+                {% if livreursPartenaires|length > 0 %}
+                <div class="lv-grid">
+                    {% for l in livreursPartenaires %}
+                    <div class="lv-card {{ commande.livreur and commande.livreur.id == l.id ? 'selected' : '' }}"
+                         data-id="{{ l.id }}"
+                         data-nom="{{ l.nomComplet }}"
+                         data-tel="{{ l.telephone }}"
+                         data-search="{{ (l.nomComplet ~ ' ' ~ l.telephone ~ ' ' ~ (l.zonesCouvertes ?? '') ~ ' ' ~ (l.societePartenaire ?? ''))|lower }}">
+                        <div class="lv-card-top">
+                            <div class="lv-avatar p">
+                                {% if l.societePartenaire %}{{ l.societePartenaire|slice(0,2)|upper }}{% else %}{{ l.prenom|slice(0,1) }}{{ l.nom|slice(0,1) }}{% endif %}
+                            </div>
+                            <div>
+                                <div class="lv-card-name">{{ l.societePartenaire ?? l.nomComplet }}</div>
+                                <div class="lv-card-tel">{{ l.telephone }}</div>
+                            </div>
+                        </div>
+                        <div class="lv-card-tags">
+                            <span class="lv-tag">{{ l.vehiculeLibelle }}</span>
+                            {% if l.zonesCouvertes %}<span class="lv-tag green"><i class="bi bi-geo-alt"></i> {{ l.zonesCouvertes }}</span>{% endif %}
+                            {% if l.note %}<span class="lv-tag">⭐ {{ l.note|number_format(1) }}</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="lv-empty"><i class="bi bi-building-x"></i> Aucun partenaire disponible.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lv-footer">
+            <button class="btn-lv-cancel" onclick="closeModal()"><i class="bi bi-x"></i> Annuler</button>
+            <button class="btn-lv-ok" id="btnOk" disabled onclick="confirmer()">
+                <i class="bi bi-check-lg"></i> Assigner ce livreur
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="cm-toast" id="toast"><i class="bi bi-check-circle-fill" style="color:#00B37E;"></i><span id="toastMsg"></span></div>
+
+<script>
+// ════════════════════════════════════════════
+//  MODAL LIVREUR — avec fix click enfants
+// ════════════════════════════════════════════
+
+let selectedId  = null;
+let selectedNom = null;
+let selectedTel = null;
+
+// ── Ouvrir / Fermer ──────────────────────
+function openModal()  { document.getElementById('lvOverlay').classList.add('open'); }
+function closeModal() {
+    document.getElementById('lvOverlay').classList.remove('open');
+    selectedId = null;
+    document.querySelectorAll('.lv-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('btnOk').disabled = true;
+}
+document.getElementById('lvOverlay').addEventListener('click', e => { if(e.target === e.currentTarget) closeModal(); });
+
+// ── ✅ FIX CLICK — utilise closest() ──────
+document.querySelectorAll('.lv-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        // closest() remonte l'arbre DOM pour trouver le vrai .lv-card
+        const c = e.target.closest('.lv-card');
+        if (!c) return;
+
+        document.querySelectorAll('.lv-card').forEach(x => x.classList.remove('selected'));
+        c.classList.add('selected');
+
+        selectedId  = c.dataset.id;
+        selectedNom = c.dataset.nom;
+        selectedTel = c.dataset.tel;
+
+        console.log('Livreur sélectionné :', selectedId, selectedNom); // debug
+        document.getElementById('btnOk').disabled = false;
+    });
+});
+
+// ── Onglets ──────────────────────────────
+function switchTab(t) {
+    document.getElementById('panelP').style.display = t === 'propres'    ? '' : 'none';
+    document.getElementById('panelA').style.display = t === 'partenaires' ? '' : 'none';
+    document.getElementById('tabP').classList.toggle('active', t === 'propres');
+    document.getElementById('tabA').classList.toggle('active', t === 'partenaires');
+    document.getElementById('lvSearch').value = '';
+    filterCards('');
+}
+
+// ── Filtre recherche ─────────────────────
+function filterCards(q) {
+    const lq = q.toLowerCase();
+    document.querySelectorAll('.lv-card').forEach(c => {
+        c.style.display = c.dataset.search.includes(lq) ? '' : 'none';
+    });
+}
+
+// ── Confirmer assignation ─────────────────
+function confirmer() {
+    if (!selectedId) { showToast('❌ Sélectionnez un livreur.'); return; }
+
+    const btn = document.getElementById('btnOk');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Assignation...';
+
+    const fd = new FormData();
+    fd.append('livreur_id', selectedId);
+    fd.append('_token', '{{ csrf_token("assign" ~ commande.id) }}');
+
+    console.log('Envoi livreur_id =', selectedId); // debug
+
+    fetch('{{ path("app_commercant_commande_assign_livreur", {"id": commande.id}) }}', {
+        method: 'POST',
+        body: fd
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            closeModal();
+            showToast('✅ ' + res.message);
+            setTimeout(() => location.reload(), 1800);
+        } else {
+            showToast('❌ ' + res.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Assigner ce livreur';
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        showToast('❌ Erreur réseau.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-lg"></i> Assigner ce livreur';
+    });
+}
+
+// ── Toast ────────────────────────────────
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+{% endblock %}

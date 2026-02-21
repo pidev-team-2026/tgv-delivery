@@ -34,7 +34,7 @@ final class CommandeController extends AbstractController
 
     // ── ADMIN CRUD ────────────────────────────
 
-    #[Route(name: 'admin_commande_index', methods: ['GET'])]
+    #[Route(name: 'wajih_commande_index', methods: ['GET'])]
     public function index(Request $request, CommandeRepository $commandeRepository): Response
     {
         $search = $request->query->get('search', '');
@@ -54,7 +54,7 @@ final class CommandeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_commande_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'wajih_commande_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $commande = new Commande();
@@ -64,7 +64,7 @@ final class CommandeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($commande);
             $entityManager->flush();
-            return $this->redirectToRoute('admin_commande_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('wajih_commande_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('commande/new.html.twig', [
@@ -170,13 +170,13 @@ final class CommandeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_commande_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}', name: 'wajih_commande_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(Commande $commande): Response
     {
         return $this->render('commande/show.html.twig', ['commande' => $commande]);
     }
 
-    #[Route('/{id}/edit', name: 'app_commande_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}/edit', name: 'wajih_commande_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(CommandeType::class, $commande);
@@ -184,19 +184,19 @@ final class CommandeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-            return $this->redirectToRoute('admin_commande_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('wajih_commande_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('commande/edit.html.twig', ['commande' => $commande, 'form' => $form]);
     }
 
-    #[Route('/{id}', name: 'app_commande_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[Route('/{id}', name: 'wajih_commande_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Commande $commande, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $commande->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($commande);
             $entityManager->flush();
         }
-        return $this->redirectToRoute('admin_commande_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('wajih_commande_index', [], Response::HTTP_SEE_OTHER);
     }
 }

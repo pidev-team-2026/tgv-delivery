@@ -55,9 +55,9 @@
                             const type = document.getElementById('search-type-select').value;
                             const search = document.getElementById('global-search-input').value;
                             if (type === 'produits') {
-                                this.action = '{{ path('app_produit_index') }}';
+                                this.action = '{{ path('wajih_produit_index') }}';
                             } else {
-                                this.action = '{{ path('app_commande_index') }}';
+                                this.action = '{{ path('wajih_commande_index') }}';
                             }
                         });
                     </script>
@@ -96,9 +96,9 @@
                             document.getElementById('mobile-search-form').addEventListener('submit', function(e) {
                                 const type = document.getElementById('mobile-search-type').value;
                                 if (type === 'produits') {
-                                    this.action = '{{ path('app_produit_index') }}';
+                                    this.action = '{{ path('wajih_produit_index') }}';
                                 } else {
-                                    this.action = '{{ path('app_commande_index') }}';
+                                    this.action = '{{ path('wajih_commande_index') }}';
                                 }
                             });
                         </script>

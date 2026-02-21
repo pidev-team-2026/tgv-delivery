@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin', name: 'admin_')]
 class DashboardController extends AbstractController
 {
-    #[Route('/', name: 'dashboard')]
+    #[Route('/', name: 'wajih_dashboard')]
     public function index(CommandeRepository $commandeRepository, ProduitRepository $produitRepository): Response
     {
         $totalCommandes = $commandeRepository->count([]);

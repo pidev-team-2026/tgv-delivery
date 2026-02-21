@@ -1,0 +1,110 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Ajouter un livreur - Espace Admin{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1><i class="bi bi-person-plus"></i> Ajouter un livreur</h1>
+        <p class="text-muted">Ajouter un nouveau livreur interne ou partenaire</p>
+    </div>
+    <a href="{{ path('admin_livreurs') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person"></i> Informations du livreur</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="nom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" name="prenom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Téléphone *</label>
+                            <input type="tel" name="telephone" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Type *</label>
+                            <select name="type" class="form-control" required>
+                                <option value="propre">Livreur interne</option>
+                                <option value="partenaire">Livreur partenaire</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Véhicule</label>
+                            <select name="vehicule" class="form-control">
+                                <option value="voiture">Voiture</option>
+                                <option value="moto">Moto</option>
+                                <option value="velo">Vélo</option>
+                                <option value="scooter">Scooter</option>
+                                <option value="camion">Camion</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Immatriculation</label>
+                            <input type="text" name="immatriculation" class="form-control">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Société (partenaires uniquement)</label>
+                            <input type="text" name="societePartenaire" class="form-control" 
+                                   placeholder="Nom de la société partenaire">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Zones couvertes</label>
+                            <textarea name="zonesCouvertes" class="form-control" rows="3" 
+                                      placeholder="Ex: Tunis, Ariana, Manouba..."></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg"></i> Ajouter le livreur
+                                </button>
+                                <a href="{{ path('admin_livreurs') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x"></i> Annuler
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informations</h5>
+            </div>
+            <div class="card-body">
+                <h6>Types de livreurs</h6>
+                <ul class="list-unstyled">
+                    <li><strong>Interne :</strong> Employé directement par votre entreprise</li>
+                    <li><strong>Partenaire :</strong> Prestataire externe</li>
+                </ul>
+                
+                <h6 class="mt-3">Statuts possibles</h6>
+                <ul class="list-unstyled">
+                    <li><span class="badge bg-success">Disponible</span> - Prêt pour les livraisons</li>
+                    <li><span class="badge bg-warning">En livraison</span> - Actuellement en course</li>
+                    <li><span class="badge bg-danger">Inactif</span> - Non disponible</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -28,8 +28,8 @@
                 <td>{{ commande.dateMisAjour ? commande.dateMisAjour|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ commande.reference }}</td>
                 <td>
-                    <a href="{{ path('app_commande_show', {'id': commande.id}) }}">show</a>
-                    <a href="{{ path('app_commande_edit', {'id': commande.id}) }}">edit</a>
+                    <a href="{{ path('wajih_commande_show', {'id': commande.id}) }}">show</a>
+                    <a href="{{ path('wajih_commande_edit', {'id': commande.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -40,5 +40,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_commande_new') }}">Creé une nouvelle commande</a>
+    <a href="{{ path('wajih_commande_new') }}">Creé une nouvelle commande</a>
 {% endblock %}

@@ -59,25 +59,21 @@ class Commande
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
-    // ── NOUVEAUX CHAMPS ───────────────────────────
+    // ── PROMO + GOUVERNORAT ───────────────────
 
-    /** Code promo saisi par le client */
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $codePromo = null;
 
-    /** Montant de la remise en TND */
     #[ORM\Column(nullable: true)]
     private ?float $remise = 0;
 
-    /** Gouvernorat sélectionné */
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $gouvernorat = null;
 
-    /** Estimation livraison en minutes */
     #[ORM\Column(nullable: true)]
     private ?int $estimationLivraison = null;
 
-    // ─────────────────────────────────────────────
+    // ── DATES ─────────────────────────────────
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateLivraisonSouhaitee = null;
@@ -85,17 +81,26 @@ class Commande
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateLivraisonEffective = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $livreur = null;
+    // ── RELATION LIVREUR ──────────────────────
+    // ✅ Remplace l'ancien champ string $livreur
+    #[ORM\ManyToOne(targetEntity: Livreur::class, inversedBy: 'commandes')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Livreur $livreur = null;
+
+    // ── PRODUITS ──────────────────────────────
 
     #[ORM\ManyToMany(targetEntity: Produit::class)]
     private Collection $produits;
+
+    // ── TIMESTAMPS ────────────────────────────
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $dateCreation = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $dateMisAjour = null;
+
+    // ═════════════════════════════════════════
 
     public function __construct()
     {
@@ -112,64 +117,103 @@ class Commande
     }
 
     #[ORM\PreUpdate]
-    public function onPreUpdate(): void { $this->dateMisAjour = new \DateTime(); }
+    public function onPreUpdate(): void
+    {
+        $this->dateMisAjour = new \DateTime();
+    }
 
     private function generateReference(): void
     {
         $this->reference = 'CMD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
     }
 
-    // Getters & Setters
+    // ═══════════════════════════════════════════
+    //  GETTERS & SETTERS
+    // ═══════════════════════════════════════════
+
     public function getId(): ?int { return $this->id; }
+
     public function getReference(): ?string { return $this->reference; }
     public function setReference(string $r): static { $this->reference = $r; return $this; }
+
     public function getTotalPrix(): ?float { return $this->totalPrix; }
     public function setTotalPrix(float $t): static { $this->totalPrix = $t; return $this; }
+
     public function getStatut(): ?string { return $this->statut; }
     public function setStatut(string $s): static { $this->statut = $s; return $this; }
+
     public function getNomClient(): ?string { return $this->nomClient; }
     public function setNomClient(string $n): static { $this->nomClient = $n; return $this; }
+
     public function getTelephone(): ?string { return $this->telephone; }
     public function setTelephone(string $t): static { $this->telephone = $t; return $this; }
+
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(?string $e): static { $this->email = $e; return $this; }
+
     public function getAdresseLivraison(): ?string { return $this->adresseLivraison; }
     public function setAdresseLivraison(string $a): static { $this->adresseLivraison = $a; return $this; }
+
     public function getVille(): ?string { return $this->ville; }
     public function setVille(string $v): static { $this->ville = $v; return $this; }
+
     public function getCodePostal(): ?string { return $this->codePostal; }
     public function setCodePostal(string $c): static { $this->codePostal = $c; return $this; }
+
     public function getModePaiement(): ?string { return $this->modePaiement; }
     public function setModePaiement(string $m): static { $this->modePaiement = $m; return $this; }
+
     public function isPaiementEffectue(): ?bool { return $this->paiementEffectue; }
     public function setPaiementEffectue(bool $p): static { $this->paiementEffectue = $p; return $this; }
+
     public function getFraisLivraison(): ?float { return $this->fraisLivraison; }
     public function setFraisLivraison(?float $f): static { $this->fraisLivraison = $f; return $this; }
+
     public function getNotes(): ?string { return $this->notes; }
     public function setNotes(?string $n): static { $this->notes = $n; return $this; }
 
-    // Nouveaux
+    // ── Promo ──
     public function getCodePromo(): ?string { return $this->codePromo; }
     public function setCodePromo(?string $c): static { $this->codePromo = $c; return $this; }
+
     public function getRemise(): ?float { return $this->remise; }
     public function setRemise(?float $r): static { $this->remise = $r; return $this; }
+
     public function getGouvernorat(): ?string { return $this->gouvernorat; }
     public function setGouvernorat(?string $g): static { $this->gouvernorat = $g; return $this; }
+
     public function getEstimationLivraison(): ?int { return $this->estimationLivraison; }
     public function setEstimationLivraison(?int $e): static { $this->estimationLivraison = $e; return $this; }
 
+    // ── Dates ──
     public function getDateLivraisonSouhaitee(): ?\DateTime { return $this->dateLivraisonSouhaitee; }
     public function setDateLivraisonSouhaitee(?\DateTime $d): static { $this->dateLivraisonSouhaitee = $d; return $this; }
+
     public function getDateLivraisonEffective(): ?\DateTime { return $this->dateLivraisonEffective; }
     public function setDateLivraisonEffective(?\DateTime $d): static { $this->dateLivraisonEffective = $d; return $this; }
-    public function getLivreur(): ?string { return $this->livreur; }
-    public function setLivreur(?string $l): static { $this->livreur = $l; return $this; }
+
+    // ── Livreur (ManyToOne → Livreur) ────────
+    public function getLivreur(): ?Livreur { return $this->livreur; }
+    public function setLivreur(?Livreur $livreur): static { $this->livreur = $livreur; return $this; }
+
+    // ── Produits ──
     public function getProduits(): Collection { return $this->produits; }
-    public function addProduit(Produit $p): static { if (!$this->produits->contains($p)) $this->produits->add($p); return $this; }
-    public function removeProduit(Produit $p): static { $this->produits->removeElement($p); return $this; }
+    public function addProduit(Produit $p): static
+    {
+        if (!$this->produits->contains($p)) $this->produits->add($p);
+        return $this;
+    }
+    public function removeProduit(Produit $p): static
+    {
+        $this->produits->removeElement($p);
+        return $this;
+    }
+
+    // ── Timestamps ──
     public function getDateCreation(): ?\DateTime { return $this->dateCreation; }
     public function getDateMisAjour(): ?\DateTime { return $this->dateMisAjour; }
 
+    // ── Calcul total ──
     public function getMontantTotal(): float
     {
         return ($this->totalPrix ?? 0) + ($this->fraisLivraison ?? 0) - ($this->remise ?? 0);
