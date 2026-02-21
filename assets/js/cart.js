@@ -1,249 +1,431 @@
-class ShoppingCart {
-    constructor() {
-        this.items = this.loadCart();
-        this.updateCartUI();
-    }
+/**
+ * ═══════════════════════════════════════════════
+ *  CART.JS — TGV DELIVERY
+ *  Panier + Code Promo + Estimation Livraison
+ * ═══════════════════════════════════════════════
+ */
 
-    loadCart() {
-        const saved = localStorage.getItem('tgv_cart');
-        return saved ? JSON.parse(saved) : [];
-    }
+const CART_KEY  = 'tgv_cart';
+const LIVRAISON_DEFAULT = 7.000;
 
-    saveCart() {
-        localStorage.setItem('tgv_cart', JSON.stringify(this.items));
-        this.updateCartUI();
-    }
+// ── État global promo ─────────────────────────
+let promoActif = {
+    code: null,
+    remise: 0,
+    fraisLivraison: LIVRAISON_DEFAULT,
+    label: null
+};
 
-    addItem(id, name, price, image, stock) {
-        const item = this.items.find(i => i.id === id);
-        if (item) {
-            item.quantity++;
+// ── Données panier ────────────────────────────
+const cart = {
+
+    getItems() {
+        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+        catch { return []; }
+    },
+
+    saveItems(items) {
+        localStorage.setItem(CART_KEY, JSON.stringify(items));
+        cartUI.refresh();
+    },
+
+    addItem(id, name, price, originalPrice, image, stock) {
+        const items = this.getItems();
+        const idx   = items.findIndex(i => i.id === id);
+        if (idx >= 0) {
+            if (items[idx].qty < (stock || 99)) items[idx].qty++;
         } else {
-            this.items.push({ id, name, price: parseFloat(price), quantity: 1, image, maxStock: stock });
+            items.push({
+                id,
+                name,
+                price: parseFloat(price),
+                originalPrice: parseFloat(originalPrice || price),
+                image: image || null,
+                stock: stock || 99,
+                qty: 1
+            });
         }
-        this.saveCart();
-        this.showNotification('✓ ' + name + ' ajouté');
-    }
-
-    updateQuantity(id, qty) {
-        const item = this.items.find(i => i.id === id);
-        if (item) {
-            if (qty <= 0) {
-                this.removeItem(id);
-            } else {
-                item.quantity = qty;
-                this.saveCart();
-            }
-        }
-    }
+        this.saveItems(items);
+    },
 
     removeItem(id) {
-        this.items = this.items.filter(i => i.id !== id);
-        this.saveCart();
-    }
+        this.saveItems(this.getItems().filter(i => i.id !== id));
+    },
+
+    updateQty(id, qty) {
+        if (qty <= 0) { this.removeItem(id); return; }
+        const items = this.getItems();
+        const idx   = items.findIndex(i => i.id === id);
+        if (idx >= 0) {
+            items[idx].qty = Math.min(qty, items[idx].stock || 99);
+            this.saveItems(items);
+        }
+    },
 
     clearCart() {
-        if (confirm('Vider le panier ?')) {
-            this.items = [];
-            this.saveCart();
-        }
+        this.saveItems([]);
+        promoActif = { code: null, remise: 0, fraisLivraison: LIVRAISON_DEFAULT, label: null };
+    },
+
+    getTotals() {
+        const items = this.getItems();
+        let subtotal = 0;
+        items.forEach(i => { subtotal += i.price * i.qty; });
+        const remise   = promoActif.remise;
+        const livraison = promoActif.fraisLivraison;
+        return {
+            subtotal,
+            remise,
+            livraison,
+            total: Math.max(0, subtotal - remise) + livraison
+        };
+    },
+
+    getCount() {
+        return this.getItems().reduce((s, i) => s + i.qty, 0);
     }
+};
 
-    getTotal() {
-        return this.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    }
+// ── Formatage TND ─────────────────────────────
+function fmtTND(amount) {
+    return parseFloat(amount).toFixed(3).replace('.', ',') + ' TND';
+}
 
-    getTotalItems() {
-        return this.items.reduce((sum, i) => sum + i.quantity, 0);
-    }
+// ── UI panneau panier ─────────────────────────
+const cartUI = {
 
-    updateCartUI() {
-        const badge = document.querySelector('.cart-badge');
-        if (badge) {
-            const total = this.getTotalItems();
-            badge.textContent = total;
-            badge.style.display = total > 0 ? 'flex' : 'none';
-        }
-        this.renderCartModal();
-    }
+    open() {
+        document.getElementById('cartPanel').classList.add('open');
+        document.getElementById('cartOverlay').classList.add('open');
+        document.body.style.overflow = 'hidden';
+        this.showView('cart');
+        this.refresh();
+    },
 
-    renderCartModal() {
-        const container = document.getElementById('cartItemsList');
-        const empty = document.getElementById('emptyCartMessage');
-        const checkout = document.getElementById('checkoutSection');
-        const total = document.getElementById('cartTotal');
+    close() {
+        document.getElementById('cartPanel').classList.remove('open');
+        document.getElementById('cartOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+    },
 
-        if (!container) return;
+    showView(view) {
+        document.getElementById('cartViewCart').style.display     = view === 'cart'     ? 'flex' : 'none';
+        document.getElementById('cartViewCheckout').style.display = view === 'checkout' ? 'flex' : 'none';
+    },
 
-        if (this.items.length === 0) {
-            container.innerHTML = '';
-            if (empty) empty.style.display = 'block';
-            if (checkout) checkout.style.display = 'none';
+    refresh() {
+        const count = cart.getCount();
+
+        // Badge navbar
+        const badge = document.getElementById('cartNavBadge');
+        if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; }
+
+        // Count header panneau
+        const hCount = document.getElementById('cartPanelCount');
+        if (hCount) hCount.textContent = count;
+
+        this.renderItems(cart.getItems());
+        this.renderTotals();
+    },
+
+    renderItems(items) {
+        const list  = document.getElementById('cartItemsList');
+        const empty = document.getElementById('cartEmpty');
+        const footer = document.getElementById('cartPanelFooter');
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (items.length === 0) {
+            if (empty) empty.style.display = 'flex';
+            list.style.display = 'none';
+            if (footer) footer.style.display = 'none';
             return;
         }
 
         if (empty) empty.style.display = 'none';
-        if (checkout) checkout.style.display = 'block';
+        list.style.display = 'block';
+        if (footer) footer.style.display = 'block';
 
-        container.innerHTML = this.items.map(item => `
-            <div class="cart-item">
-                <div class="cart-item-image">
-                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : '<div class="no-image"><i class="bi bi-image"></i></div>'}
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <div class="cart-item-thumb">
+                    ${item.image ? `<img src="${item.image}" alt="${item.name}">` : '🛍️'}
                 </div>
                 <div class="cart-item-details">
-                    <h6>${item.name}</h6>
-                    <p class="text-muted mb-1">${item.price.toFixed(2)}€</p>
-                    <div class="quantity-control">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="cart.updateQuantity(${item.id}, ${item.quantity - 1})">
-                            <i class="bi bi-dash"></i>
-                        </button>
-                        <input type="number" value="${item.quantity}" min="1" onchange="cart.updateQuantity(${item.id}, parseInt(this.value))" class="form-control form-control-sm">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="cart.updateQuantity(${item.id}, ${item.quantity + 1})">
-                            <i class="bi bi-plus"></i>
-                        </button>
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-unit-price">${fmtTND(item.price)}</div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="cart.updateQty(${item.id}, ${item.qty - 1})">−</button>
+                        <span class="qty-num">${item.qty}</span>
+                        <button class="qty-btn" onclick="cart.updateQty(${item.id}, ${item.qty + 1})">+</button>
                     </div>
                 </div>
-                <div class="cart-item-price">
-                    <strong>${(item.price * item.quantity).toFixed(2)}€</strong>
-                    <button class="btn btn-sm btn-link text-danger" onclick="cart.removeItem(${item.id})">
-                        <i class="bi bi-trash"></i>
+                <div class="cart-item-right">
+                    <span class="cart-item-total">${fmtTND(item.price * item.qty)}</span>
+                    <button class="cart-item-delete" onclick="cart.removeItem(${item.id})">
+                        <i class="bi bi-trash3"></i>
                     </button>
                 </div>
-            </div>
-        `).join('');
+            `;
+            list.appendChild(div);
+        });
+    },
 
-        if (total) total.textContent = this.getTotal().toFixed(2) + '€';
-        this.updateOrderSummary();
+    renderTotals() {
+        const t  = cart.getTotals();
+        const el = id => document.getElementById(id);
+
+        if (el('cartSubtotal'))  el('cartSubtotal').textContent  = fmtTND(t.subtotal);
+        if (el('cartLivraison')) el('cartLivraison').textContent = fmtTND(t.livraison);
+        if (el('cartTotal'))     el('cartTotal').textContent     = fmtTND(t.total);
+
+        // Ligne remise dans le résumé panier
+        const remiseLine = el('cartRemiseLine');
+        if (remiseLine) {
+            remiseLine.style.display = t.remise > 0 ? 'flex' : 'none';
+            const remiseVal = el('cartRemiseVal');
+            if (remiseVal) remiseVal.textContent = '−' + fmtTND(t.remise);
+        }
+    },
+
+    goToCheckout() {
+        this.showView('checkout');
+        this.syncCheckoutTotals();
+
+        // Demander estimation si gouvernorat déjà saisi
+        const gov = document.getElementById('govInput');
+        if (gov && gov.value) fetchEstimation(gov.value);
+    },
+
+    syncCheckoutTotals() {
+        const t  = cart.getTotals();
+        const el = id => document.getElementById(id);
+        if (el('ckSubtotal'))  el('ckSubtotal').textContent  = fmtTND(t.subtotal);
+        if (el('ckRemise'))    el('ckRemise').textContent    = t.remise > 0 ? '−' + fmtTND(t.remise) : '-';
+        if (el('ckLivraison')) el('ckLivraison').textContent = fmtTND(t.livraison);
+        if (el('ckTotal'))     el('ckTotal').textContent     = fmtTND(t.total);
+
+        const remiseLine = el('ckRemiseLine');
+        if (remiseLine) remiseLine.style.display = t.remise > 0 ? 'flex' : 'none';
+    },
+
+    backToCart() {
+        this.showView('cart');
     }
+};
 
-    updateOrderSummary() {
-        const subtotal = this.getTotal();
-        const delivery = document.querySelector('input[name="deliveryType"]:checked');
-        const shipping = delivery && delivery.value === 'express' ? 9.99 : 4.99;
-        const totalAmount = subtotal + shipping;
+// ── CODE PROMO ────────────────────────────────
+function appliquerPromo() {
+    const input = document.getElementById('promoInput');
+    const code  = input ? input.value.trim().toUpperCase() : '';
+    const btn   = document.getElementById('promoBtn');
+    const msg   = document.getElementById('promoMsg');
 
-        const sub = document.getElementById('summarySubtotal');
-        const ship = document.getElementById('summaryShipping');
-        const tot = document.getElementById('summaryTotal');
+    if (!code) return;
 
-        if (sub) sub.textContent = subtotal.toFixed(2) + '€';
-        if (ship) ship.textContent = shipping.toFixed(2) + '€';
-        if (tot) tot.textContent = totalAmount.toFixed(2) + '€';
-    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
 
-    showNotification(msg) {
-        const n = document.createElement('div');
-        n.className = 'alert alert-success cart-notification';
-        n.textContent = msg;
-        document.body.appendChild(n);
-        setTimeout(() => n.classList.add('show'), 10);
-        setTimeout(() => {
-            n.classList.remove('show');
-            setTimeout(() => n.remove(), 300);
-        }, 2000);
-    }
+    const t = cart.getTotals();
+
+    fetch('/commande/api/promo/verifier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, total: t.subtotal })
+    })
+    .then(r => r.json())
+    .then(res => {
+        btn.disabled = false;
+        btn.innerHTML = 'Appliquer';
+
+        if (res.success) {
+            promoActif.code           = res.code;
+            promoActif.remise         = res.remise;
+            promoActif.fraisLivraison = res.fraisLivraison;
+            promoActif.label          = res.label;
+
+            msg.className = 'promo-msg success';
+            msg.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${res.label} appliqué !`;
+
+            cartUI.renderTotals();
+            cartUI.syncCheckoutTotals();
+            showToast('Code promo appliqué 🎉');
+        } else {
+            msg.className = 'promo-msg error';
+            msg.innerHTML = `<i class="bi bi-x-circle-fill"></i> ${res.message}`;
+        }
+        msg.style.display = 'flex';
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Appliquer';
+        msg.className = 'promo-msg error';
+        msg.innerHTML = '<i class="bi bi-x-circle-fill"></i> Erreur de connexion';
+        msg.style.display = 'flex';
+    });
 }
 
-const cart = new ShoppingCart();
+// ── ESTIMATION LIVRAISON ──────────────────────
+function fetchEstimation(gouvernorat) {
+    if (!gouvernorat) return;
 
-function openCartModal() {
-    cart.renderCartModal();
-    new bootstrap.Modal(document.getElementById('cartModal')).show();
+    fetch('/commande/api/livraison/estimation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gouvernorat: gouvernorat.toLowerCase() })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            const box = document.getElementById('estimationLivraison');
+const txt = document.getElementById('estimationText');
+if (box && txt) {
+    txt.textContent = res.label;
+    box.style.display = 'flex';
+}
+        }
+    })
+    .catch(() => {});
 }
 
-function proceedToCheckout() {
-    if (cart.items.length === 0) {
-        alert('Panier vide');
-        return;
+// ── Gouvernorats autocomplete ─────────────────
+const GOUVERNORATS = [
+    'Ariana','Béja','Ben Arous','Bizerte','Gabès','Gafsa','Jendouba',
+    'Kairouan','Kasserine','Kébili','Kef','Mahdia','Manouba','Médenine',
+    'Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse',
+    'Tataouine','Tozeur','Tunis','Zaghouan'
+];
+
+function initGouvernoratInput() {
+    const input = document.getElementById('govInput');
+    const list  = document.getElementById('govList');
+    if (!input || !list) return;
+
+    function render(q) {
+        const filtered = q
+            ? GOUVERNORATS.filter(g => g.toLowerCase().includes(q.toLowerCase()))
+            : GOUVERNORATS;
+        list.innerHTML = filtered.map(g =>
+            `<div class="gov-option" onclick="selectGov('${g}')">${g}</div>`
+        ).join('');
+        list.classList.toggle('open', filtered.length > 0);
     }
-    document.getElementById('cartView').style.display = 'none';
-    document.getElementById('checkoutView').style.display = 'block';
-    document.getElementById('modalTitle').textContent = 'Finaliser ma commande';
-    cart.updateOrderSummary();
+
+    input.addEventListener('focus', () => render(input.value));
+    input.addEventListener('input', () => render(input.value));
+    document.addEventListener('click', e => {
+        if (!input.contains(e.target) && !list.contains(e.target))
+            list.classList.remove('open');
+    });
 }
 
-function backToCart() {
-    document.getElementById('cartView').style.display = 'block';
-    document.getElementById('checkoutView').style.display = 'none';
-    document.getElementById('modalTitle').textContent = 'Mon Panier';
+function selectGov(name) {
+    const input = document.getElementById('govInput');
+    if (input) input.value = name;
+    const list = document.getElementById('govList');
+    if (list) list.classList.remove('open');
+
+    // Déclencher estimation dès qu'un gouvernorat est sélectionné
+    fetchEstimation(name);
+    cartUI.syncCheckoutTotals();
 }
 
+// ── Payment selection ─────────────────────────
+function selectPayment(el) {
+    document.querySelectorAll('.payment-opt').forEach(o => {
+        o.classList.remove('selected');
+        const chk = o.querySelector('.payment-opt-check');
+        if (chk) chk.innerHTML = '';
+    });
+    el.classList.add('selected');
+    const chk = el.querySelector('.payment-opt-check');
+    if (chk) chk.innerHTML = '<i class="bi bi-check"></i>';
+}
+
+// ── Submit commande ───────────────────────────
 function submitOrder(e) {
     e.preventDefault();
-    alert('✅ Commande validée !');
-    cart.clearCart();
-    bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
-    backToCart();
-    document.getElementById('checkoutForm').reset();
+    const form = document.getElementById('checkoutForm');
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Ajouter items + promo
+    data.items          = cart.getItems();
+    data.remise         = promoActif.remise;
+    data.fraisLivraison = promoActif.fraisLivraison;
+    data.codePromo      = promoActif.code;
+
+    // Désactiver le bouton pendant l'envoi
+    const btn = form.querySelector('.btn-valider');
+    const origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enregistrement...';
+
+    fetch('/commande/api/client/commande', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            cart.clearCart();
+            cartUI.close();
+            showToast(`✅ Commande ${res.reference} enregistrée !`);
+            setTimeout(() => window.location.href = '/client/commandes', 2500);
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = origHTML;
+            showToast('❌ Erreur : ' + (res.message || 'Réessayez.'));
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = origHTML;
+        showToast('❌ Erreur de connexion.');
+    });
 }
 
-// ============================================
-// FORMATAGE AUTOMATIQUE CARTE BANCAIRE
-// ============================================
+// ── Toast ─────────────────────────────────────
+function showToast(msg) {
+    const t = document.getElementById('tgvToast');
+    if (!t) return;
+    document.getElementById('tgvToastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-    const cardNumber = document.getElementById('cardNumber');
-    const cardExpiry = document.getElementById('cardExpiry');
-    const cardCvv = document.getElementById('cardCvv');
-    
-    // Formatage numéro de carte (XXXX XXXX XXXX XXXX)
-    if (cardNumber) {
-        cardNumber.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            e.target.value = formattedValue;
+// ── Exposer globalement ───────────────────────
+window.cart            = cart;
+window.cartUI          = cartUI;
+window.showToast       = showToast;
+window.selectGov       = selectGov;
+window.selectPayment   = selectPayment;
+window.submitOrder     = submitOrder;
+window.appliquerPromo  = appliquerPromo;
+window.fetchEstimation = fetchEstimation;
+
+// ── Init ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    cartUI.refresh();
+    initGouvernoratInput();
+
+    const overlay = document.getElementById('cartOverlay');
+    if (overlay) overlay.addEventListener('click', () => cartUI.close());
+
+    const cartBtn = document.getElementById('cartIconBtn');
+    if (cartBtn) cartBtn.addEventListener('click', () => cartUI.open());
+
+    // Promo : Enter key
+    const promoInput = document.getElementById('promoInput');
+    if (promoInput) {
+        promoInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); appliquerPromo(); }
         });
     }
-    
-    // Formatage date expiration (MM/AA)
-    if (cardExpiry) {
-        cardExpiry.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 2) {
-                value = value.substring(0, 2) + '/' + value.substring(2, 4);
-            }
-            e.target.value = value;
-        });
-    }
-    
-    // CVV : seulement chiffres
-    if (cardCvv) {
-        cardCvv.addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-    }
-});
-
-// ============================================
-// AFFICHAGE FORMULAIRES PAIEMENT (MISE À JOUR)
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
-    const cardForm = document.getElementById('cardForm');
-    const googlePayForm = document.getElementById('googlePayForm');
-    const qrCodeForm = document.getElementById('qrCodeForm');
-    
-    if (!paymentRadios.length) return;
-    
-    paymentRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Cacher tous les formulaires
-            if (cardForm) cardForm.style.display = 'none';
-            if (googlePayForm) googlePayForm.style.display = 'none';
-            if (qrCodeForm) qrCodeForm.style.display = 'none';
-            
-            // Afficher le formulaire correspondant
-            if (this.value === 'card' && cardForm) {
-                cardForm.style.display = 'block';
-            } else if (this.value === 'googlepay' && googlePayForm) {
-                googlePayForm.style.display = 'block';
-            } else if (this.value === 'mobile' && qrCodeForm) {
-                qrCodeForm.style.display = 'block';
-            }
-        });
-    });
-    
-    // Afficher le formulaire carte par défaut
-    if (cardForm) cardForm.style.display = 'block';
 });

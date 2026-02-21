@@ -40,17 +40,20 @@ class ProduitType extends AbstractType
                 'mapped' => false,
             ])
             ->add('categorie', ChoiceType::class, [
-                'label' => 'Catégorie',
-                'choices' => [
-                    'Entrées' => 'Entrées',
-                    'Plats principaux' => 'Plats principaux',
-                    'Desserts' => 'Desserts',
-                    'Boissons' => 'Boissons',
-                    'Snacks' => 'Snacks',
-                    'Autres' => 'Autres',
-                ],
-                'required' => true,
-            ])
+    'choices' => [
+        'Restauration'  => 'Restauration',
+        'Boissons'      => 'Boissons',
+        'Desserts'      => 'Desserts',
+        'Snacks'        => 'Snacks',
+        'Épicerie'      => 'Épicerie',
+        'Pharmacie'     => 'Pharmacie',
+        'Électronique'  => 'Électronique',
+        'Beauté'        => 'Beauté',
+        'Sport'         => 'Sport',
+        'Maison'        => 'Maison',
+        'Autres'        => 'Autres',
+    ],
+])
             ->add('statut', ChoiceType::class, [
                 'label' => 'Statut',
                 'choices' => [

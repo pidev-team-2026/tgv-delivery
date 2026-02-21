@@ -4,157 +4,542 @@
    =================================== */
 
 /* Hero sections avec gradient */
-.hero {
-    background: linear-gradient(135deg, #1e3a5f 0%, #2ecc71 100%);
-    color: white;
-    padding: 3rem 0;
-    text-align: center;
-    margin-bottom: 2rem;
-}
 
-.hero h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.hero p {
-    font-size: 1.2rem;
-    opacity: 0.9;
-}
-
-/* Cards modernes */
-.card {
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(30, 58, 95, 0.15);
-}
-
-/* Produits */
-.product-card {
-    border: none;
-    border-radius: 15px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.2);
-}
-
-.product-image {
+/* ===================================
+   HERO SECTION AVEC IMAGE 3D (ORIGINAL)
+   =================================== */
+.hero-section {
     position: relative;
-    height: 200px;
-    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2ecc71 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
-.product-image i {
-    font-size: 3rem;
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1200px;
+    width: 100%;
+    padding: 2rem;
+    align-items: center;
+}
+
+.hero-left {
+    text-align: center;
     color: white;
+    z-index: 2;
 }
 
-.product-badge {
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 1s ease;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease 0.2s both;
+}
+
+.hero-features {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    animation: fadeInUp 1s ease 0.4s both;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+}
+
+.feature-item i {
+    font-size: 1.5rem;
+    color: #2ecc71;
+}
+
+.hero-right {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===================================
+   IMAGE 3D ANIMÉE (ORIGINAL)
+   =================================== */
+.delivery-3d-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    perspective: 1000px;
+    animation: float 6s ease-in-out infinite;
+    margin: 0 auto;
+}
+
+.delivery-3d-box {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: rotate3d 20s linear infinite;
+}
+
+.delivery-3d-face {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 0.5rem 1rem;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(46, 204, 113, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
     border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
 }
 
-.badge-disponible {
+.delivery-3d-face.front { transform: translateZ(200px); }
+.delivery-3d-face.back { transform: rotateY(180deg) translateZ(200px); }
+.delivery-3d-face.right { transform: rotateY(90deg) translateZ(200px); }
+.delivery-3d-face.left { transform: rotateY(-90deg) translateZ(200px); }
+.delivery-3d-face.top { transform: rotateX(90deg) translateZ(200px); }
+.delivery-3d-face.bottom { transform: rotateX(-90deg) translateZ(200px); }
+
+/* ===================================
+   SECTION ADRESSE AVEC CARTE INLINE
+   =================================== */
+.address-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    margin-top: 3rem;
+    animation: fadeInUp 1s ease 0.6s both;
+}
+
+.address-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.address-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Champ adresse avec autocomplete */
+.address-input-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.address-input-group {
+    position: relative;
+    flex: 1;
+}
+
+.address-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.address-input:focus {
+    outline: none;
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+.address-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+/* Suggestions autocomplete */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #2ecc71;
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: -13px;
+    display: none;
+}
+
+.autocomplete-suggestions.active {
+    display: block;
+}
+
+.suggestion-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.suggestion-item:hover {
+    background: #f8f9fa;
+    color: #2ecc71;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item i {
+    color: #2ecc71;
+    font-size: 1.1rem;
+}
+
+.suggestion-item .suggestion-main {
+    font-weight: 600;
+    color: #1e3a5f;
+}
+
+.suggestion-item .suggestion-sub {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Bouton toggle carte */
+.map-toggle-btn {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     color: white;
-}
-
-.badge-rupture {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-}
-
-.badge-bientot {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: white;
-}
-
-.badge-archive {
-    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-    color: white;
-}
-
-/* Commandes */
-.order-card {
     border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.map-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.map-toggle-btn.active {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.map-toggle-btn i {
+    font-size: 1.3rem;
+}
+
+/* Conteneur carte inline */
+.inline-map-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, margin 0.5s ease;
+    border-radius: 15px;
+    margin: 0;
+}
+
+.inline-map-container.active {
+    max-height: 600px;
+    margin: 1rem 0;
+}
+
+.map-wrapper {
+    background: white;
     border-radius: 15px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 2px solid #2ecc71;
 }
 
-.order-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.2);
-}
-
-.order-header {
+.map-controls-bar {
     background: linear-gradient(135deg, #1e3a5f, #2ecc71);
     color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 15px 15px 0 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.order-status {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+.map-controls-bar h4 {
+    margin: 0;
+    font-size: 1.1rem;
     font-weight: 600;
-    text-transform: uppercase;
 }
 
-.status-en_attente {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: white;
+.map-quick-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
-.status-confirmee {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+.map-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
     color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-.status-preparation {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    color: white;
+.map-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
-.status-prete {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-    color: white;
+.map-display {
+    position: relative;
 }
 
-.status-livraison {
-    background: linear-gradient(135deg, #1abc9c, #16a085);
-    color: white;
+#inlineMap {
+    width: 100%;
+    height: 500px;
+    z-index: 1;
 }
 
-.status-livree {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-    color: white;
+.map-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 1000;
+    display: none;
 }
 
-.status-annulee {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
+.map-loading.active {
+    display: block;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2ecc71;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+/* Infos sélection */
+.selected-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-top: 2px solid #e9ecef;
+    display: none;
+}
+
+.selected-info.active {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-info-text {
+    flex: 1;
+}
+
+.selected-info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.selected-info-value {
+    color: #1e3a5f;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.use-location-btn {
+    background: #2ecc71;
     color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.use-location-btn:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+}
+
+/* Bouton livrer ici */
+.deliver-button {
+    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.deliver-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+}
+
+.deliver-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Custom Marker */
+.custom-marker {
+    background: #2ecc71;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.5);
+    border: 3px solid white;
+}
+
+/* ===================================
+   ANIMATIONS
+   =================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes rotate3d {
+    from { transform: rotateX(0) rotateY(0); }
+    to { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===================================
+   RESPONSIVE
+   =================================== */
+@media (max-width: 992px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .delivery-3d-container {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .address-input-wrapper {
+        flex-direction: column;
+    }
+    
+    .map-toggle-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-features {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .delivery-3d-container {
+        width: 250px;
+        height: 250px;
+    }
+    
+    #inlineMap {
+        height: 400px;
+    }
+    
+    .map-controls-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .selected-info.active {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }

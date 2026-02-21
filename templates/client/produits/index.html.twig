@@ -3,297 +3,336 @@
 {% block title %}Nos produits - TGV Delivery{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ asset('css/client-pages.css') }}">
+<link rel="stylesheet" href="{{ asset('css/products-page.css') }}">
 {% endblock %}
 
 {% block hero %}
 <div class="hero">
     <h1><i class="bi bi-bag"></i> Nos Produits</h1>
-    <p>Découvrez notre sélection de produits livrés rapidement à votre domicile</p>
+    <p>Découvrez notre sélection livrée rapidement partout en Tunisie</p>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- FILTRES -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Rechercher un produit..." id="searchInput">
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="statusFilter">
-                                <option value="">Tous les statuts</option>
-                                <option value="disponible">Disponible</option>
-                                <option value="rupture">En rupture</option>
-                                <option value="bientot_disponible">Bientôt disponible</option>
-                                <option value="archive">Archivé</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-primary w-100" onclick="filterProducts()">
-                                <i class="bi bi-search"></i> Filtrer
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+{# ─────────────────────────────────────────────
+   BARRE FILTRES + RECHERCHE
+───────────────────────────────────────────── #}
+<div class="filter-bar">
+
+    <div class="search-bar-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher un produit...">
+    </div>
+
+    <button class="filter-pill active" id="pill-all" onclick="filterByStatus('', this)">
+        Tous
+    </button>
+    <button class="filter-pill" id="pill-promo" onclick="filterByStatus('promo', this)">
+        <i class="bi bi-tag-fill" style="color:#e84545;"></i> Offres
+    </button>
+    <button class="filter-pill" id="pill-disponible" onclick="filterByStatus('disponible', this)">
+        <i class="bi bi-check-circle-fill" style="color:#00B37E;"></i> Disponible
+    </button>
+    <button class="filter-pill" id="pill-rupture" onclick="filterByStatus('rupture', this)">
+        <i class="bi bi-x-circle-fill" style="color:#f59e0b;"></i> Rupture
+    </button>
+
+    <span class="results-count" id="resultsCount" style="margin-left:auto;">
+        <strong id="countNum">0</strong> produit(s)
+    </span>
+</div>
+
+{# ─────────────────────────────────────────────
+   CATÉGORIES HORIZONTALES (icônes + titre)
+   Adapte les catégories à celles de ta BDD
+───────────────────────────────────────────── #}
+<div class="categories-row" id="categoriesRow">
+    <button class="cat-chip active" data-cat="" onclick="filterByCategory('', this)">
+        <span class="cat-chip-icon">🛒</span>
+        <span class="cat-chip-label">Tout</span>
+    </button>
+    <button class="cat-chip" data-cat="plats principaux" onclick="filterByCategory('plats principaux', this)">
+        <span class="cat-chip-icon">🍽️</span>
+        <span class="cat-chip-label">Restauration</span>
+    </button>
+    <button class="cat-chip" data-cat="boissons" onclick="filterByCategory('boissons', this)">
+        <span class="cat-chip-icon">🥤</span>
+        <span class="cat-chip-label">Boissons</span>
+    </button>
+    <button class="cat-chip" data-cat="desserts" onclick="filterByCategory('desserts', this)">
+        <span class="cat-chip-icon">🍰</span>
+        <span class="cat-chip-label">Desserts</span>
+    </button>
+    <button class="cat-chip" data-cat="snacks" onclick="filterByCategory('snacks', this)">
+        <span class="cat-chip-icon">🍟</span>
+        <span class="cat-chip-label">Snacks</span>
+    </button>
+    <button class="cat-chip" data-cat="epicerie" onclick="filterByCategory('epicerie', this)">
+        <span class="cat-chip-icon">🏪</span>
+        <span class="cat-chip-label">Épicerie</span>
+    </button>
+    <button class="cat-chip" data-cat="pharmacie" onclick="filterByCategory('pharmacie', this)">
+        <span class="cat-chip-icon">💊</span>
+        <span class="cat-chip-label">Pharmacie</span>
+    </button>
+    <button class="cat-chip" data-cat="electronique" onclick="filterByCategory('electronique', this)">
+        <span class="cat-chip-icon">📱</span>
+        <span class="cat-chip-label">Électronique</span>
+    </button>
+    <button class="cat-chip" data-cat="beaute" onclick="filterByCategory('beaute', this)">
+        <span class="cat-chip-icon">💄</span>
+        <span class="cat-chip-label">Beauté</span>
+    </button>
+    <button class="cat-chip" data-cat="sport" onclick="filterByCategory('sport', this)">
+        <span class="cat-chip-icon">⚽</span>
+        <span class="cat-chip-label">Sport</span>
+    </button>
+    <button class="cat-chip" data-cat="maison" onclick="filterByCategory('maison', this)">
+        <span class="cat-chip-icon">🏠</span>
+        <span class="cat-chip-label">Maison</span>
+    </button>
+    <button class="cat-chip" data-cat="autres" onclick="filterByCategory('autres', this)">
+        <span class="cat-chip-icon">📦</span>
+        <span class="cat-chip-label">Autres</span>
+    </button>
+</div>
+
+{% if produits|length > 0 %}
+
+    {# ─────────────────────────────────────────────
+       SECTION PROMOS (produits avec réduction)
+    ───────────────────────────────────────────── #}
+    {% set produits_promo = [] %}
+    {% for p in produits %}
+        {% if p.promotion is not null and p.promotion > 0 %}
+            {% set produits_promo = produits_promo|merge([p]) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if produits_promo|length > 0 %}
+    <div id="promoSection" class="mb-5">
+        <div class="section-title">
+            <span class="section-tag promo">🔥 Promos</span>
+            <h2>Offres spéciales</h2>
+        </div>
+
+        <div class="products-grid" id="promoGrid">
+            {% for produit in produits_promo %}
+                {{ _self.product_card(produit, true) }}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# ─────────────────────────────────────────────
+       SECTION TOUS LES PRODUITS
+    ───────────────────────────────────────────── #}
+    <div id="allProductsSection">
+        <div class="section-title">
+            <h2>Tous nos produits</h2>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            {% for produit in produits %}
+                {{ _self.product_card(produit, false) }}
+            {% endfor %}
         </div>
     </div>
 
-    <!-- GRILLE DE PRODUITS -->
-    {% if produits|length > 0 %}
-        <div class="row" id="productsGrid">
-            {% for produit in produits %}
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="product-card">
-                        <!-- IMAGE PLACEHOLDER -->
-                        <div class="product-image">
-                            {% if produit.image %}
-                                <img class="product-img" src="{{ asset(produit.image) }}" alt="{{ produit.nom }}">
-                            {% else %}
-                                <div class="image-placeholder">
-                                    <i class="bi bi-image"></i>
-                                </div>
-                            {% endif %}
-                            {% if produit.statut == 'disponible' %}
-                                <span class="product-badge active">Disponible</span>
-                            {% elseif produit.statut == 'bientot_disponible' %}
-                                <span class="product-badge inactive">Bientôt dispo</span>
-                            {% elseif produit.statut == 'rupture' %}
-                                <span class="product-badge out-of-stock">Rupture</span>
-                            {% else %}
-                                <span class="product-badge inactive">Indisponible</span>
-                            {% endif %}
-                        </div>
+{% else %}
+    <div class="products-empty">
+        <i class="bi bi-inbox"></i>
+        <h5>Aucun produit disponible</h5>
+        <p>Revenez bientôt pour découvrir nos nouveaux produits !</p>
+    </div>
+{% endif %}
 
-                        <!-- CORPS CARTE -->
-                        <div class="product-body">
-                            <!-- TITRE -->
-                            <h5 class="product-title">{{ produit.nom }}</h5>
 
-                            <!-- DESCRIPTION -->
-                            <p class="product-description">
-                                {{ produit.description|slice(0, 80) }}{% if produit.description|length > 80 %}...{% endif %}
-                            </p>
+{# ─────────────────────────────────────────────
+   MACRO — Carte produit
+───────────────────────────────────────────── #}
+{% macro product_card(produit, forceShowDiscount) %}
+    {% set hasDiscount = produit.promotion is not null and produit.promotion > 0 %}
+    {% set discountPct = hasDiscount ? produit.promotion : 0 %}
+    {% set prixFinal   = hasDiscount ? produit.getPrixApresPromotion() : produit.prix %}
+    {% set savings     = hasDiscount ? (produit.prix - prixFinal) : 0 %}
 
-                            <!-- PRIX ET STOCK -->
-                            <div class="product-meta">
-                                <div class="product-price">
-                                    <strong>{{ produit.prix }}€</strong>
-                                </div>
-                                <div class="product-stock">
-                                    {% if produit.stock > 0 %}
-                                        <span class="stock-available">
-                                            <i class="bi bi-check-circle"></i> {{ produit.stock }} en stock
-                                        </span>
-                                    {% else %}
-                                        <span class="stock-unavailable">
-                                            <i class="bi bi-x-circle"></i> Rupture
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            </div>
+    <div
+        class="prod-card"
+        data-name="{{ produit.nom|lower }}"
+        data-statut="{{ produit.statut }}"
+        data-category="{{ produit.categorie|lower }}"
+        data-promo="{{ hasDiscount ? 'true' : 'false' }}"
+    >
+        <div class="prod-img-zone">
+            {% if produit.image %}
+                <img src="{{ asset(produit.image) }}" alt="{{ produit.nom }}">
+            {% else %}
+                <span class="prod-emoji">
+                    {% if 'plats' in produit.categorie|lower %}🍽️
+                    {% elseif 'dessert' in produit.categorie|lower %}🍰
+                    {% elseif 'boisson' in produit.categorie|lower %}🥤
+                    {% elseif 'snack' in produit.categorie|lower %}🍟
+                    {% elseif 'entree' in produit.categorie|lower or 'entrée' in produit.categorie|lower %}🥗
+                    {% else %}🛍️{% endif %}
+                </span>
+            {% endif %}
 
-                            <!-- ACTIONS -->
-                            <div class="product-actions">
-                                <div class="btn-group w-100" role="group">
-                                    <a href="{{ path('app_produit_show', {'id': produit.id}) }}" class="btn btn-sm btn-outline-info">
-                                        <i class="bi bi-eye"></i> Détails
-                                    </a>
-                                    {% if produit.stock > 0 %}
-                                        <button class="btn btn-sm btn-success" onclick="addToCart({{ produit.id }}, '{{ produit.nom }}', {{ produit.prix }})">
-                                            <i class="bi bi-cart-plus"></i> Ajouter
-                                        </button>
-                                    {% else %}
-                                        <button class="btn btn-sm btn-secondary" disabled>
-                                            <i class="bi bi-cart-x"></i> Rupture
-                                        </button>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {% if hasDiscount %}
+                <span class="badge-promo">
+                    <i class="bi bi-tag-fill"></i> -{{ discountPct }}%
+                </span>
+            {% endif %}
+
+            {% if produit.statut == 'rupture' %}
+                <span class="badge-statut rupture">Rupture</span>
+            {% elseif produit.statut == 'bientot_disponible' %}
+                <span class="badge-statut indispo">Bientôt dispo</span>
+            {% endif %}
+        </div>
+
+        <div class="prod-body">
+            <div class="prod-category">{{ produit.categorie }}</div>
+            <div class="prod-name">{{ produit.nom }}</div>
+            <div class="prod-desc">
+                {{ produit.description|slice(0, 60) }}{% if produit.description|length > 60 %}...{% endif %}
+            </div>
+
+            <div class="prod-bottom">
+                <div class="prod-price-block">
+                    {# Prix final après promo #}
+                    <span class="prod-price-final">{{ prixFinal|number_format(2, ',', ' ') }} TND</span>
+                    {# Prix original barré #}
+                    {% if hasDiscount %}
+                        <span class="prod-price-original">{{ produit.prix|number_format(2, ',', ' ') }} TND</span>
+                    {% endif %}
                 </div>
-            {% endfor %}
+
+                {% if produit.statut == 'disponible' and produit.stock > 0 %}
+                    <button
+                        class="btn-add-cart"
+                        onclick="addToCartFromPage(
+                            {{ produit.id }},
+                            '{{ produit.nom|e('js') }}',
+                            {{ prixFinal }},
+                            {{ produit.prix }},
+                            this
+                        )"
+                    >
+                        <i class="bi bi-cart-plus"></i> Ajouter
+                    </button>
+                {% else %}
+                    <button class="btn-add-cart" disabled>
+                        <i class="bi bi-cart-x"></i> Rupture
+                    </button>
+                {% endif %}
+            </div>
+
+            {% if hasDiscount %}
+                <div class="prod-savings">
+                    Vous économisez {{ savings|number_format(2, ',', ' ') }} TND
+                </div>
+            {% endif %}
         </div>
-    {% else %}
-        <div class="alert alert-info text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-            <h4 class="mt-3">Aucun produit disponible</h4>
-            <p>Revenez bientôt pour découvrir nos nouveaux produits !</p>
-        </div>
-    {% endif %}
-</div>
+    </div>
+{% endmacro %}
 
-<style>
-.product-card {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s;
-    overflow: hidden;
-    height: 100%;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-
-.product-image {
-    position: relative;
-    height: 150px;
-    background: linear-gradient(135deg, #1e3a5f, #2ecc71);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.product-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.image-placeholder {
-    color: white;
-    opacity: 0.7;
-}
-
-.image-placeholder i {
-    font-size: 3rem;
-}
-
-.product-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 0.3rem 0.6rem;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: bold;
-}
-
-.product-badge.active {
-    background: #28a745;
-    color: white;
-}
-
-.product-badge.inactive {
-    background: #dc3545;
-    color: white;
-}
-
-.product-badge.out-of-stock {
-    background: #ffc107;
-    color: #212529;
-}
-
-.product-body {
-    padding: 0.85rem 0.9rem;
-    background: white;
-}
-
-.product-title {
-    color: var(--secondary-color);
-    font-size: 1rem;
-    margin-bottom: 0.35rem;
-}
-
-.product-description {
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-bottom: 0.65rem;
-    min-height: 2.8rem;
-}
-
-.product-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-     margin-bottom: 0.75rem;
-}
-.product-actions .btn {
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
-}
-
-.product-price {
-    font-size: 1.3rem;
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-.product-stock {
-    font-size: 0.8rem;
-}
-
-.stock-available {
-    color: #28a745;
-}
-
-.stock-unavailable {
-    color: #dc3545;
-}
-
-.product-actions {
-    padding: 0;
-}
-
-.product-actions .btn {
-    border-radius: 0;
-}
-</style>
 
 <script>
-function filterProducts() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const status = document.getElementById('statusFilter').value;
-    const cards = document.querySelectorAll('#productsGrid .product-card');
-    
-    cards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const matchesSearch = !search || text.includes(search);
-        const matchesStatus = !status || text.includes(status.toLowerCase());
-        
-        if (matchesSearch && matchesStatus) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-function addToCart(id, name, price) {
-    // Récupérer les infos du produit
-    const productCard = event.target.closest('.product-card');
-    const image = productCard.querySelector('.product-img')?.src || null;
-    const stockText = productCard.querySelector('.stock-available')?.textContent;
-    const stock = stockText ? parseInt(stockText.match(/\d+/)[0]) : 99;
-    
-    // Ajouter au panier
-    cart.addItem(id, name, price, image, stock);
-    
-    // Animation bouton
-    const button = event.target.closest('button');
-    const originalHTML = button.innerHTML;
-    button.innerHTML = '<i class="bi bi-check"></i> Ajouté !';
-    button.classList.remove('btn-success');
-    button.classList.add('btn-outline-success');
-    
-    setTimeout(() => {
-        button.innerHTML = originalHTML;
-        button.classList.remove('btn-outline-success');
-        button.classList.add('btn-success');
-    }, 1500);
+// ═══════════════════════════════════════════════
+//  FILTRE PAR CATÉGORIE
+// ═══════════════════════════════════════════════
+let activeCategory = '';
+let activeStatus   = '';
+let searchQuery    = '';
+
+function filterByCategory(cat, el) {
+    activeCategory = cat;
+    document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    applyFilters();
 }
 
-// Activer les filtres au chargement
-document.getElementById('searchInput').addEventListener('input', filterProducts);
-document.getElementById('statusFilter').addEventListener('change', filterProducts);
+function filterByStatus(status, el) {
+    activeStatus = status;
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+
+    // Afficher / masquer section promos
+    const promoSection = document.getElementById('promoSection');
+    if (promoSection) {
+        promoSection.style.display = (status === '' || status === 'promo') ? 'block' : 'none';
+    }
+    applyFilters();
+}
+
+function applyFilters() {
+    const cards = document.querySelectorAll('#productsGrid .prod-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+        const name     = card.dataset.name || '';
+        const statut   = card.dataset.statut || '';
+        const category = card.dataset.category || '';
+        const isPromo  = card.dataset.promo === 'true';
+
+        const matchSearch   = !searchQuery || name.includes(searchQuery.toLowerCase());
+        const matchCategory = !activeCategory || category.includes(activeCategory);
+        const matchStatus   = !activeStatus
+            || activeStatus === 'promo' ? isPromo
+            : statut === activeStatus;
+
+        const show = matchSearch && matchCategory && (
+            activeStatus === ''       ? true :
+            activeStatus === 'promo'  ? isPromo :
+            statut === activeStatus
+        );
+
+        card.closest('.prod-card') ? (card.style.display = show ? '' : 'none') : null;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    document.getElementById('countNum').textContent = visible;
+}
+
+// Recherche en temps réel
+document.getElementById('searchInput').addEventListener('input', function() {
+    searchQuery = this.value.trim();
+    applyFilters();
+});
+
+// Init count
+document.addEventListener('DOMContentLoaded', () => {
+    const total = document.querySelectorAll('#productsGrid .prod-card').length;
+    document.getElementById('countNum').textContent = total;
+});
+
+// ═══════════════════════════════════════════════
+//  AJOUTER AU PANIER
+// ═══════════════════════════════════════════════
+function addToCartFromPage(id, name, price, originalPrice, btn) {
+    // Récupère l'image si présente
+    const card  = btn.closest('.prod-card');
+    const img   = card.querySelector('.prod-img-zone img');
+    const image = img ? img.src : null;
+
+    cart.addItem(id, name, price, originalPrice, image, 99);
+
+    // Animation bouton
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check-lg"></i> Ajouté !';
+    btn.classList.add('added');
+    setTimeout(() => {
+        btn.innerHTML = orig;
+        btn.classList.remove('added');
+    }, 1500);
+
+    // Ouvrir le panier après ajout (optionnel)
+    // cartUI.open();
+}
 </script>
+
+
 {% endblock %}

@@ -37,7 +37,9 @@ class Produit
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La catégorie est requise')]
     #[Assert\Choice(
-        choices: ['Entrées', 'Plats principaux', 'Desserts', 'Boissons', 'Snacks', 'Autres'], 
+        choices: ['Restauration', 'Boissons', 'Desserts', 'Snacks',
+        'Épicerie', 'Pharmacie', 'Électronique',
+        'Beauté', 'Sport', 'Maison', 'Autres'], 
         message: 'La catégorie doit être valide'
     )]
     private ?string $categorie = null;

@@ -6,7 +6,9 @@ use App\Entity\Produit;
 use App\Entity\Commande;
 use App\Repository\ProduitRepository;
 use App\Repository\CommandeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -70,12 +72,33 @@ class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/client/commande/{id}', name: 'client_commande_show')]
+    /** Détails commande côté client */
+    #[Route('/client/commande/{id}', name: 'client_commande_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function commandeShow(Commande $commande): Response
     {
         return $this->render('client/commandes/show.html.twig', [
             'commande' => $commande,
         ]);
+    }
+
+    /** Annuler une commande (seulement si en_attente) */
+    #[Route('/client/commande/{id}/annuler', name: 'client_commande_annuler', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function commandeAnnuler(Commande $commande, EntityManagerInterface $em, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('annuler' . $commande->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token invalide.');
+            return $this->redirectToRoute('client_commandes');
+        }
+
+        if ($commande->getStatut() === 'en_attente') {
+            $commande->setStatut('annulee');
+            $em->flush();
+            $this->addFlash('success', '✅ Commande ' . $commande->getReference() . ' annulée avec succès.');
+        } else {
+            $this->addFlash('error', '❌ Cette commande ne peut plus être annulée (statut : ' . $commande->getStatutLibelle() . ').');
+        }
+
+        return $this->redirectToRoute('client_commandes');
     }
 
     // ========================================
@@ -93,9 +116,6 @@ class ClientController extends AbstractController
     #[Route('/client/reclamations', name: 'client_reclamations')]
     public function reclamations(): Response
     {
-        // TODO: Plus tard, ajouter la logique pour récupérer les réclamations de l'utilisateur
-        // $reclamations = $reclamationRepository->findBy(['user' => $this->getUser()]);
-        
         return $this->render('client/support/reclamations.html.twig');
     }
 
@@ -114,9 +134,6 @@ class ClientController extends AbstractController
     #[Route('/client/partenaires', name: 'client_partenaires')]
     public function partenaires(): Response
     {
-        // TODO: Plus tard, récupérer les partenaires de la base de données
-        // $partenaires = $partenaireRepository->findBy(['actif' => true]);
-        
         return $this->render('client/partenaires/index.html.twig');
     }
 }

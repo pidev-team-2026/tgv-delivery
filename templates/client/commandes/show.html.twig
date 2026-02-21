@@ -1,292 +1,354 @@
 {% extends "client/base_client.html.twig" %}
 
-{% block title %}Commande #{{ commande.reference }} - TGV Delivery{% endblock %}
+{% block title %}Commande {{ commande.reference }} — TGV Delivery{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ asset('css/commande-detailes.css') }}">
+{% endblock %}
 
 {% block hero %}
 <div class="hero">
-    <h1><i class="bi bi-clipboard-check"></i> Détails de la commande</h1>
-    <p>Suivez l'état de votre commande #{{ commande.reference }}</p>
+    <h1><i class="bi bi-receipt"></i> Détails de la commande</h1>
+    <p>Référence : <strong>{{ commande.reference }}</strong></p>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-receipt"></i> Commande #{{ commande.reference }}</h5>
+
+{# ── Parser items depuis notes JSON ── #}
+{% set items = [] %}
+{% if commande.notes %}
+    {% set parsed = commande.notes|json_encode %}
+    {% if parsed is iterable %}{% set items = parsed %}{% endif %}
+{% endif %}
+
+{# ── Index du statut pour le suivi ── #}
+{% set statutOrder = ['en_attente','confirmee','en_preparation','prete','en_livraison','livree'] %}
+{% set currentIdx = 0 %}
+{% for i, s in statutOrder %}
+    {% if s == commande.statut %}{% set currentIdx = i %}{% endif %}
+{% endfor %}
+
+<div class="cmd-page">
+
+    <!-- HEADER -->
+    <div class="cmd-header">
+        <div class="cmd-ref">Commande <span>#{{ commande.reference }}</span></div>
+        <a href="{{ path('client_commandes') }}" class="btn-back-cmd">
+            <i class="bi bi-arrow-left"></i> Mes commandes
+        </a>
+    </div>
+
+    <!-- BADGE STATUT -->
+    <div class="s-badge s-{{ commande.statut }}">
+        {% if commande.statut == 'en_attente' %}<i class="bi bi-hourglass-split"></i> En attente de validation
+        {% elseif commande.statut == 'confirmee' %}<i class="bi bi-check-circle-fill"></i> Confirmée
+        {% elseif commande.statut == 'en_preparation' %}<i class="bi bi-box-seam"></i> En préparation
+        {% elseif commande.statut == 'prete' %}<i class="bi bi-bag-check-fill"></i> Prête à expédier
+        {% elseif commande.statut == 'en_livraison' %}<i class="bi bi-truck"></i> En cours de livraison
+        {% elseif commande.statut == 'livree' %}<i class="bi bi-check2-circle"></i> Livrée ✓
+        {% elseif commande.statut == 'annulee' %}<i class="bi bi-x-circle-fill"></i> Annulée
+        {% else %}{{ commande.statut }}{% endif %}
+    </div>
+
+    <div class="cmd-grid">
+
+        <!-- ═══ COLONNE GAUCHE ═══ -->
+        <div>
+
+            <!-- RÉSUMÉ COMMANDE -->
+            <div class="cc">
+                <div class="cc-head"><i class="bi bi-receipt"></i> Résumé de la commande</div>
+                <div class="cc-body">
+                    <div class="ir">
+                        <span class="ir-l">Référence</span>
+                        <span class="ir-v" style="font-family:monospace;">{{ commande.reference }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Date</span>
+                        <span class="ir-v">{{ commande.dateCreation ? commande.dateCreation|date('d/m/Y à H:i') : '—' }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Client</span>
+                        <span class="ir-v">{{ commande.nomClient }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Email</span>
+                        <span class="ir-v">{{ commande.email ?? '—' }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Téléphone</span>
+                        <span class="ir-v">{{ commande.telephone }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Paiement</span>
+                        <span class="ir-v">
+                            {% if commande.modePaiement == 'carte' %}
+                                <span class="pay-b"><i class="bi bi-credit-card-2-front"></i> Carte bancaire</span>
+                            {% elseif commande.modePaiement == 'virement' %}
+                                <span class="pay-b"><i class="bi bi-bank"></i> Virement bancaire</span>
+                            {% else %}
+                                <span class="pay-b"><i class="bi bi-cash-stack"></i> Paiement à la livraison</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if commande.codePromo %}
+                    <div class="ir">
+                        <span class="ir-l">Code promo</span>
+                        <span class="ir-v" style="color:#00B37E;"><i class="bi bi-tag-fill"></i> {{ commande.codePromo }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="ir">
+                        <span class="ir-l"><i class="bi bi-truck"></i> Frais livraison</span>
+                        <span class="ir-v">{{ commande.fraisLivraison|number_format(3,',','') }} TND</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <!-- STATUT DE LA COMMANDE -->
-                    <div class="order-status-large mb-4">
-                        {% if commande.statut == 'en attente' %}
-                            <div class="status-badge-large bg-warning">
-                                <i class="bi bi-hourglass"></i>
-                                <span>En attente de validation</span>
+
+                {% if commande.remise is defined and commande.remise > 0 %}
+                <div class="remise-band">
+                    <span><i class="bi bi-tag-fill"></i> Remise appliquée</span>
+                    <span>−{{ commande.remise|number_format(3,',','') }} TND</span>
+                </div>
+                {% endif %}
+
+                <div class="total-band">
+                    <span class="total-band-l">TOTAL TTC</span>
+                    <span class="total-band-v">
+                        {{ (commande.totalPrix + commande.fraisLivraison)|number_format(3,',','') }} TND
+                    </span>
+                </div>
+            </div>
+
+            <!-- ARTICLES -->
+            <div class="cc">
+                <div class="cc-head">
+                    <i class="bi bi-bag"></i> Articles commandés
+                    <span style="margin-left:auto;font-size:0.78rem;color:#bbb;font-weight:400;">{{ items|length }} article(s)</span>
+                </div>
+                <div class="cc-body">
+                    {% if items|length > 0 %}
+                        {% for item in items %}
+                        <div class="item-row">
+                            <div class="item-thumb">
+                                {% if item.image is defined and item.image %}
+                                    <img src="{{ item.image }}" alt="{{ item.name }}">
+                                {% else %}🛍️{% endif %}
                             </div>
-                        {% elseif commande.statut == 'confirmée' %}
-                            <div class="status-badge-large bg-info">
-                                <i class="bi bi-check-circle"></i>
-                                <span>Commande confirmée</span>
+                            <div>
+                                <div class="item-n">{{ item.name ?? item.nom ?? 'Produit' }}</div>
+                                <div class="item-q">Quantité : {{ item.qty ?? item.quantite ?? 1 }}</div>
                             </div>
-                        {% elseif commande.statut == 'expédiée' %}
-                            <div class="status-badge-large bg-primary">
-                                <i class="bi bi-box"></i>
-                                <span>Commande expédiée</span>
+                            <div class="item-p">
+                                {{ ((item.price ?? item.prix ?? 0) * (item.qty ?? item.quantite ?? 1))|number_format(3,',','') }} TND
                             </div>
-                        {% elseif commande.statut == 'livrée' %}
-                            <div class="status-badge-large bg-success">
-                                <i class="bi bi-check-lg"></i>
-                                <span>Commande livrée</span>
-                            </div>
-                        {% elseif commande.statut == 'annulée' %}
-                            <div class="status-badge-large bg-danger">
-                                <i class="bi bi-x-circle"></i>
-                                <span>Commande annulée</span>
-                            </div>
-                        {% else %}
-                            <div class="status-badge-large bg-secondary">
-                                <i class="bi bi-question-circle"></i>
-                                <span>{{ commande.statut }}</span>
-                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color:#ccc;text-align:center;font-size:0.84rem;padding:14px 0;">
+                            Détail des articles non disponible.
+                        </p>
+                    {% endif %}
+
+                    <!-- Sous-totaux -->
+                    <div style="border-top:2px solid #f0f0f0;margin-top:14px;padding-top:14px;">
+                        <div class="ir">
+                            <span class="ir-l">Sous-total produits</span>
+                            <span class="ir-v">{{ commande.totalPrix|number_format(3,',','') }} TND</span>
+                        </div>
+                        <div class="ir">
+                            <span class="ir-l"><i class="bi bi-truck"></i> Livraison</span>
+                            <span class="ir-v">{{ commande.fraisLivraison|number_format(3,',','') }} TND</span>
+                        </div>
+                        {% if commande.remise is defined and commande.remise > 0 %}
+                        <div class="ir" style="color:#00B37E;">
+                            <span class="ir-l" style="color:#00B37E;"><i class="bi bi-tag-fill"></i> Remise</span>
+                            <span class="ir-v" style="color:#00B37E;">−{{ commande.remise|number_format(3,',','') }} TND</span>
+                        </div>
                         {% endif %}
-                    </div>
-
-                    <!-- INFORMATIONS PRINCIPALES -->
-                    <div class="order-info">
-                        <div class="info-row">
-                            <strong>Date de commande :</strong>
-                            <span>{{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : '-' }}</span>
+                        <div class="ir">
+                            <span class="ir-l" style="font-family:'Syne',sans-serif;font-weight:800;color:#1a1a1a;font-size:0.95rem;">TOTAL</span>
+                            <span class="ir-v" style="color:#00B37E;font-size:1.1rem;font-family:'Syne',sans-serif;font-weight:800;">
+                                {{ (commande.totalPrix + commande.fraisLivraison)|number_format(3,',','') }} TND
+                            </span>
                         </div>
-                        <div class="info-row">
-                            <strong>Total TTC :</strong>
-                            <span class="price-xlarge">{{ commande.totalPrix }}€</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Nombre d'articles :</strong>
-                            <span>{{ commande.produits|length }} article(s)</span>
-                        </div>
-                    </div>
-
-                    <!-- PRODUITS DE LA COMMANDE -->
-                    <div class="order-products-section">
-                        <h6><i class="bi bi-box"></i> Articles de la commande</h6>
-                        <div class="products-list">
-                            {% for item in commande.produits %}
-                                <div class="order-item">
-                                    <div class="item-image">
-                                        <i class="bi bi-image"></i>
-                                    </div>
-                                    <div class="item-details">
-                                        <h6>{{ item.nom }}</h6>
-                                        <p class="text-muted small">{{ item.description|slice(0, 100) }}{% if item.description|length > 100 %}...{% endif %}</p>
-                                        <div class="item-meta">
-                                            <span class="price">{{ item.prix }}€</span>
-                                            <span class="quantity">× {{ item.quantite|default(1) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- ACTIONS -->
-                    <div class="order-actions-section">
-                        {% if commande.statut == 'en attente' or commande.statut == 'confirmée' %}
-                            <a href="{{ path('client_commande_edit', {'id': commande.id}) }}" class="btn btn-warning">
-                                <i class="bi bi-pencil"></i> Modifier la commande
-                            </a>
-                        {% endif %}
-                        <a href="{{ path('client_commandes') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-arrow-left"></i> Retour à mes commandes
-                        </a>
                     </div>
                 </div>
             </div>
+
+            <!-- BOUTON ANNULER (seulement si en_attente) -->
+            {% if commande.statut == 'en_attente' %}
+            <div class="cc">
+                <div class="cc-body" style="text-align:center;">
+                    <p style="font-size:0.82rem;color:#bbb;margin-bottom:14px;">
+                        Vous pouvez annuler votre commande tant qu'elle est en attente de validation.
+                    </p>
+                    <button class="btn-annuler" onclick="openAnnul()">
+                        <i class="bi bi-x-circle-fill"></i> Annuler cette commande
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
-        <div class="col-md-4">
-            <!-- INFORMATIONS DE LIVRAISON -->
-            <div class="card">
-                <div class="card-header">
-                    <h6><i class="bi bi-truck"></i> Livraison</h6>
-                </div>
-                <div class="card-body">
-                    <div class="delivery-info">
-                        <div class="delivery-row">
-                            <strong>Adresse :</strong>
-                            <p>123 Rue de la Livraison<br>75001 Paris<br>France</p>
-                        </div>
-                        <div class="delivery-row">
-                            <strong>Téléphone :</strong>
-                            <p>+33 1 23 45 67 89</p>
-                        </div>
-                        <div class="delivery-row">
-                            <strong>Email :</strong>
-                            <p>client@tgvdelivery.com</p>
-                        </div>
-                        <div class="delivery-row">
-                            <strong>Mode de livraison :</strong>
-                            <p>Standard (2-3 jours)</p>
-                        </div>
+
+        <!-- ═══ COLONNE DROITE ═══ -->
+        <div>
+
+            <!-- ADRESSE LIVRAISON (vraies données BDD) -->
+            <div class="cc">
+                <div class="cc-head"><i class="bi bi-geo-alt-fill"></i> Livraison</div>
+                <div class="cc-body">
+                    {% if commande.gouvernorat is defined and commande.gouvernorat %}
+                    <div class="ir">
+                        <span class="ir-l">Gouvernorat</span>
+                        <span class="ir-v">{{ commande.gouvernorat }}</span>
                     </div>
-                    
-                    <!-- SUIVI -->
-                    <div class="tracking-section">
-                        <h6><i class="bi bi-geo-alt"></i> Suivi de livraison</h6>
-                        <div class="tracking-placeholder">
-                            <p class="text-muted">Le suivi sera disponible lorsque la commande sera expédiée</p>
-                        </div>
+                    {% endif %}
+                    <div class="ir">
+                        <span class="ir-l">Ville</span>
+                        <span class="ir-v">{{ commande.ville }}</span>
                     </div>
+                    <div class="ir">
+                        <span class="ir-l">Adresse</span>
+                        <span class="ir-v">{{ commande.adresseLivraison }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Code postal</span>
+                        <span class="ir-v">{{ commande.codePostal }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Téléphone</span>
+                        <span class="ir-v">{{ commande.telephone }}</span>
+                    </div>
+                    <div class="ir">
+                        <span class="ir-l">Email</span>
+                        <span class="ir-v">{{ commande.email ?? '—' }}</span>
+                    </div>
+
+                    {% if commande.estimationLivraison is defined and commande.estimationLivraison %}
+                        {% set mins = commande.estimationLivraison %}
+                        <div class="est-box">
+                            <i class="bi bi-clock-fill"></i>
+                            {% if mins < 60 %}
+                                Livraison estimée : {{ mins }} min
+                            {% else %}
+                                Livraison estimée : {{ (mins / 60)|round(0,'floor') }}h{{ mins % 60 > 0 ? '%02d'|format(mins % 60) : '' }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
+            </div>
+
+            <!-- SUIVI EN TEMPS RÉEL -->
+            <div class="cc">
+                <div class="cc-head">
+                    <i class="bi bi-geo-alt"></i> Suivi de commande
+                    {% if commande.statut != 'annulee' and commande.statut != 'livree' %}
+                        <span class="live-dot"></span>
+                    {% endif %}
+                </div>
+                <div class="cc-body">
+
+                    {% if commande.statut == 'annulee' %}
+
+                        <div class="t-step cancelled">
+                            <div class="t-dot"><i class="bi bi-x-lg"></i></div>
+                            <div class="t-info">
+                                <div class="t-lbl">Commande annulée</div>
+                                <div class="t-desc" style="color:#e11d48;">Cette commande a été annulée.</div>
+                            </div>
+                        </div>
+
+                    {% else %}
+
+                    {% set steps = [
+                        {key:'en_attente',     icon:'bi-hourglass-split', lbl:'En attente',       desc:'Commande reçue, en attente de validation'},
+                        {key:'confirmee',      icon:'bi-check-circle',    lbl:'Confirmée',         desc:'Votre commande a été validée'},
+                        {key:'en_preparation', icon:'bi-box-seam',        lbl:'En préparation',    desc:'Préparation de votre colis en cours'},
+                        {key:'prete',          icon:'bi-bag-check',       lbl:'Prête à expédier',  desc:'Votre colis est prêt'},
+                        {key:'en_livraison',   icon:'bi-truck',           lbl:'En livraison',      desc:'Votre colis est en route'},
+                        {key:'livree',         icon:'bi-check2-all',      lbl:'Livrée ✓',          desc:'Commande livrée avec succès'},
+                    ] %}
+
+                    <div class="track-wrap">
+                        {% for i, step in steps %}
+                            {% set isDone = i < currentIdx %}
+                            {% set isCurr = i == currentIdx %}
+                            <div class="t-step {{ isDone ? 'done' : '' }} {{ isCurr ? 'curr' : '' }}">
+                                <div class="t-dot"><i class="bi {{ step.icon }}"></i></div>
+                                <div class="t-info">
+                                    <div class="t-lbl">{{ step.lbl }}</div>
+                                    <div class="t-desc">{{ step.desc }}</div>
+                                    {% if isCurr %}
+                                        <div class="t-date">
+                                            {{ commande.dateCreation ? commande.dateCreation|date('d/m/Y H:i') : '' }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL ANNULATION PROFESSIONNELLE
+══════════════════════════════════════════ -->
+{% if commande.statut == 'en_attente' %}
+<div class="an-overlay" id="anOverlay">
+    <div class="an-modal">
+        <div class="an-top">
+            <div class="an-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <h4>Annuler la commande ?</h4>
+            <p>Cette action est irréversible.</p>
+        </div>
+        <div class="an-body">
+            <div class="an-ref">
+                <i class="bi bi-receipt" style="color:#00B37E;flex-shrink:0;"></i>
+                <span>
+                    Commande : <strong>{{ commande.reference }}</strong>
+                    &nbsp;·&nbsp;
+                    <strong>{{ (commande.totalPrix + commande.fraisLivraison)|number_format(3,',','') }} TND</strong>
+                </span>
+            </div>
+            <div class="an-warn">
+                <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+                <span>
+                    En annulant, votre commande sera définitivement supprimée.
+                    {% if commande.modePaiement != 'especes' %}
+                        Un remboursement sera traité sous 3–5 jours ouvrables.
+                    {% endif %}
+                </span>
+            </div>
+            <div class="an-btns">
+                <button class="btn-an-no" onclick="closeAnnul()">
+                    <i class="bi bi-arrow-left"></i> Non, garder
+                </button>
+                <form method="POST" action="{{ path('client_commande_annuler', {'id': commande.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('annuler' ~ commande.id) }}">
+                    <button type="submit" class="btn-an-yes">
+                        <i class="bi bi-x-circle-fill"></i> Oui, annuler
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-.order-status-large {
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    text-align: center;
-}
+<script>
+function openAnnul() { document.getElementById('anOverlay').classList.add('open'); }
+function closeAnnul() { document.getElementById('anOverlay').classList.remove('open'); }
+document.getElementById('anOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeAnnul();
+});
+</script>
+{% endif %}
 
-.status-badge-large {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-}
-
-.status-badge-large i {
-    font-size: 1.2rem;
-}
-
-.order-info {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 0;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.info-row:last-child {
-    border-bottom: none;
-}
-
-.info-row strong {
-    color: var(--secondary-color);
-}
-
-.price-xlarge {
-    font-size: 1.8rem;
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-.order-products-section {
-    margin-bottom: 2rem;
-}
-
-.products-list {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.order-item {
-    display: flex;
-    align-items: flex-start;
-    padding: 1rem;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-.item-image {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
-    color: white;
-    opacity: 0.8;
-}
-
-.item-details h6 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--secondary-color);
-}
-
-.item-details p {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    color: #6c757d;
-    line-height: 1.4;
-}
-
-.item-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.item-meta .price {
-    font-size: 1.1rem;
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-.item-meta .quantity {
-    background: #e9ecef;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-}
-
-.order-actions-section {
-    display: flex;
-    gap: 1rem;
-}
-
-.delivery-info {
-    margin-bottom: 2rem;
-}
-
-.delivery-row {
-    margin-bottom: 1rem;
-}
-
-.delivery-row strong {
-    color: var(--secondary-color);
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.tracking-section {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.tracking-placeholder {
-    color: #6c757d;
-    font-style: italic;
-}
-</style>
 {% endblock %}

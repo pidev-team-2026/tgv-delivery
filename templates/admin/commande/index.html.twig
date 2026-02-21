@@ -15,7 +15,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <form method="get" action="{{ path('app_commande_index') }}">
+                <form method="get" action="{{ path('admin_commande_index') }}">
                     <div class="row">
                         <div class="col-md-8">
                             <input type="text" 
@@ -30,7 +30,7 @@
                             </button>
                         </div>
                         <div class="col-md-2">
-                            <a href="{{ path('app_commande_index') }}" class="btn btn-outline-secondary w-100">
+                            <a href="{{ path('admin_commande_index') }}" class="btn btn-outline-secondary w-100">
                                 <i class="bi bi-arrow-clockwise"></i> Réinitialiser
                             </a>
                         </div>
@@ -56,7 +56,7 @@
             <thead class="table-light">
                 <tr>
                     <th>
-                        <a href="{{ path('app_commande_index', {
+                        <a href="{{ path('admin_commande_index', {
                             search: search|default(''), 
                             sort: 'id', 
                             order: (sortBy|default('id') == 'id' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -68,7 +68,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_commande_index', {
+                        <a href="{{ path('admin_commande_index', {
                             search: search|default(''), 
                             sort: 'reference', 
                             order: (sortBy|default('id') == 'reference' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -80,7 +80,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_commande_index', {
+                        <a href="{{ path('admin_commande_index', {
                             search: search|default(''), 
                             sort: 'totalPrix', 
                             order: (sortBy|default('id') == 'totalPrix' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -92,7 +92,7 @@
                         </a>
                     </th>
                     <th>
-                        <a href="{{ path('app_commande_index', {
+                        <a href="{{ path('admin_commande_index', {
                             search: search|default(''), 
                             sort: 'statut', 
                             order: (sortBy|default('id') == 'statut' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
@@ -105,7 +105,7 @@
                     </th>
                     <th>Produits</th>
                     <th>
-                        <a href="{{ path('app_commande_index', {
+                        <a href="{{ path('admin_commande_index', {
                             search: search|default(''), 
                             sort: 'dateCreation', 
                             order: (sortBy|default('id') == 'dateCreation' and order|default('DESC') == 'ASC') ? 'DESC' : 'ASC'
