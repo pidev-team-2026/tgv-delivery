@@ -35,7 +35,6 @@
                             </a>
                         </div>
                     </div>
-                    <!-- Garder les paramètres de tri -->
                     <input type="hidden" name="sort" value="{{ sortBy|default('id') }}">
                     <input type="hidden" name="order" value="{{ order|default('DESC') }}">
                 </form>
@@ -160,7 +159,10 @@
                     </td>
                     <td>
                         {% if commande.livreur %}
-                            <span class="badge bg-info">{{ commande.livreur }}</span>
+                            <span class="badge bg-success">
+                                <i class="bi bi-person-check"></i>
+                                {{ commande.livreur.nomComplet }}
+                            </span>
                         {% else %}
                             <span class="text-muted">Non assigné</span>
                         {% endif %}
@@ -191,7 +193,6 @@
                                 </form>
                             {% endif %}
                             
-                            <!-- Dropdown pour changer le statut -->
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" 
                                         data-bs-toggle="dropdown" title="Changer le statut">
@@ -228,18 +229,20 @@
                                 </ul>
                             </div>
                             
-                            <!-- Affecter livreur -->
+                            {# ✅ FIX 1/2 : data-csrf généré par Twig ici au bon moment #}
                             {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
                                 <button type="button" 
                                         class="btn btn-sm btn-outline-primary" 
                                         title="Affecter un livreur"
                                         data-bs-toggle="tooltip"
-                                        onclick="openLivreurModal({{ commande.id }}, '{{ commande.reference }}')">
+                                        data-commande-id="{{ commande.id }}"
+                                        data-commande-ref="{{ commande.reference }}"
+                                        data-csrf="{{ csrf_token('assign' ~ commande.id) }}"
+                                        onclick="openLivreurModal(this)">
                                     <i class="bi bi-truck"></i>
                                 </button>
                             {% endif %}
                             
-                            <!-- Contacter client -->
                             <a href="{{ path('wajih_commercant_commande_contact', {'id': commande.id}) }}" 
                                class="btn btn-sm btn-outline-secondary" 
                                title="Contacter le client"
@@ -247,7 +250,6 @@
                                 <i class="bi bi-envelope"></i>
                             </a>
                             
-                            <!-- Annuler -->
                             {% if commande.statut != 'livree' and commande.statut != 'annulee' %}
                                 <form method="POST" 
                                       action="{{ path('wajih_commercant_commande_cancel', {'id': commande.id}) }}" 
@@ -332,22 +334,29 @@
 
 <div class="cm-toast" id="toast"><i class="bi bi-check-circle-fill" style="color:#00B37E;"></i><span id="toastMsg"></span></div>
 
-
 <script>
-let currentCommandeId = null;
-let selectedLivreurId = null;
-let selectedLivreurNom = null;
-let selectedLivreurTel = null;
-let livreursData = { propres: [], partenaires: [] };
+let currentCommandeId  = null;
+let currentCsrfToken   = null;   // ✅ FIX : stocké ici depuis le bouton
+let selectedLivreurId  = null;
+let livreursData       = { propres: [], partenaires: [] };
 
-// ── Ouvrir / Fermer ──────────────────────
-function openLivreurModal(commandeId, commandeRef) {
-    currentCommandeId = commandeId;
-    document.getElementById('modalCommandeRef').textContent = commandeRef;
+// ── ✅ FIX 2/2 : openLivreurModal reçoit le bouton (this)
+//    et lit ses data-attributes au lieu de chercher une meta
+function openLivreurModal(btn) {
+    currentCommandeId = btn.dataset.commandeId;
+    currentCsrfToken  = btn.dataset.csrf;          // ← token Symfony correct
+    const ref         = btn.dataset.commandeRef;
+
+    document.getElementById('modalCommandeRef').textContent = ref;
     document.getElementById('lvOverlay').classList.add('open');
-    
-    // Charger les livreurs disponibles
-    fetch(`/commercant/commandes/${commandeId}/livreurs-dispo`)
+
+    // Reset
+    selectedLivreurId = null;
+    document.getElementById('btnOk').disabled = true;
+    document.getElementById('gridP').innerHTML = '<p class="text-muted text-center py-3">Chargement...</p>';
+    document.getElementById('gridA').innerHTML = '';
+
+    fetch(`/commercant/commandes/${currentCommandeId}/livreurs-dispo`)
         .then(r => r.json())
         .then(data => {
             livreursData = data;
@@ -370,61 +379,60 @@ document.getElementById('lvOverlay').addEventListener('click', e => {
     if(e.target === e.currentTarget) closeLivreurModal(); 
 });
 
-// ── Rendu des livreurs ─────────────────────
+// ── Rendu des livreurs ────────────────────
 function renderLivreurs() {
-    renderLivreurGrid('propres', livreursData.propres);
+    renderLivreurGrid('propres',     livreursData.propres);
     renderLivreurGrid('partenaires', livreursData.partenaires);
-    
     document.getElementById('cntP').textContent = livreursData.propres.length;
     document.getElementById('cntA').textContent = livreursData.partenaires.length;
-    
-    // Afficher/masquer les messages vide
-    document.getElementById('emptyP').style.display = livreursData.propres.length === 0 ? 'block' : 'none';
+    document.getElementById('emptyP').style.display = livreursData.propres.length     === 0 ? 'block' : 'none';
     document.getElementById('emptyA').style.display = livreursData.partenaires.length === 0 ? 'block' : 'none';
 }
 
 function renderLivreurGrid(type, livreurs) {
     const grid = document.getElementById(type === 'propres' ? 'gridP' : 'gridA');
-    
-    if (livreurs.length === 0) {
-        grid.innerHTML = '';
-        return;
-    }
-    
+    if (livreurs.length === 0) { grid.innerHTML = ''; return; }
+
     grid.innerHTML = livreurs.map(l => `
-        <div class="lv-card" 
+        <div class="lv-card"
              data-id="${l.id}"
              data-nom="${l.nomComplet}"
              data-tel="${l.telephone}"
-             data-search="${(l.nomComplet + ' ' + l.telephone + ' ' + (l.zonesCouvertes || '') + ' ' + (l.societePartenaire || '')).toLowerCase()}">
-            <div class="lv-card-top">
-                <div class="lv-avatar ${type === 'partenaires' ? 'p' : ''}">
-                    ${type === 'partenaires' && l.societePartenaire ? l.societePartenaire.slice(0,2).toUpperCase() : l.nomComplet.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}
+             data-search="${(l.nomComplet+' '+l.telephone+' '+(l.zonesCouvertes||'')+' '+(l.societePartenaire||'')).toLowerCase()}"
+             style="border:2px solid #f0f0f0;border-radius:14px;padding:14px;cursor:pointer;transition:all 0.15s;position:relative;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:40px;height:40px;border-radius:50%;
+                     background:${type==='partenaires'?'linear-gradient(135deg,#3b82f6,#2563eb)':'linear-gradient(135deg,#00B37E,#059669)'};
+                     display:flex;align-items:center;justify-content:center;
+                     color:white;font-weight:800;font-size:0.9rem;flex-shrink:0;">
+                    ${type==='partenaires'&&l.societePartenaire ? l.societePartenaire.slice(0,2).toUpperCase() : l.nomComplet.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)}
                 </div>
                 <div>
-                    <div class="lv-card-name">${l.societePartenaire || l.nomComplet}</div>
-                    <div class="lv-card-tel">${l.telephone}</div>
+                    <div style="font-weight:700;font-size:0.88rem;color:#1a1a1a;">${l.societePartenaire||l.nomComplet}</div>
+                    <div style="font-size:0.76rem;color:#aaa;">${l.telephone}</div>
                 </div>
             </div>
-            <div class="lv-card-tags">
-                <span class="lv-tag">${l.vehiculeLibelle || 'Véhicule'}</span>
-                ${l.zonesCouvertes ? `<span class="lv-tag green"><i class="bi bi-geo-alt"></i> ${l.zonesCouvertes}</span>` : ''}
-                ${l.note ? `<span class="lv-tag">⭐ ${l.note}</span>` : ''}
-                ${l.nombreLivraisons ? `<span class="lv-tag">${l.nombreLivraisons} livr.</span>` : ''}
+            <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                <span style="background:#f5f5f5;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:600;color:#555;">${l.vehiculeLibelle||'—'}</span>
+                ${l.zonesCouvertes ? `<span style="background:#f0fdf9;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:600;color:#059669;">📍 ${l.zonesCouvertes}</span>` : ''}
+                ${l.note           ? `<span style="background:#f5f5f5;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:600;color:#555;">⭐ ${l.note}</span>` : ''}
+                ${l.nombreLivraisons ? `<span style="background:#f5f5f5;border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:600;color:#555;">${l.nombreLivraisons} livr.</span>` : ''}
             </div>
         </div>
     `).join('');
-    
-    // Ajouter les écouteurs d'événements
+
+    // Click sur chaque carte — pas de problème enfants car inline HTML
     grid.querySelectorAll('.lv-card').forEach(card => {
         card.addEventListener('click', function() {
-            document.querySelectorAll('.lv-card').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
-            
+            document.querySelectorAll('.lv-card').forEach(c => {
+                c.style.borderColor = '#f0f0f0';
+                c.style.background  = 'white';
+            });
+            this.style.borderColor = '#00B37E';
+            this.style.background  = '#f0fdf9';
+
             selectedLivreurId = this.dataset.id;
-            selectedLivreurNom = this.dataset.nom;
-            selectedLivreurTel = this.dataset.tel;
-            
+            console.log('Sélectionné id=', selectedLivreurId); // debug
             document.getElementById('btnOk').disabled = false;
         });
     });
@@ -432,7 +440,7 @@ function renderLivreurGrid(type, livreurs) {
 
 // ── Onglets ──────────────────────────────
 function switchLivreurTab(type) {
-    document.getElementById('panelP').style.display = type === 'propres' ? '' : 'none';
+    document.getElementById('panelP').style.display = type === 'propres'    ? '' : 'none';
     document.getElementById('panelA').style.display = type === 'partenaires' ? '' : 'none';
     document.getElementById('tabP').classList.toggle('active', type === 'propres');
     document.getElementById('tabA').classList.toggle('active', type === 'partenaires');
@@ -440,32 +448,29 @@ function switchLivreurTab(type) {
     filterLivreurCards('');
 }
 
-// ── Filtre recherche ─────────────────────
 function filterLivreurCards(query) {
-    const lowerQuery = query.toLowerCase();
     document.querySelectorAll('.lv-card').forEach(card => {
-        card.style.display = card.dataset.search.includes(lowerQuery) ? '' : 'none';
+        card.style.display = card.dataset.search.includes(query.toLowerCase()) ? '' : 'none';
     });
 }
 
-// ── Confirmer assignation ─────────────────
+// ── ✅ Confirmer — utilise currentCsrfToken stocké à l'ouverture
 function confirmerLivreur() {
-    if (!selectedLivreurId) {
-        showToast('❌ Sélectionnez un livreur.');
-        return;
-    }
-    
+    if (!selectedLivreurId) { showToast('❌ Sélectionnez un livreur.'); return; }
+
     const btn = document.getElementById('btnOk');
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Assignation...';
-    
-    const formData = new FormData();
-    formData.append('livreur_id', selectedLivreurId);
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.content || '');
-    
+
+    const fd = new FormData();
+    fd.append('livreur_id', selectedLivreurId);
+    fd.append('_token',     currentCsrfToken);   // ← token correct ici
+
+    console.log('POST livreur_id=', selectedLivreurId, 'token=', currentCsrfToken); // debug
+
     fetch(`/commercant/commandes/${currentCommandeId}/assign-livreur`, {
         method: 'POST',
-        body: formData
+        body: fd
     })
     .then(r => r.json())
     .then(res => {
@@ -481,18 +486,17 @@ function confirmerLivreur() {
     })
     .catch(err => {
         console.error(err);
-        showToast('❌ Erseau.');
+        showToast('❌ Erreur réseau.');
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-lg"></i> Assigner ce livreur';
     });
 }
 
-// ── Toast ────────────────────────────────
 function showToast(msg) {
-    const toast = document.getElementById('toast');
+    const t = document.getElementById('toast');
     document.getElementById('toastMsg').textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3500);
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
 }
 </script>
 {% endblock %}
